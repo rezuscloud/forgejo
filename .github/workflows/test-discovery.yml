@@ -1,0 +1,7 @@
+name: test-discovery
+on: [push]
+jobs:
+  t:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "discovery works"
