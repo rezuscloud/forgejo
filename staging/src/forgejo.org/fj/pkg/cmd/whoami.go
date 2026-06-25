@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"forgejo.org/fj/internal/client"
-	"forgejo.org/fj/internal/keys"
 	"github.com/spf13/cobra"
 )
 
@@ -15,11 +13,7 @@ func newWhoAmICmd() *cobra.Command {
 		Short: "Show the currently authenticated user",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			host, _ := cmd.Flags().GetString("host")
-			if host == "" {
-				return fmt.Errorf("--host is required")
-			}
-			ki, _ := keys.Load()
-			c, err := client.FromKeys(ki, host)
+			c, err := resolveHostClient(cmd, host)
 			if err != nil {
 				return err
 			}
@@ -33,7 +27,7 @@ func newWhoAmICmd() *cobra.Command {
 			if email != "" {
 				fmt.Printf(" <%s>", email)
 			}
-			fmt.Printf(" @ %s\n", host)
+			fmt.Println()
 			return nil
 		},
 	}
