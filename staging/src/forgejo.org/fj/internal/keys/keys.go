@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
 )
 
 // KeyInfo is the top-level auth store, persisted as keys.json.
@@ -23,7 +25,49 @@ type LoginInfo struct {
 	Type         string `json:"type"`          // "Application" or "OAuth"
 	Token        string `json:"token"`
 	RefreshToken string `json:"refresh_token,omitempty"` // OAuth only
-	ExpiresAt    int64  `json:"expires_at,omitempty"`   // OAuth only (unix timestamp)
+	// ExpiresAt is the OAuth token expiry. The Rust CLI writes this as a unix
+	// timestamp integer OR the sentinel string "never" (for Application tokens
+	// that do not expire). We accept either to stay compatible with the Rust
+	// keys.json format.
+	ExpiresAt ExpiresAt `json:"expires_at,omitempty"` // OAuth only
+}
+
+// ExpiresAt tolerates either an integer unix timestamp or the Rust CLI's
+// "never" sentinel string (written for non-expiring Application tokens).
+type ExpiresAt int64
+
+// UnmarshalJSON accepts numbers and strings. "never" (case-insensitive) maps
+// to 0 (no expiry). Numeric strings are parsed as a unix timestamp.
+func (e *ExpiresAt) UnmarshalJSON(data []byte) error {
+	s := strings.TrimSpace(string(data))
+	if s == "" || s == "null" {
+		return nil
+	}
+	if strings.EqualFold(s, `"never"`) || s == `"never"` {
+		*e = 0
+		return nil
+	}
+	// try a plain integer
+	var i int64
+	if err := json.Unmarshal(data, &i); err == nil {
+		*e = ExpiresAt(i)
+		return nil
+	}
+	// fall back to a numeric string
+	var str string
+	if err := json.Unmarshal(data, &str); err == nil {
+		if n, err := strconv.ParseInt(str, 10, 64); err == nil {
+			*e = ExpiresAt(n)
+			return nil
+		}
+		if strings.EqualFold(str, "never") {
+			*e = 0
+			return nil
+		}
+	}
+	// unknown shape — treat as no expiry rather than failing the whole file
+	*e = 0
+	return nil
 }
 
 // keysPath returns the path to keys.json, mirroring the Rust CLI:
@@ -85,6 +129,9 @@ func (ki *KeyInfo) Save() error {
 
 // GetLogin returns the LoginInfo for a host, or nil if not found.
 func (ki *KeyInfo) GetLogin(host string) *LoginInfo {
+	if ki == nil || ki.Hosts == nil {
+		return nil
+	}
 	return ki.Hosts[host]
 }
 
