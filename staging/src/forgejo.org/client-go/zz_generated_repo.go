@@ -174,7 +174,7 @@ func (s *RepoService) GetBlob(ctx context.Context, owner string, repo string, sh
 func (s *RepoService) GetBlobs(ctx context.Context, owner string, repo string, shas string) ([]GitBlob, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/git/blobs", owner, repo))
 	qry := u.Query()
-	if shas != "" { qry.Set("shas", fmt.Sprintf("%v", shas)) }
+	if shas != "" { qry.Set("shas", fmt.Sprintf("shas", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -195,9 +195,9 @@ func (s *RepoService) GetBlobs(ctx context.Context, owner string, repo string, s
 func (s *RepoService) GetTree(ctx context.Context, owner string, repo string, sha string, recursive bool, page int, perPage int) (*GitTreeResponse, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/git/trees/%s", owner, repo, sha))
 	qry := u.Query()
-	if recursive != false { qry.Set("recursive", fmt.Sprintf("%v", recursive)) }
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if perPage != 0 { qry.Set("per_page", fmt.Sprintf("%v", perPage)) }
+	if recursive != false { qry.Set("recursive", fmt.Sprintf("recursive", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if perPage != 0 { qry.Set("per_page", fmt.Sprintf("perPage", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -218,9 +218,9 @@ func (s *RepoService) GetTree(ctx context.Context, owner string, repo string, sh
 func (s *RepoService) ListActionArtifacts(ctx context.Context, owner string, repo string, name string, page int, limit int) ([]ActionArtifact, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/artifacts", owner, repo))
 	qry := u.Query()
-	if name != "" { qry.Set("name", fmt.Sprintf("%v", name)) }
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if name != "" { qry.Set("name", fmt.Sprintf("name", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -241,9 +241,9 @@ func (s *RepoService) ListActionArtifacts(ctx context.Context, owner string, rep
 func (s *RepoService) ListActionRunArtifacts(ctx context.Context, owner string, repo string, runId int64, name string, page int, limit int) ([]ActionArtifact, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/runs/%d/artifacts", owner, repo, runId))
 	qry := u.Query()
-	if name != "" { qry.Set("name", fmt.Sprintf("%v", name)) }
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if name != "" { qry.Set("name", fmt.Sprintf("name", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -282,14 +282,14 @@ func (s *RepoService) ListActionRunJobs(ctx context.Context, owner string, repo 
 func (s *RepoService) ListActionRuns(ctx context.Context, owner string, repo string, page int, limit int, event []interface{}, status []interface{}, runNumber int64, headSha string, ref string, workflowId string) (*ListActionRunResponse, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/runs", owner, repo))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
-	if event != nil { qry.Set("event", fmt.Sprintf("%v", event)) }
-	if status != nil { qry.Set("status", fmt.Sprintf("%v", status)) }
-	if runNumber != 0 { qry.Set("run_number", fmt.Sprintf("%v", runNumber)) }
-	if headSha != "" { qry.Set("head_sha", fmt.Sprintf("%v", headSha)) }
-	if ref != "" { qry.Set("ref", fmt.Sprintf("%v", ref)) }
-	if workflowId != "" { qry.Set("workflow_id", fmt.Sprintf("%v", workflowId)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
+	if event != nil { qry.Set("event", fmt.Sprintf("event", %!s(MISSING))) }
+	if status != nil { qry.Set("status", fmt.Sprintf("status", %!s(MISSING))) }
+	if runNumber != 0 { qry.Set("run_number", fmt.Sprintf("runNumber", %!s(MISSING))) }
+	if headSha != "" { qry.Set("head_sha", fmt.Sprintf("headSha", %!s(MISSING))) }
+	if ref != "" { qry.Set("ref", fmt.Sprintf("ref", %!s(MISSING))) }
+	if workflowId != "" { qry.Set("workflow_id", fmt.Sprintf("workflowId", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -310,9 +310,9 @@ func (s *RepoService) ListActionRuns(ctx context.Context, owner string, repo str
 func (s *RepoService) ListActionTasks(ctx context.Context, owner string, repo string, page int, limit int, status []interface{}) (*ActionTaskResponse, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/tasks", owner, repo))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
-	if status != nil { qry.Set("status", fmt.Sprintf("%v", status)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
+	if status != nil { qry.Set("status", fmt.Sprintf("status", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -474,9 +474,9 @@ func (s *RepoService) GetRepoRunner(ctx context.Context, owner string, repo stri
 func (s *RepoService) GetRepoRunners(ctx context.Context, owner string, repo string, visible bool, page int, limit int) ([]ActionRunner, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/runners", owner, repo))
 	qry := u.Query()
-	if visible != false { qry.Set("visible", fmt.Sprintf("%v", visible)) }
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if visible != false { qry.Set("visible", fmt.Sprintf("visible", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -515,8 +515,8 @@ func (s *RepoService) GetRepoVariable(ctx context.Context, owner string, repo st
 func (s *RepoService) GetRepoVariablesList(ctx context.Context, owner string, repo string, page int, limit int) ([]ActionVariable, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/variables", owner, repo))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -674,8 +674,8 @@ func (s *RepoService) IssueCreateIssue(ctx context.Context, owner string, repo s
 func (s *RepoService) IssueCreateIssueAttachment(ctx context.Context, owner string, repo string, index int64, name string, updatedAt time.Time) (*Attachment, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/assets", owner, repo, index))
 	qry := u.Query()
-	if name != "" { qry.Set("name", fmt.Sprintf("%v", name)) }
-	if updatedAt != (time.Time{}) { qry.Set("updated_at", fmt.Sprintf("%v", updatedAt)) }
+	if name != "" { qry.Set("name", fmt.Sprintf("name", %!s(MISSING))) }
+	if updatedAt != (time.Time{}) { qry.Set("updated_at", fmt.Sprintf("updatedAt", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -717,8 +717,8 @@ func (s *RepoService) IssueCreateIssueBlocking(ctx context.Context, owner string
 func (s *RepoService) IssueCreateIssueCommentAttachment(ctx context.Context, owner string, repo string, id int64, name string, updatedAt time.Time) (*Attachment, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/comments/%d/assets", owner, repo, id))
 	qry := u.Query()
-	if name != "" { qry.Set("name", fmt.Sprintf("%v", name)) }
-	if updatedAt != (time.Time{}) { qry.Set("updated_at", fmt.Sprintf("%v", updatedAt)) }
+	if name != "" { qry.Set("name", fmt.Sprintf("name", %!s(MISSING))) }
+	if updatedAt != (time.Time{}) { qry.Set("updated_at", fmt.Sprintf("updatedAt", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -1204,8 +1204,8 @@ func (s *RepoService) IssueGetCommentReactions(ctx context.Context, owner string
 func (s *RepoService) IssueGetComments(ctx context.Context, owner string, repo string, index int64, since time.Time, before time.Time) ([]Comment, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/comments", owner, repo, index))
 	qry := u.Query()
-	if since != (time.Time{}) { qry.Set("since", fmt.Sprintf("%v", since)) }
-	if before != (time.Time{}) { qry.Set("before", fmt.Sprintf("%v", before)) }
+	if since != (time.Time{}) { qry.Set("since", fmt.Sprintf("since", %!s(MISSING))) }
+	if before != (time.Time{}) { qry.Set("before", fmt.Sprintf("before", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -1226,10 +1226,10 @@ func (s *RepoService) IssueGetComments(ctx context.Context, owner string, repo s
 func (s *RepoService) IssueGetCommentsAndTimeline(ctx context.Context, owner string, repo string, index int64, since time.Time, page int, limit int, before time.Time) ([]TimelineComment, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/timeline", owner, repo, index))
 	qry := u.Query()
-	if since != (time.Time{}) { qry.Set("since", fmt.Sprintf("%v", since)) }
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
-	if before != (time.Time{}) { qry.Set("before", fmt.Sprintf("%v", before)) }
+	if since != (time.Time{}) { qry.Set("since", fmt.Sprintf("since", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
+	if before != (time.Time{}) { qry.Set("before", fmt.Sprintf("before", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -1304,8 +1304,8 @@ func (s *RepoService) IssueGetIssueCommentAttachment(ctx context.Context, owner 
 func (s *RepoService) IssueGetIssueReactions(ctx context.Context, owner string, repo string, index int64, page int, limit int) ([]Reaction, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/reactions", owner, repo, index))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -1380,10 +1380,10 @@ func (s *RepoService) IssueGetMilestone(ctx context.Context, owner string, repo 
 func (s *RepoService) IssueGetMilestonesList(ctx context.Context, owner string, repo string, state string, name string, page int, limit int) ([]Milestone, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/milestones", owner, repo))
 	qry := u.Query()
-	if state != "" { qry.Set("state", fmt.Sprintf("%v", state)) }
-	if name != "" { qry.Set("name", fmt.Sprintf("%v", name)) }
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if state != "" { qry.Set("state", fmt.Sprintf("state", %!s(MISSING))) }
+	if name != "" { qry.Set("name", fmt.Sprintf("name", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -1404,10 +1404,10 @@ func (s *RepoService) IssueGetMilestonesList(ctx context.Context, owner string, 
 func (s *RepoService) IssueGetRepoComments(ctx context.Context, owner string, repo string, since time.Time, before time.Time, page int, limit int) ([]Comment, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/comments", owner, repo))
 	qry := u.Query()
-	if since != (time.Time{}) { qry.Set("since", fmt.Sprintf("%v", since)) }
-	if before != (time.Time{}) { qry.Set("before", fmt.Sprintf("%v", before)) }
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if since != (time.Time{}) { qry.Set("since", fmt.Sprintf("since", %!s(MISSING))) }
+	if before != (time.Time{}) { qry.Set("before", fmt.Sprintf("before", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -1428,8 +1428,8 @@ func (s *RepoService) IssueGetRepoComments(ctx context.Context, owner string, re
 func (s *RepoService) IssueListBlocks(ctx context.Context, owner string, repo string, index int64, page int, limit int) ([]Issue, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/blocks", owner, repo, index))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -1486,8 +1486,8 @@ func (s *RepoService) IssueListIssueCommentAttachments(ctx context.Context, owne
 func (s *RepoService) IssueListIssueDependencies(ctx context.Context, owner string, repo string, index int64, page int, limit int) ([]Issue, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/dependencies", owner, repo, index))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -1508,19 +1508,19 @@ func (s *RepoService) IssueListIssueDependencies(ctx context.Context, owner stri
 func (s *RepoService) IssueListIssues(ctx context.Context, owner string, repo string, state string, labels string, q string, type_ string, milestones string, since time.Time, before time.Time, createdBy string, assignedBy string, mentionedBy string, page int, limit int, sort string) ([]Issue, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues", owner, repo))
 	qry := u.Query()
-	if state != "" { qry.Set("state", fmt.Sprintf("%v", state)) }
-	if labels != "" { qry.Set("labels", fmt.Sprintf("%v", labels)) }
-	if q != "" { qry.Set("q", fmt.Sprintf("%v", q)) }
-	if type_ != "" { qry.Set("type", fmt.Sprintf("%v", type_)) }
-	if milestones != "" { qry.Set("milestones", fmt.Sprintf("%v", milestones)) }
-	if since != (time.Time{}) { qry.Set("since", fmt.Sprintf("%v", since)) }
-	if before != (time.Time{}) { qry.Set("before", fmt.Sprintf("%v", before)) }
-	if createdBy != "" { qry.Set("created_by", fmt.Sprintf("%v", createdBy)) }
-	if assignedBy != "" { qry.Set("assigned_by", fmt.Sprintf("%v", assignedBy)) }
-	if mentionedBy != "" { qry.Set("mentioned_by", fmt.Sprintf("%v", mentionedBy)) }
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
-	if sort != "" { qry.Set("sort", fmt.Sprintf("%v", sort)) }
+	if state != "" { qry.Set("state", fmt.Sprintf("state", %!s(MISSING))) }
+	if labels != "" { qry.Set("labels", fmt.Sprintf("labels", %!s(MISSING))) }
+	if q != "" { qry.Set("q", fmt.Sprintf("q", %!s(MISSING))) }
+	if type_ != "" { qry.Set("type", fmt.Sprintf("type_", %!s(MISSING))) }
+	if milestones != "" { qry.Set("milestones", fmt.Sprintf("milestones", %!s(MISSING))) }
+	if since != (time.Time{}) { qry.Set("since", fmt.Sprintf("since", %!s(MISSING))) }
+	if before != (time.Time{}) { qry.Set("before", fmt.Sprintf("before", %!s(MISSING))) }
+	if createdBy != "" { qry.Set("created_by", fmt.Sprintf("createdBy", %!s(MISSING))) }
+	if assignedBy != "" { qry.Set("assigned_by", fmt.Sprintf("assignedBy", %!s(MISSING))) }
+	if mentionedBy != "" { qry.Set("mentioned_by", fmt.Sprintf("mentionedBy", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
+	if sort != "" { qry.Set("sort", fmt.Sprintf("sort", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -1541,9 +1541,9 @@ func (s *RepoService) IssueListIssues(ctx context.Context, owner string, repo st
 func (s *RepoService) IssueListLabels(ctx context.Context, owner string, repo string, sort string, page int, limit int) ([]Label, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/labels", owner, repo))
 	qry := u.Query()
-	if sort != "" { qry.Set("sort", fmt.Sprintf("%v", sort)) }
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if sort != "" { qry.Set("sort", fmt.Sprintf("sort", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -1704,24 +1704,24 @@ func (s *RepoService) IssueResetTime(ctx context.Context, owner string, repo str
 func (s *RepoService) IssueSearchIssues(ctx context.Context, state string, labels string, milestones string, q string, priorityRepoId int64, type_ string, since time.Time, before time.Time, assigned bool, created bool, mentioned bool, reviewRequested bool, reviewed bool, owner string, team string, page int, limit int, sort string) ([]Issue, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/issues/search"))
 	qry := u.Query()
-	if state != "" { qry.Set("state", fmt.Sprintf("%v", state)) }
-	if labels != "" { qry.Set("labels", fmt.Sprintf("%v", labels)) }
-	if milestones != "" { qry.Set("milestones", fmt.Sprintf("%v", milestones)) }
-	if q != "" { qry.Set("q", fmt.Sprintf("%v", q)) }
-	if priorityRepoId != 0 { qry.Set("priority_repo_id", fmt.Sprintf("%v", priorityRepoId)) }
-	if type_ != "" { qry.Set("type", fmt.Sprintf("%v", type_)) }
-	if since != (time.Time{}) { qry.Set("since", fmt.Sprintf("%v", since)) }
-	if before != (time.Time{}) { qry.Set("before", fmt.Sprintf("%v", before)) }
-	if assigned != false { qry.Set("assigned", fmt.Sprintf("%v", assigned)) }
-	if created != false { qry.Set("created", fmt.Sprintf("%v", created)) }
-	if mentioned != false { qry.Set("mentioned", fmt.Sprintf("%v", mentioned)) }
-	if reviewRequested != false { qry.Set("review_requested", fmt.Sprintf("%v", reviewRequested)) }
-	if reviewed != false { qry.Set("reviewed", fmt.Sprintf("%v", reviewed)) }
-	if owner != "" { qry.Set("owner", fmt.Sprintf("%v", owner)) }
-	if team != "" { qry.Set("team", fmt.Sprintf("%v", team)) }
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
-	if sort != "" { qry.Set("sort", fmt.Sprintf("%v", sort)) }
+	if state != "" { qry.Set("state", fmt.Sprintf("state", %!s(MISSING))) }
+	if labels != "" { qry.Set("labels", fmt.Sprintf("labels", %!s(MISSING))) }
+	if milestones != "" { qry.Set("milestones", fmt.Sprintf("milestones", %!s(MISSING))) }
+	if q != "" { qry.Set("q", fmt.Sprintf("q", %!s(MISSING))) }
+	if priorityRepoId != 0 { qry.Set("priority_repo_id", fmt.Sprintf("priorityRepoId", %!s(MISSING))) }
+	if type_ != "" { qry.Set("type", fmt.Sprintf("type_", %!s(MISSING))) }
+	if since != (time.Time{}) { qry.Set("since", fmt.Sprintf("since", %!s(MISSING))) }
+	if before != (time.Time{}) { qry.Set("before", fmt.Sprintf("before", %!s(MISSING))) }
+	if assigned != false { qry.Set("assigned", fmt.Sprintf("assigned", %!s(MISSING))) }
+	if created != false { qry.Set("created", fmt.Sprintf("created", %!s(MISSING))) }
+	if mentioned != false { qry.Set("mentioned", fmt.Sprintf("mentioned", %!s(MISSING))) }
+	if reviewRequested != false { qry.Set("review_requested", fmt.Sprintf("reviewRequested", %!s(MISSING))) }
+	if reviewed != false { qry.Set("reviewed", fmt.Sprintf("reviewed", %!s(MISSING))) }
+	if owner != "" { qry.Set("owner", fmt.Sprintf("owner", %!s(MISSING))) }
+	if team != "" { qry.Set("team", fmt.Sprintf("team", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
+	if sort != "" { qry.Set("sort", fmt.Sprintf("sort", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -1774,8 +1774,8 @@ func (s *RepoService) IssueStopStopWatch(ctx context.Context, owner string, repo
 func (s *RepoService) IssueSubscriptions(ctx context.Context, owner string, repo string, index int64, page int, limit int) ([]User, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/subscriptions", owner, repo, index))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -1796,11 +1796,11 @@ func (s *RepoService) IssueSubscriptions(ctx context.Context, owner string, repo
 func (s *RepoService) IssueTrackedTimes(ctx context.Context, owner string, repo string, index int64, user string, since time.Time, before time.Time, page int, limit int) ([]TrackedTime, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/times", owner, repo, index))
 	qry := u.Query()
-	if user != "" { qry.Set("user", fmt.Sprintf("%v", user)) }
-	if since != (time.Time{}) { qry.Set("since", fmt.Sprintf("%v", since)) }
-	if before != (time.Time{}) { qry.Set("before", fmt.Sprintf("%v", before)) }
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if user != "" { qry.Set("user", fmt.Sprintf("user", %!s(MISSING))) }
+	if since != (time.Time{}) { qry.Set("since", fmt.Sprintf("since", %!s(MISSING))) }
+	if before != (time.Time{}) { qry.Set("before", fmt.Sprintf("before", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -1821,8 +1821,8 @@ func (s *RepoService) IssueTrackedTimes(ctx context.Context, owner string, repo 
 func (s *RepoService) ListForks(ctx context.Context, owner string, repo string, page int, limit int) ([]Repository, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/forks", owner, repo))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -1859,13 +1859,13 @@ func (s *RepoService) MoveIssuePin(ctx context.Context, owner string, repo strin
 func (s *RepoService) NotifyGetRepoList(ctx context.Context, owner string, repo string, all bool, statusTypes []interface{}, subjectType []interface{}, since time.Time, before time.Time, page int, limit int) ([]NotificationThread, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/notifications", owner, repo))
 	qry := u.Query()
-	if all != false { qry.Set("all", fmt.Sprintf("%v", all)) }
-	if statusTypes != nil { qry.Set("status-types", fmt.Sprintf("%v", statusTypes)) }
-	if subjectType != nil { qry.Set("subject-type", fmt.Sprintf("%v", subjectType)) }
-	if since != (time.Time{}) { qry.Set("since", fmt.Sprintf("%v", since)) }
-	if before != (time.Time{}) { qry.Set("before", fmt.Sprintf("%v", before)) }
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if all != false { qry.Set("all", fmt.Sprintf("all", %!s(MISSING))) }
+	if statusTypes != nil { qry.Set("status-types", fmt.Sprintf("statusTypes", %!s(MISSING))) }
+	if subjectType != nil { qry.Set("subject-type", fmt.Sprintf("subjectType", %!s(MISSING))) }
+	if since != (time.Time{}) { qry.Set("since", fmt.Sprintf("since", %!s(MISSING))) }
+	if before != (time.Time{}) { qry.Set("before", fmt.Sprintf("before", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -1886,10 +1886,10 @@ func (s *RepoService) NotifyGetRepoList(ctx context.Context, owner string, repo 
 func (s *RepoService) NotifyReadRepoList(ctx context.Context, owner string, repo string, all bool, statusTypes []interface{}, toStatus string, lastReadAt time.Time) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/notifications", owner, repo))
 	qry := u.Query()
-	if all != false { qry.Set("all", fmt.Sprintf("%v", all)) }
-	if statusTypes != nil { qry.Set("status-types", fmt.Sprintf("%v", statusTypes)) }
-	if toStatus != "" { qry.Set("to-status", fmt.Sprintf("%v", toStatus)) }
-	if lastReadAt != (time.Time{}) { qry.Set("last_read_at", fmt.Sprintf("%v", lastReadAt)) }
+	if all != false { qry.Set("all", fmt.Sprintf("all", %!s(MISSING))) }
+	if statusTypes != nil { qry.Set("status-types", fmt.Sprintf("statusTypes", %!s(MISSING))) }
+	if toStatus != "" { qry.Set("to-status", fmt.Sprintf("toStatus", %!s(MISSING))) }
+	if lastReadAt != (time.Time{}) { qry.Set("last_read_at", fmt.Sprintf("lastReadAt", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, u.String(), nil)
 	if err != nil { return nil, fmt.Errorf("request: %w", err) }
@@ -2405,7 +2405,7 @@ func (s *RepoService) RepoCreateRelease(ctx context.Context, owner string, repo 
 func (s *RepoService) RepoCreateReleaseAttachment(ctx context.Context, owner string, repo string, id int64, name string) (*Attachment, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/releases/%d/assets", owner, repo, id))
 	qry := u.Query()
-	if name != "" { qry.Set("name", fmt.Sprintf("%v", name)) }
+	if name != "" { qry.Set("name", fmt.Sprintf("name", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -2925,7 +2925,7 @@ func (s *RepoService) RepoDownloadCommitDiffOrPatch(ctx context.Context, owner s
 func (s *RepoService) RepoDownloadPullDiffOrPatch(ctx context.Context, owner string, repo string, index int64, diffType string, binary bool) (string, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/pulls/%d.%s", owner, repo, index, diffType))
 	qry := u.Query()
-	if binary != false { qry.Set("binary", fmt.Sprintf("%v", binary)) }
+	if binary != false { qry.Set("binary", fmt.Sprintf("binary", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return "", nil, fmt.Errorf("request: %w", err) }
@@ -3153,7 +3153,7 @@ func (s *RepoService) RepoGet(ctx context.Context, owner string, repo string) (*
 func (s *RepoService) RepoGetActionJobLogs(ctx context.Context, owner string, repo string, jobId int64, attempt int64) (string, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/jobs/%d/logs", owner, repo, jobId))
 	qry := u.Query()
-	if attempt != 0 { qry.Set("attempt", fmt.Sprintf("%v", attempt)) }
+	if attempt != 0 { qry.Set("attempt", fmt.Sprintf("attempt", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return "", nil, fmt.Errorf("request: %w", err) }
@@ -3192,14 +3192,14 @@ func (s *RepoService) RepoGetActionRunLogs(ctx context.Context, owner string, re
 func (s *RepoService) RepoGetAllCommits(ctx context.Context, owner string, repo string, sha string, path string, stat bool, verification bool, files bool, page int, limit int, not string) ([]Commit, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/commits", owner, repo))
 	qry := u.Query()
-	if sha != "" { qry.Set("sha", fmt.Sprintf("%v", sha)) }
-	if path != "" { qry.Set("path", fmt.Sprintf("%v", path)) }
-	if stat != false { qry.Set("stat", fmt.Sprintf("%v", stat)) }
-	if verification != false { qry.Set("verification", fmt.Sprintf("%v", verification)) }
-	if files != false { qry.Set("files", fmt.Sprintf("%v", files)) }
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
-	if not != "" { qry.Set("not", fmt.Sprintf("%v", not)) }
+	if sha != "" { qry.Set("sha", fmt.Sprintf("sha", %!s(MISSING))) }
+	if path != "" { qry.Set("path", fmt.Sprintf("path", %!s(MISSING))) }
+	if stat != false { qry.Set("stat", fmt.Sprintf("stat", %!s(MISSING))) }
+	if verification != false { qry.Set("verification", fmt.Sprintf("verification", %!s(MISSING))) }
+	if files != false { qry.Set("files", fmt.Sprintf("files", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
+	if not != "" { qry.Set("not", fmt.Sprintf("not", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -3290,8 +3290,8 @@ func (s *RepoService) RepoGetBranchProtection(ctx context.Context, owner string,
 func (s *RepoService) RepoGetCombinedStatusByRef(ctx context.Context, owner string, repo string, ref string, page int, limit int) (*CombinedStatus, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/commits/%s/status", owner, repo, ref))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -3330,7 +3330,7 @@ func (s *RepoService) RepoGetCommitPullRequest(ctx context.Context, owner string
 func (s *RepoService) RepoGetContents(ctx context.Context, owner string, repo string, filepath string, ref string) (*ContentsResponse, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/contents/%s", owner, repo, filepath))
 	qry := u.Query()
-	if ref != "" { qry.Set("ref", fmt.Sprintf("%v", ref)) }
+	if ref != "" { qry.Set("ref", fmt.Sprintf("ref", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -3351,7 +3351,7 @@ func (s *RepoService) RepoGetContents(ctx context.Context, owner string, repo st
 func (s *RepoService) RepoGetContentsList(ctx context.Context, owner string, repo string, ref string) ([]ContentsResponse, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/contents", owner, repo))
 	qry := u.Query()
-	if ref != "" { qry.Set("ref", fmt.Sprintf("%v", ref)) }
+	if ref != "" { qry.Set("ref", fmt.Sprintf("ref", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -3372,7 +3372,7 @@ func (s *RepoService) RepoGetContentsList(ctx context.Context, owner string, rep
 func (s *RepoService) RepoGetEditorConfig(ctx context.Context, owner string, repo string, filepath string, ref string) (*map[string]string, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/editorconfig/%s", owner, repo, filepath))
 	qry := u.Query()
-	if ref != "" { qry.Set("ref", fmt.Sprintf("%v", ref)) }
+	if ref != "" { qry.Set("ref", fmt.Sprintf("ref", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -3519,8 +3519,8 @@ func (s *RepoService) RepoGetLatestRelease(ctx context.Context, owner string, re
 func (s *RepoService) RepoGetNote(ctx context.Context, owner string, repo string, sha string, verification bool, files bool) (*Note, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/git/notes/%s", owner, repo, sha))
 	qry := u.Query()
-	if verification != false { qry.Set("verification", fmt.Sprintf("%v", verification)) }
-	if files != false { qry.Set("files", fmt.Sprintf("%v", files)) }
+	if verification != false { qry.Set("verification", fmt.Sprintf("verification", %!s(MISSING))) }
+	if files != false { qry.Set("files", fmt.Sprintf("files", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -3577,10 +3577,10 @@ func (s *RepoService) RepoGetPullRequestByBaseHead(ctx context.Context, owner st
 func (s *RepoService) RepoGetPullRequestCommits(ctx context.Context, owner string, repo string, index int64, page int, limit int, verification bool, files bool) ([]Commit, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/pulls/%d/commits", owner, repo, index))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
-	if verification != false { qry.Set("verification", fmt.Sprintf("%v", verification)) }
-	if files != false { qry.Set("files", fmt.Sprintf("%v", files)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
+	if verification != false { qry.Set("verification", fmt.Sprintf("verification", %!s(MISSING))) }
+	if files != false { qry.Set("files", fmt.Sprintf("files", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -3601,10 +3601,10 @@ func (s *RepoService) RepoGetPullRequestCommits(ctx context.Context, owner strin
 func (s *RepoService) RepoGetPullRequestFiles(ctx context.Context, owner string, repo string, index int64, skipTo string, whitespace string, page int, limit int) ([]ChangedFile, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/pulls/%d/files", owner, repo, index))
 	qry := u.Query()
-	if skipTo != "" { qry.Set("skip-to", fmt.Sprintf("%v", skipTo)) }
-	if whitespace != "" { qry.Set("whitespace", fmt.Sprintf("%v", whitespace)) }
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if skipTo != "" { qry.Set("skip-to", fmt.Sprintf("skipTo", %!s(MISSING))) }
+	if whitespace != "" { qry.Set("whitespace", fmt.Sprintf("whitespace", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -3697,7 +3697,7 @@ func (s *RepoService) RepoGetPushMirrorByRemoteName(ctx context.Context, owner s
 func (s *RepoService) RepoGetRawFile(ctx context.Context, owner string, repo string, filepath string, ref string) ([]byte, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/raw/%s", owner, repo, filepath))
 	qry := u.Query()
-	if ref != "" { qry.Set("ref", fmt.Sprintf("%v", ref)) }
+	if ref != "" { qry.Set("ref", fmt.Sprintf("ref", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -3718,7 +3718,7 @@ func (s *RepoService) RepoGetRawFile(ctx context.Context, owner string, repo str
 func (s *RepoService) RepoGetRawFileOrLFS(ctx context.Context, owner string, repo string, filepath string, ref string) ([]byte, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/media/%s", owner, repo, filepath))
 	qry := u.Query()
-	if ref != "" { qry.Set("ref", fmt.Sprintf("%v", ref)) }
+	if ref != "" { qry.Set("ref", fmt.Sprintf("ref", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -3847,9 +3847,9 @@ func (s *RepoService) RepoGetRunnerRegistrationToken(ctx context.Context, owner 
 func (s *RepoService) RepoGetSingleCommit(ctx context.Context, owner string, repo string, sha string, stat bool, verification bool, files bool) (*Commit, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/git/commits/%s", owner, repo, sha))
 	qry := u.Query()
-	if stat != false { qry.Set("stat", fmt.Sprintf("%v", stat)) }
-	if verification != false { qry.Set("verification", fmt.Sprintf("%v", verification)) }
-	if files != false { qry.Set("files", fmt.Sprintf("%v", files)) }
+	if stat != false { qry.Set("stat", fmt.Sprintf("stat", %!s(MISSING))) }
+	if verification != false { qry.Set("verification", fmt.Sprintf("verification", %!s(MISSING))) }
+	if files != false { qry.Set("files", fmt.Sprintf("files", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -3924,7 +3924,7 @@ func (s *RepoService) RepoGetWikiPage(ctx context.Context, owner string, repo st
 func (s *RepoService) RepoGetWikiPageRevisions(ctx context.Context, owner string, repo string, pageName string, page int) (*WikiCommitList, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/wiki/revisions/%s", owner, repo, pageName))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -3945,8 +3945,8 @@ func (s *RepoService) RepoGetWikiPageRevisions(ctx context.Context, owner string
 func (s *RepoService) RepoGetWikiPages(ctx context.Context, owner string, repo string, page int, limit int) ([]WikiPageMetaData, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/wiki/pages", owner, repo))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -3967,8 +3967,8 @@ func (s *RepoService) RepoGetWikiPages(ctx context.Context, owner string, repo s
 func (s *RepoService) RepoListActionsSecrets(ctx context.Context, owner string, repo string, page int, limit int) ([]Secret, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/secrets", owner, repo))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -3989,9 +3989,9 @@ func (s *RepoService) RepoListActionsSecrets(ctx context.Context, owner string, 
 func (s *RepoService) RepoListActivityFeeds(ctx context.Context, owner string, repo string, date string, page int, limit int) ([]Activity, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/activities/feeds", owner, repo))
 	qry := u.Query()
-	if date != "" { qry.Set("date", fmt.Sprintf("%v", date)) }
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if date != "" { qry.Set("date", fmt.Sprintf("date", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -4048,8 +4048,8 @@ func (s *RepoService) RepoListBranchProtection(ctx context.Context, owner string
 func (s *RepoService) RepoListBranches(ctx context.Context, owner string, repo string, page int, limit int) ([]Branch, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/branches", owner, repo))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -4070,8 +4070,8 @@ func (s *RepoService) RepoListBranches(ctx context.Context, owner string, repo s
 func (s *RepoService) RepoListCollaborators(ctx context.Context, owner string, repo string, page int, limit int) ([]User, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/collaborators", owner, repo))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -4146,8 +4146,8 @@ func (s *RepoService) RepoListGitRefs(ctx context.Context, owner string, repo st
 func (s *RepoService) RepoListHooks(ctx context.Context, owner string, repo string, page int, limit int) ([]Hook, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/hooks", owner, repo))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -4168,10 +4168,10 @@ func (s *RepoService) RepoListHooks(ctx context.Context, owner string, repo stri
 func (s *RepoService) RepoListKeys(ctx context.Context, owner string, repo string, keyId int, fingerprint string, page int, limit int) ([]DeployKey, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/keys", owner, repo))
 	qry := u.Query()
-	if keyId != 0 { qry.Set("key_id", fmt.Sprintf("%v", keyId)) }
-	if fingerprint != "" { qry.Set("fingerprint", fmt.Sprintf("%v", fingerprint)) }
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if keyId != 0 { qry.Set("key_id", fmt.Sprintf("keyId", %!s(MISSING))) }
+	if fingerprint != "" { qry.Set("fingerprint", fmt.Sprintf("fingerprint", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -4228,15 +4228,15 @@ func (s *RepoService) RepoListPinnedPullRequests(ctx context.Context, owner stri
 func (s *RepoService) RepoListPullRequests(ctx context.Context, owner string, repo string, state string, sort string, milestone int64, labels []interface{}, poster string, base string, head string, page int, limit int) ([]PullRequest, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/pulls", owner, repo))
 	qry := u.Query()
-	if state != "" { qry.Set("state", fmt.Sprintf("%v", state)) }
-	if sort != "" { qry.Set("sort", fmt.Sprintf("%v", sort)) }
-	if milestone != 0 { qry.Set("milestone", fmt.Sprintf("%v", milestone)) }
-	if labels != nil { qry.Set("labels", fmt.Sprintf("%v", labels)) }
-	if poster != "" { qry.Set("poster", fmt.Sprintf("%v", poster)) }
-	if base != "" { qry.Set("base", fmt.Sprintf("%v", base)) }
-	if head != "" { qry.Set("head", fmt.Sprintf("%v", head)) }
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if state != "" { qry.Set("state", fmt.Sprintf("state", %!s(MISSING))) }
+	if sort != "" { qry.Set("sort", fmt.Sprintf("sort", %!s(MISSING))) }
+	if milestone != 0 { qry.Set("milestone", fmt.Sprintf("milestone", %!s(MISSING))) }
+	if labels != nil { qry.Set("labels", fmt.Sprintf("labels", %!s(MISSING))) }
+	if poster != "" { qry.Set("poster", fmt.Sprintf("poster", %!s(MISSING))) }
+	if base != "" { qry.Set("base", fmt.Sprintf("base", %!s(MISSING))) }
+	if head != "" { qry.Set("head", fmt.Sprintf("head", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -4257,8 +4257,8 @@ func (s *RepoService) RepoListPullRequests(ctx context.Context, owner string, re
 func (s *RepoService) RepoListPullReviews(ctx context.Context, owner string, repo string, index int64, page int, limit int) ([]PullReview, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/pulls/%d/reviews", owner, repo, index))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -4279,8 +4279,8 @@ func (s *RepoService) RepoListPullReviews(ctx context.Context, owner string, rep
 func (s *RepoService) RepoListPushMirrors(ctx context.Context, owner string, repo string, page int, limit int) ([]PushMirror, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/push_mirrors", owner, repo))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -4319,11 +4319,11 @@ func (s *RepoService) RepoListReleaseAttachments(ctx context.Context, owner stri
 func (s *RepoService) RepoListReleases(ctx context.Context, owner string, repo string, draft bool, preRelease bool, q string, page int, limit int) ([]Release, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/releases", owner, repo))
 	qry := u.Query()
-	if draft != false { qry.Set("draft", fmt.Sprintf("%v", draft)) }
-	if preRelease != false { qry.Set("pre-release", fmt.Sprintf("%v", preRelease)) }
-	if q != "" { qry.Set("q", fmt.Sprintf("%v", q)) }
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if draft != false { qry.Set("draft", fmt.Sprintf("draft", %!s(MISSING))) }
+	if preRelease != false { qry.Set("pre-release", fmt.Sprintf("preRelease", %!s(MISSING))) }
+	if q != "" { qry.Set("q", fmt.Sprintf("q", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -4344,8 +4344,8 @@ func (s *RepoService) RepoListReleases(ctx context.Context, owner string, repo s
 func (s *RepoService) RepoListStargazers(ctx context.Context, owner string, repo string, page int, limit int) ([]User, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/stargazers", owner, repo))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -4366,10 +4366,10 @@ func (s *RepoService) RepoListStargazers(ctx context.Context, owner string, repo
 func (s *RepoService) RepoListStatuses(ctx context.Context, owner string, repo string, sha string, sort string, state string, page int, limit int) ([]CommitStatus, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/statuses/%s", owner, repo, sha))
 	qry := u.Query()
-	if sort != "" { qry.Set("sort", fmt.Sprintf("%v", sort)) }
-	if state != "" { qry.Set("state", fmt.Sprintf("%v", state)) }
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if sort != "" { qry.Set("sort", fmt.Sprintf("sort", %!s(MISSING))) }
+	if state != "" { qry.Set("state", fmt.Sprintf("state", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -4390,10 +4390,10 @@ func (s *RepoService) RepoListStatuses(ctx context.Context, owner string, repo s
 func (s *RepoService) RepoListStatusesByRef(ctx context.Context, owner string, repo string, ref string, sort string, state string, page int, limit int) ([]CommitStatus, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/commits/%s/statuses", owner, repo, ref))
 	qry := u.Query()
-	if sort != "" { qry.Set("sort", fmt.Sprintf("%v", sort)) }
-	if state != "" { qry.Set("state", fmt.Sprintf("%v", state)) }
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if sort != "" { qry.Set("sort", fmt.Sprintf("sort", %!s(MISSING))) }
+	if state != "" { qry.Set("state", fmt.Sprintf("state", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -4414,8 +4414,8 @@ func (s *RepoService) RepoListStatusesByRef(ctx context.Context, owner string, r
 func (s *RepoService) RepoListSubscribers(ctx context.Context, owner string, repo string, page int, limit int) ([]User, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/subscribers", owner, repo))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -4454,8 +4454,8 @@ func (s *RepoService) RepoListTagProtection(ctx context.Context, owner string, r
 func (s *RepoService) RepoListTags(ctx context.Context, owner string, repo string, page int, limit int) ([]Tag, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/tags", owner, repo))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -4494,8 +4494,8 @@ func (s *RepoService) RepoListTeams(ctx context.Context, owner string, repo stri
 func (s *RepoService) RepoListTopics(ctx context.Context, owner string, repo string, page int, limit int) (*TopicName, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/topics", owner, repo))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -4657,23 +4657,23 @@ func (s *RepoService) RepoReplaceAllFlags(ctx context.Context, owner string, rep
 func (s *RepoService) RepoSearch(ctx context.Context, q string, topic bool, includeDesc bool, uid int64, priorityOwnerId int64, teamId int64, starredBy int64, private bool, isPrivate bool, template bool, archived bool, mode string, exclusive bool, sort string, order string, page int, limit int) (*SearchResults, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/search"))
 	qry := u.Query()
-	if q != "" { qry.Set("q", fmt.Sprintf("%v", q)) }
-	if topic != false { qry.Set("topic", fmt.Sprintf("%v", topic)) }
-	if includeDesc != false { qry.Set("includeDesc", fmt.Sprintf("%v", includeDesc)) }
-	if uid != 0 { qry.Set("uid", fmt.Sprintf("%v", uid)) }
-	if priorityOwnerId != 0 { qry.Set("priority_owner_id", fmt.Sprintf("%v", priorityOwnerId)) }
-	if teamId != 0 { qry.Set("team_id", fmt.Sprintf("%v", teamId)) }
-	if starredBy != 0 { qry.Set("starredBy", fmt.Sprintf("%v", starredBy)) }
-	if private != false { qry.Set("private", fmt.Sprintf("%v", private)) }
-	if isPrivate != false { qry.Set("is_private", fmt.Sprintf("%v", isPrivate)) }
-	if template != false { qry.Set("template", fmt.Sprintf("%v", template)) }
-	if archived != false { qry.Set("archived", fmt.Sprintf("%v", archived)) }
-	if mode != "" { qry.Set("mode", fmt.Sprintf("%v", mode)) }
-	if exclusive != false { qry.Set("exclusive", fmt.Sprintf("%v", exclusive)) }
-	if sort != "" { qry.Set("sort", fmt.Sprintf("%v", sort)) }
-	if order != "" { qry.Set("order", fmt.Sprintf("%v", order)) }
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if q != "" { qry.Set("q", fmt.Sprintf("q", %!s(MISSING))) }
+	if topic != false { qry.Set("topic", fmt.Sprintf("topic", %!s(MISSING))) }
+	if includeDesc != false { qry.Set("includeDesc", fmt.Sprintf("includeDesc", %!s(MISSING))) }
+	if uid != 0 { qry.Set("uid", fmt.Sprintf("uid", %!s(MISSING))) }
+	if priorityOwnerId != 0 { qry.Set("priority_owner_id", fmt.Sprintf("priorityOwnerId", %!s(MISSING))) }
+	if teamId != 0 { qry.Set("team_id", fmt.Sprintf("teamId", %!s(MISSING))) }
+	if starredBy != 0 { qry.Set("starredBy", fmt.Sprintf("starredBy", %!s(MISSING))) }
+	if private != false { qry.Set("private", fmt.Sprintf("private", %!s(MISSING))) }
+	if isPrivate != false { qry.Set("is_private", fmt.Sprintf("isPrivate", %!s(MISSING))) }
+	if template != false { qry.Set("template", fmt.Sprintf("template", %!s(MISSING))) }
+	if archived != false { qry.Set("archived", fmt.Sprintf("archived", %!s(MISSING))) }
+	if mode != "" { qry.Set("mode", fmt.Sprintf("mode", %!s(MISSING))) }
+	if exclusive != false { qry.Set("exclusive", fmt.Sprintf("exclusive", %!s(MISSING))) }
+	if sort != "" { qry.Set("sort", fmt.Sprintf("sort", %!s(MISSING))) }
+	if order != "" { qry.Set("order", fmt.Sprintf("order", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -4694,7 +4694,7 @@ func (s *RepoService) RepoSearch(ctx context.Context, q string, topic bool, incl
 func (s *RepoService) RepoSearchRunJobs(ctx context.Context, owner string, repo string, labels string) ([]ActionRunJob, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/runners/jobs", owner, repo))
 	qry := u.Query()
-	if labels != "" { qry.Set("labels", fmt.Sprintf("%v", labels)) }
+	if labels != "" { qry.Set("labels", fmt.Sprintf("labels", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -4843,7 +4843,7 @@ func (s *RepoService) RepoSyncForkDefaultInfo(ctx context.Context, owner string,
 func (s *RepoService) RepoTestHook(ctx context.Context, owner string, repo string, id int64, ref string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/hooks/%d/tests", owner, repo, id))
 	qry := u.Query()
-	if ref != "" { qry.Set("ref", fmt.Sprintf("%v", ref)) }
+	if ref != "" { qry.Set("ref", fmt.Sprintf("ref", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), nil)
 	if err != nil { return nil, fmt.Errorf("request: %w", err) }
@@ -4862,11 +4862,11 @@ func (s *RepoService) RepoTestHook(ctx context.Context, owner string, repo strin
 func (s *RepoService) RepoTrackedTimes(ctx context.Context, owner string, repo string, user string, since time.Time, before time.Time, page int, limit int) ([]TrackedTime, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/times", owner, repo))
 	qry := u.Query()
-	if user != "" { qry.Set("user", fmt.Sprintf("%v", user)) }
-	if since != (time.Time{}) { qry.Set("since", fmt.Sprintf("%v", since)) }
-	if before != (time.Time{}) { qry.Set("before", fmt.Sprintf("%v", before)) }
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if user != "" { qry.Set("user", fmt.Sprintf("user", %!s(MISSING))) }
+	if since != (time.Time{}) { qry.Set("since", fmt.Sprintf("since", %!s(MISSING))) }
+	if before != (time.Time{}) { qry.Set("before", fmt.Sprintf("before", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -4983,7 +4983,7 @@ func (s *RepoService) RepoUpdateFile(ctx context.Context, owner string, repo str
 func (s *RepoService) RepoUpdatePullRequest(ctx context.Context, owner string, repo string, index int64, style string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/pulls/%d/update", owner, repo, index))
 	qry := u.Query()
-	if style != "" { qry.Set("style", fmt.Sprintf("%v", style)) }
+	if style != "" { qry.Set("style", fmt.Sprintf("style", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), nil)
 	if err != nil { return nil, fmt.Errorf("request: %w", err) }

@@ -2,21 +2,18 @@ name: release
 
 # Rezuscloud Forgejo distribution release.
 #
-# This repo IS the Forgejo fork (a fork of codeberg.org/forgejo/forgejo). It is
-# built and released as one unit, k8s-style:
+# This repo IS the Forgejo fork. It builds and releases as one unit:
 #   - server image  : built from the repo root via Dockerfile / Dockerfile.rootless
 #   - fj CLI binary : built from ./cmd/fj (the fj analogue of cmd/kubectl)
 #   - Helm chart    : packaged from charts/forgejo (vendored upstream + Rezuscloud overlay)
-# All three are versioned to the SAME Forgejo release version so
-#   image tag == chart appVersion == fj Client Version == server version.
 #
-# Release metadata lives in distributions/forgejo-<version>.env.
+# PR VALIDATION (build + codegen + integration) runs centrally in k8s-config's
+# fork-maintenance CronJob BEFORE the sync PR is pushed. The fork repo keeps
+# only tag-triggered release logic — no per-PR CI jobs here.
 
 on:
-  pull_request:
-    branches: [rezus/forgejo]   # run check-sdk-cli on every sync PR (not just path-filtered)
   push:
-    branches: [forgejo]
+    tags: ["forgejo-v*"]
   workflow_dispatch:
     inputs:
       distribution_file:
@@ -25,147 +22,8 @@ on:
         default: distributions/forgejo-16.0.0-rc.1.env
 
 jobs:
-  check-sdk-cli:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          fetch-tags: true
-      - uses: actions/setup-go@v5
-        with:
-          go-version-file: go.mod
-      - name: Build staging SDK (forgejo.org/client-go)
-        run: |
-          cd staging/src/forgejo.org/client-go
-          go build ./...
-      - name: Build staging CLI lib (forgejo.org/fj)
-        run: |
-          cd staging/src/forgejo.org/fj
-          go build ./...
-      - name: Build fj binary from root module (cmd/fj)
-        run: go build -mod=mod ./cmd/fj
-      - name: Chart lint + template
-        uses: azure/setup-helm@v4
-        with:
-          version: "v3.16.0"
-      - run: helm dependency build charts/forgejo
-      - run: helm lint charts/forgejo
-      - run: helm template forgejo charts/forgejo >/dev/null
-
-  # ===========================================================================
-  # codegen-check: verify the generated SDK + CLI commands match the swagger
-  # spec. Mirrors upstream forgejo-api's codegen-check.yml — runs the generator
-  # and checks git diff is clean. If it isn't, the sync PR forgot to commit the
-  # regenerated code.
-  # ===========================================================================
-  codegen-check:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-go@v5
-        with:
-          go-version-file: go.mod
-      - name: Strip Go-template placeholders from swagger template
-        run: |
-          python3 -c "
-          import json, re
-          with open('templates/swagger/v1_json.tmpl') as f: spec = f.read()
-          spec = spec.replace('{{AppVer | JSEscape}}', '16.0.0-dev')
-          spec = spec.replace('{{AppSubUrl | JSEscape}}', '')
-          spec = re.sub(r'{{[^}]+}}', '', spec)
-          data = json.loads(spec)
-          with open('staging/src/forgejo.org/client-go/spec/swagger.json', 'w') as f:
-              json.dump(data, f, indent=2)
-          "
-      - name: Run generator (SDK + CLI commands)
-        run: |
-          cd staging/src/forgejo.org/client-go
-          go run ./gen -spec spec/swagger.json -out . \
-            -cli-out ../../fj/pkg/cmd/
-      - name: Check generated code matches committed code
-        run: |
-          diff=$(git ls-files --modified --others --exclude-standard \
-            staging/src/forgejo.org/client-go/ \
-            staging/src/forgejo.org/fj/pkg/cmd/zz_generated_commands.go)
-          echo "$diff"
-          if [ -n "$diff" ]; then
-            echo "::error::Generated code does not match the swagger spec."
-            echo "::error::Run the generator and commit the result:"
-            echo "::error::  cd staging/src/forgejo.org/client-go && go run ./gen -spec spec/swagger.json -out . -cli-out ../../fj/pkg/cmd/"
-            exit 1
-          fi
-
-  # ===========================================================================
-  # integration: spin up a Forgejo container and test the SDK + CLI commands
-  # against it. Mirrors upstream forgejo-api's integration.yml.
-  # ===========================================================================
-  integration:
-    needs: [check-sdk-cli, codegen-check]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
-        with:
-          go-version-file: go.mod
-      - name: Start Forgejo container
-        run: |
-          docker run -d --name forgejo-test \
-            -p 3000:3000 \
-            -e FORGEJO__security__INSTALL_LOCK=true \
-            -e FORGEJO__database__DB_TYPE=sqlite3 \
-            codeberg.org/forgejo/forgejo:15-rootless
-      - name: Wait for Forgejo to be healthy
-        run: |
-          for i in $(seq 1 60); do
-            if curl -sf http://localhost:3000/api/v1/version >/dev/null 2>&1; then
-              echo "Forgejo is up"
-              break
-            fi
-            sleep 2
-          done
-          curl -sf http://localhost:3000/api/v1/version || { echo "Forgejo did not start"; exit 1; }
-      - name: Create admin user via CLI
-        run: |
-          docker exec forgejo-test forgejo admin user create \
-            --admin --username root --password root123456 \
-            --email root@test.local --must-change-password=false \
-            || true  # may already exist on re-run
-      - name: Create API token via CLI (full scope)
-        run: |
-          # Use the forgejo CLI to generate a token with full access — the
-          # API token creation uses fine-grained scopes that vary by version.
-          # The CLI token is simpler and always works.
-          TOKEN=$(docker exec forgejo-test forgejo admin user generate-access-token \
-            --username root --token-name ci-test --scopes 'all' --raw 2>/dev/null \
-            || true)
-          if [ -z "$TOKEN" ]; then
-            # Fallback: API token creation
-            TOKEN=$(curl -sf -X POST http://localhost:3000/api/v1/users/root/tokens \
-              -u root:root123456 \
-              -H "Content-Type: application/json" \
-              -d '{"name":"ci-test","scopes":["all"]}' \
-              | jq -r .sha1)
-          fi
-          echo "Token: ${TOKEN:0:8}..."
-          echo "FORGEJO_TEST_TOKEN=$TOKEN" >> $GITHUB_ENV
-          echo "FORGEJO_TEST_URL=http://localhost:3000" >> $GITHUB_ENV
-          echo "FORGEJO_TEST_USER=root" >> $GITHUB_ENV
-          echo "FORGEJO_REPO_ROOT=$PWD" >> $GITHUB_ENV
-      - name: Run SDK + CLI integration tests
-        run: |
-          cd staging/src/forgejo.org/fj
-          go test -v -tags=integration ./tests/integration/...
-
   prepare:
     if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/forgejo-v')
-    needs: check-sdk-cli
     runs-on: ubuntu-latest
     outputs:
       distribution_file: ${{ steps.meta.outputs.distribution_file }}

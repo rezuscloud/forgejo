@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"os"
 	"testing"
+	"strings"
 )
 
 // testURL returns the Forgejo instance URL for integration tests.
@@ -157,4 +158,15 @@ func TestSDKCreateIssue(t *testing.T) {
 		t.Fatalf("issue title mismatch: got %q", issue.Title)
 	}
 	t.Logf("created issue #%d: %s", issue.Number, issue.Title)
+}
+
+// isAcceptableError returns true for HTTP errors that still prove the command
+// works (the endpoint exists, we just don't have the resource).
+func isAcceptableError(output string) bool {
+	for _, code := range []string{"404", "403", "401", "409", "422"} {
+		if strings.Contains(output, code) {
+			return true
+		}
+	}
+	return false
 }

@@ -15,13 +15,13 @@ import (
 func (s *NotifyService) NotifyGetList(ctx context.Context, all bool, statusTypes []interface{}, subjectType []interface{}, since time.Time, before time.Time, page int, limit int) ([]NotificationThread, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/notifications"))
 	qry := u.Query()
-	if all != false { qry.Set("all", fmt.Sprintf("%v", all)) }
-	if statusTypes != nil { qry.Set("status-types", fmt.Sprintf("%v", statusTypes)) }
-	if subjectType != nil { qry.Set("subject-type", fmt.Sprintf("%v", subjectType)) }
-	if since != (time.Time{}) { qry.Set("since", fmt.Sprintf("%v", since)) }
-	if before != (time.Time{}) { qry.Set("before", fmt.Sprintf("%v", before)) }
-	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if all != false { qry.Set("all", fmt.Sprintf("all", %!s(MISSING))) }
+	if statusTypes != nil { qry.Set("status-types", fmt.Sprintf("statusTypes", %!s(MISSING))) }
+	if subjectType != nil { qry.Set("subject-type", fmt.Sprintf("subjectType", %!s(MISSING))) }
+	if since != (time.Time{}) { qry.Set("since", fmt.Sprintf("since", %!s(MISSING))) }
+	if before != (time.Time{}) { qry.Set("before", fmt.Sprintf("before", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -78,10 +78,10 @@ func (s *NotifyService) NotifyNewAvailable(ctx context.Context) (*NotificationCo
 func (s *NotifyService) NotifyReadList(ctx context.Context, lastReadAt time.Time, all bool, statusTypes []interface{}, toStatus string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/notifications"))
 	qry := u.Query()
-	if lastReadAt != (time.Time{}) { qry.Set("last_read_at", fmt.Sprintf("%v", lastReadAt)) }
-	if all != false { qry.Set("all", fmt.Sprintf("%v", all)) }
-	if statusTypes != nil { qry.Set("status-types", fmt.Sprintf("%v", statusTypes)) }
-	if toStatus != "" { qry.Set("to-status", fmt.Sprintf("%v", toStatus)) }
+	if lastReadAt != (time.Time{}) { qry.Set("last_read_at", fmt.Sprintf("lastReadAt", %!s(MISSING))) }
+	if all != false { qry.Set("all", fmt.Sprintf("all", %!s(MISSING))) }
+	if statusTypes != nil { qry.Set("status-types", fmt.Sprintf("statusTypes", %!s(MISSING))) }
+	if toStatus != "" { qry.Set("to-status", fmt.Sprintf("toStatus", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, u.String(), nil)
 	if err != nil { return nil, fmt.Errorf("request: %w", err) }
@@ -100,7 +100,7 @@ func (s *NotifyService) NotifyReadList(ctx context.Context, lastReadAt time.Time
 func (s *NotifyService) NotifyReadThread(ctx context.Context, id int64, toStatus string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/notifications/threads/%d", id))
 	qry := u.Query()
-	if toStatus != "" { qry.Set("to-status", fmt.Sprintf("%v", toStatus)) }
+	if toStatus != "" { qry.Set("to-status", fmt.Sprintf("toStatus", %!s(MISSING))) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, u.String(), nil)
 	if err != nil { return nil, fmt.Errorf("request: %w", err) }
