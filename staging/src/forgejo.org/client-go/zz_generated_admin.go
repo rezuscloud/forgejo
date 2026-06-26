@@ -15,19 +15,13 @@ import (
 func (s *AdminService) AdminAddRuleToQuotaGroup(ctx context.Context, quotagroup string, quotarule string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/quota/groups/%s/rules/%s", quotagroup, quotarule))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -37,19 +31,13 @@ func (s *AdminService) AdminAddRuleToQuotaGroup(ctx context.Context, quotagroup 
 func (s *AdminService) AdminAddUserToQuotaGroup(ctx context.Context, quotagroup string, username string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/quota/groups/%s/users/%s", quotagroup, username))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -59,19 +47,13 @@ func (s *AdminService) AdminAddUserToQuotaGroup(ctx context.Context, quotagroup 
 func (s *AdminService) AdminAdoptRepository(ctx context.Context, owner string, repo string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/unadopted/%s/%s", owner, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -81,29 +63,19 @@ func (s *AdminService) AdminAdoptRepository(ctx context.Context, owner string, r
 func (s *AdminService) AdminCreateHook(ctx context.Context, body *CreateHookOption) (*Hook, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/hooks"))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Hook
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -112,29 +84,19 @@ func (s *AdminService) AdminCreateHook(ctx context.Context, body *CreateHookOpti
 func (s *AdminService) AdminCreateOrg(ctx context.Context, username string, organization *CreateOrgOption) (*Organization, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/users/%s/orgs", username))
 	bodyBytes, err := json.Marshal(organization)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Organization
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -143,29 +105,19 @@ func (s *AdminService) AdminCreateOrg(ctx context.Context, username string, orga
 func (s *AdminService) AdminCreatePublicKey(ctx context.Context, username string, key *CreateKeyOption) (*PublicKey, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/users/%s/keys", username))
 	bodyBytes, err := json.Marshal(key)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result PublicKey
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -174,29 +126,19 @@ func (s *AdminService) AdminCreatePublicKey(ctx context.Context, username string
 func (s *AdminService) AdminCreateQuotaGroup(ctx context.Context, group *CreateQuotaGroupOptions) (*QuotaGroup, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/quota/groups"))
 	bodyBytes, err := json.Marshal(group)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result QuotaGroup
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -205,29 +147,19 @@ func (s *AdminService) AdminCreateQuotaGroup(ctx context.Context, group *CreateQ
 func (s *AdminService) AdminCreateQuotaRule(ctx context.Context, rule *CreateQuotaRuleOptions) (*QuotaRuleInfo, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/quota/rules"))
 	bodyBytes, err := json.Marshal(rule)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result QuotaRuleInfo
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -236,29 +168,19 @@ func (s *AdminService) AdminCreateQuotaRule(ctx context.Context, rule *CreateQuo
 func (s *AdminService) AdminCreateRepo(ctx context.Context, username string, repository *CreateRepoOption) (*Repository, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/users/%s/repos", username))
 	bodyBytes, err := json.Marshal(repository)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Repository
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -267,29 +189,19 @@ func (s *AdminService) AdminCreateRepo(ctx context.Context, username string, rep
 func (s *AdminService) AdminCreateUser(ctx context.Context, body *CreateUserOption) (*User, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/users"))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result User
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -298,29 +210,19 @@ func (s *AdminService) AdminCreateUser(ctx context.Context, body *CreateUserOpti
 func (s *AdminService) AdminCreateUserAccessToken(ctx context.Context, username string, body *CreateAccessTokenOption) (*AccessToken, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/users/%s/tokens", username))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result AccessToken
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -329,32 +231,20 @@ func (s *AdminService) AdminCreateUserAccessToken(ctx context.Context, username 
 func (s *AdminService) AdminCronList(ctx context.Context, page int, limit int) ([]Cron, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/cron"))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Cron
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -363,19 +253,13 @@ func (s *AdminService) AdminCronList(ctx context.Context, page int, limit int) (
 func (s *AdminService) AdminCronRun(ctx context.Context, task string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/cron/%s", task))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -385,19 +269,13 @@ func (s *AdminService) AdminCronRun(ctx context.Context, task string) (*Response
 func (s *AdminService) AdminDeleteHook(ctx context.Context, id int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/hooks/%d", id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -407,19 +285,13 @@ func (s *AdminService) AdminDeleteHook(ctx context.Context, id int64) (*Response
 func (s *AdminService) AdminDeleteQuotaGroup(ctx context.Context, quotagroup string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/quota/groups/%s", quotagroup))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -429,19 +301,13 @@ func (s *AdminService) AdminDeleteQuotaGroup(ctx context.Context, quotagroup str
 func (s *AdminService) AdminDeleteQuotaRule(ctx context.Context, quotarule string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/quota/rules/%s", quotarule))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -451,19 +317,13 @@ func (s *AdminService) AdminDeleteQuotaRule(ctx context.Context, quotarule strin
 func (s *AdminService) AdminDeleteUnadoptedRepository(ctx context.Context, owner string, repo string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/unadopted/%s/%s", owner, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -473,24 +333,16 @@ func (s *AdminService) AdminDeleteUnadoptedRepository(ctx context.Context, owner
 func (s *AdminService) AdminDeleteUser(ctx context.Context, username string, purge bool) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/users/%s", username))
 	qry := u.Query()
-	if purge != false {
-		qry.Set("purge", fmt.Sprintf("%v", purge))
-	}
+	if purge != false { qry.Set("purge", fmt.Sprintf("%v", purge)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -500,19 +352,13 @@ func (s *AdminService) AdminDeleteUser(ctx context.Context, username string, pur
 func (s *AdminService) AdminDeleteUserAccessToken(ctx context.Context, username string, token string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/users/%s/tokens/%s", username, token))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -522,24 +368,16 @@ func (s *AdminService) AdminDeleteUserAccessToken(ctx context.Context, username 
 func (s *AdminService) AdminDeleteUserEmails(ctx context.Context, username string, body *DeleteEmailOption) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/users/%s/emails", username))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -549,19 +387,13 @@ func (s *AdminService) AdminDeleteUserEmails(ctx context.Context, username strin
 func (s *AdminService) AdminDeleteUserPublicKey(ctx context.Context, username string, id int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/users/%s/keys/%d", username, id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -571,29 +403,19 @@ func (s *AdminService) AdminDeleteUserPublicKey(ctx context.Context, username st
 func (s *AdminService) AdminEditHook(ctx context.Context, id int64, body *EditHookOption) (*Hook, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/hooks/%d", id))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Hook
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -602,29 +424,19 @@ func (s *AdminService) AdminEditHook(ctx context.Context, id int64, body *EditHo
 func (s *AdminService) AdminEditQuotaRule(ctx context.Context, quotarule string, rule *EditQuotaRuleOptions) (*QuotaRuleInfo, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/quota/rules/%s", quotarule))
 	bodyBytes, err := json.Marshal(rule)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result QuotaRuleInfo
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -633,29 +445,19 @@ func (s *AdminService) AdminEditQuotaRule(ctx context.Context, quotarule string,
 func (s *AdminService) AdminEditUser(ctx context.Context, username string, body *EditUserOption) (*User, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/users/%s", username))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result User
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -664,29 +466,19 @@ func (s *AdminService) AdminEditUser(ctx context.Context, username string, body 
 func (s *AdminService) AdminGetActionRunJobs(ctx context.Context, labels string) ([]ActionRunJob, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/actions/runners/jobs"))
 	qry := u.Query()
-	if labels != "" {
-		qry.Set("labels", fmt.Sprintf("%v", labels))
-	}
+	if labels != "" { qry.Set("labels", fmt.Sprintf("%v", labels)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []ActionRunJob
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -695,32 +487,20 @@ func (s *AdminService) AdminGetActionRunJobs(ctx context.Context, labels string)
 func (s *AdminService) AdminGetAllEmails(ctx context.Context, page int, limit int) ([]Email, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/emails"))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Email
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -729,32 +509,20 @@ func (s *AdminService) AdminGetAllEmails(ctx context.Context, page int, limit in
 func (s *AdminService) AdminGetAllOrgs(ctx context.Context, page int, limit int) ([]Organization, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/orgs"))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Organization
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -763,24 +531,16 @@ func (s *AdminService) AdminGetAllOrgs(ctx context.Context, page int, limit int)
 func (s *AdminService) AdminGetHook(ctx context.Context, id int64) (*Hook, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/hooks/%d", id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Hook
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -789,24 +549,16 @@ func (s *AdminService) AdminGetHook(ctx context.Context, id int64) (*Hook, *Resp
 func (s *AdminService) AdminGetQuotaGroup(ctx context.Context, quotagroup string) (*QuotaGroup, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/quota/groups/%s", quotagroup))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result QuotaGroup
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -815,24 +567,16 @@ func (s *AdminService) AdminGetQuotaGroup(ctx context.Context, quotagroup string
 func (s *AdminService) AdminGetQuotaRule(ctx context.Context, quotarule string) (*QuotaRuleInfo, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/quota/rules/%s", quotarule))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result QuotaRuleInfo
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -841,24 +585,16 @@ func (s *AdminService) AdminGetQuotaRule(ctx context.Context, quotarule string) 
 func (s *AdminService) AdminGetRegistrationToken(ctx context.Context) (*RegistrationToken, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/runners/registration-token"))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result RegistrationToken
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -867,24 +603,16 @@ func (s *AdminService) AdminGetRegistrationToken(ctx context.Context) (*Registra
 func (s *AdminService) AdminGetRunnerRegistrationToken(ctx context.Context) (*RegistrationToken, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/actions/runners/registration-token"))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result RegistrationToken
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -893,24 +621,16 @@ func (s *AdminService) AdminGetRunnerRegistrationToken(ctx context.Context) (*Re
 func (s *AdminService) AdminGetUserQuota(ctx context.Context, username string) (*QuotaInfo, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/users/%s/quota", username))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result QuotaInfo
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -919,32 +639,20 @@ func (s *AdminService) AdminGetUserQuota(ctx context.Context, username string) (
 func (s *AdminService) AdminListHooks(ctx context.Context, page int, limit int) ([]Hook, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/hooks"))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Hook
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -953,24 +661,16 @@ func (s *AdminService) AdminListHooks(ctx context.Context, page int, limit int) 
 func (s *AdminService) AdminListQuotaGroups(ctx context.Context) (*QuotaGroupList, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/quota/groups"))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result QuotaGroupList
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -979,24 +679,16 @@ func (s *AdminService) AdminListQuotaGroups(ctx context.Context) (*QuotaGroupLis
 func (s *AdminService) AdminListQuotaRules(ctx context.Context) ([]QuotaRuleInfo, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/quota/rules"))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []QuotaRuleInfo
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -1005,32 +697,20 @@ func (s *AdminService) AdminListQuotaRules(ctx context.Context) ([]QuotaRuleInfo
 func (s *AdminService) AdminListUserAccessTokens(ctx context.Context, username string, page int, limit int) ([]AccessToken, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/users/%s/tokens", username))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []AccessToken
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -1039,24 +719,16 @@ func (s *AdminService) AdminListUserAccessTokens(ctx context.Context, username s
 func (s *AdminService) AdminListUserEmails(ctx context.Context, username string) ([]Email, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/users/%s/emails", username))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Email
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -1065,24 +737,16 @@ func (s *AdminService) AdminListUserEmails(ctx context.Context, username string)
 func (s *AdminService) AdminListUsersInQuotaGroup(ctx context.Context, quotagroup string) ([]User, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/quota/groups/%s/users", quotagroup))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []User
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -1091,19 +755,13 @@ func (s *AdminService) AdminListUsersInQuotaGroup(ctx context.Context, quotagrou
 func (s *AdminService) AdminRemoveRuleFromQuotaGroup(ctx context.Context, quotagroup string, quotarule string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/quota/groups/%s/rules/%s", quotagroup, quotarule))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -1113,19 +771,13 @@ func (s *AdminService) AdminRemoveRuleFromQuotaGroup(ctx context.Context, quotag
 func (s *AdminService) AdminRemoveUserFromQuotaGroup(ctx context.Context, quotagroup string, username string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/quota/groups/%s/users/%s", quotagroup, username))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -1135,24 +787,16 @@ func (s *AdminService) AdminRemoveUserFromQuotaGroup(ctx context.Context, quotag
 func (s *AdminService) AdminRenameUser(ctx context.Context, username string, body *RenameUserOption) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/users/%s/rename", username))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -1162,35 +806,21 @@ func (s *AdminService) AdminRenameUser(ctx context.Context, username string, bod
 func (s *AdminService) AdminSearchEmails(ctx context.Context, q string, page int, limit int) ([]Email, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/emails/search"))
 	qry := u.Query()
-	if q != "" {
-		qry.Set("q", fmt.Sprintf("%v", q))
-	}
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if q != "" { qry.Set("q", fmt.Sprintf("%v", q)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Email
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -1199,29 +829,19 @@ func (s *AdminService) AdminSearchEmails(ctx context.Context, q string, page int
 func (s *AdminService) AdminSearchRunJobs(ctx context.Context, labels string) ([]ActionRunJob, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/runners/jobs"))
 	qry := u.Query()
-	if labels != "" {
-		qry.Set("labels", fmt.Sprintf("%v", labels))
-	}
+	if labels != "" { qry.Set("labels", fmt.Sprintf("%v", labels)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []ActionRunJob
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -1230,44 +850,24 @@ func (s *AdminService) AdminSearchRunJobs(ctx context.Context, labels string) ([
 func (s *AdminService) AdminSearchUsers(ctx context.Context, sourceId int64, loginName string, is2faEnabled bool, sort string, page int, limit int) ([]User, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/users"))
 	qry := u.Query()
-	if sourceId != 0 {
-		qry.Set("source_id", fmt.Sprintf("%v", sourceId))
-	}
-	if loginName != "" {
-		qry.Set("login_name", fmt.Sprintf("%v", loginName))
-	}
-	if is2faEnabled != false {
-		qry.Set("is_2fa_enabled", fmt.Sprintf("%v", is2faEnabled))
-	}
-	if sort != "" {
-		qry.Set("sort", fmt.Sprintf("%v", sort))
-	}
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if sourceId != 0 { qry.Set("source_id", fmt.Sprintf("%v", sourceId)) }
+	if loginName != "" { qry.Set("login_name", fmt.Sprintf("%v", loginName)) }
+	if is2faEnabled != false { qry.Set("is_2fa_enabled", fmt.Sprintf("%v", is2faEnabled)) }
+	if sort != "" { qry.Set("sort", fmt.Sprintf("%v", sort)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []User
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -1276,24 +876,16 @@ func (s *AdminService) AdminSearchUsers(ctx context.Context, sourceId int64, log
 func (s *AdminService) AdminSetUserQuotaGroups(ctx context.Context, username string, groups *SetUserQuotaGroupsOptions) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/users/%s/quota/groups", username))
 	bodyBytes, err := json.Marshal(groups)
-	if err != nil {
-		return nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -1303,35 +895,21 @@ func (s *AdminService) AdminSetUserQuotaGroups(ctx context.Context, username str
 func (s *AdminService) AdminUnadoptedList(ctx context.Context, page int, limit int, pattern string) ([]string, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/unadopted"))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
-	if pattern != "" {
-		qry.Set("pattern", fmt.Sprintf("%v", pattern))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if pattern != "" { qry.Set("pattern", fmt.Sprintf("%v", pattern)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []string
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -1340,19 +918,13 @@ func (s *AdminService) AdminUnadoptedList(ctx context.Context, page int, limit i
 func (s *AdminService) DeleteAdminRunner(ctx context.Context, runnerId string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/actions/runners/%s", runnerId))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -1362,24 +934,16 @@ func (s *AdminService) DeleteAdminRunner(ctx context.Context, runnerId string) (
 func (s *AdminService) GetAdminRunner(ctx context.Context, runnerId string) (*ActionRunner, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/actions/runners/%s", runnerId))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result ActionRunner
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -1388,35 +952,21 @@ func (s *AdminService) GetAdminRunner(ctx context.Context, runnerId string) (*Ac
 func (s *AdminService) GetAdminRunners(ctx context.Context, visible bool, page int, limit int) ([]ActionRunner, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/actions/runners"))
 	qry := u.Query()
-	if visible != false {
-		qry.Set("visible", fmt.Sprintf("%v", visible))
-	}
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if visible != false { qry.Set("visible", fmt.Sprintf("%v", visible)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []ActionRunner
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -1425,28 +975,19 @@ func (s *AdminService) GetAdminRunners(ctx context.Context, visible bool, page i
 func (s *AdminService) RegisterAdminRunner(ctx context.Context, body *RegisterRunnerOptions) (*RegisterRunnerResponse, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/actions/runners"))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result RegisterRunnerResponse
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
+

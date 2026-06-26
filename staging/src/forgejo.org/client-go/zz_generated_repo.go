@@ -17,24 +17,16 @@ import (
 func (s *RepoService) ActionRun(ctx context.Context, owner string, repo string, runId int64) (*ActionRun, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/runs/%d", owner, repo, runId))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result ActionRun
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -43,19 +35,13 @@ func (s *RepoService) ActionRun(ctx context.Context, owner string, repo string, 
 func (s *RepoService) CancelActionRun(ctx context.Context, owner string, repo string, runId int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/runs/%d/cancel", owner, repo, runId))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -65,19 +51,13 @@ func (s *RepoService) CancelActionRun(ctx context.Context, owner string, repo st
 func (s *RepoService) DeleteActionArtifact(ctx context.Context, owner string, repo string, artifactId int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/artifacts/%d", owner, repo, artifactId))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -87,19 +67,13 @@ func (s *RepoService) DeleteActionArtifact(ctx context.Context, owner string, re
 func (s *RepoService) DeleteActionRun(ctx context.Context, owner string, repo string, runId int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/runs/%d", owner, repo, runId))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -109,29 +83,19 @@ func (s *RepoService) DeleteActionRun(ctx context.Context, owner string, repo st
 func (s *RepoService) DispatchWorkflow(ctx context.Context, owner string, repo string, workflowfilename string, body *DispatchWorkflowOption) (*DispatchWorkflowRun, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/workflows/%s/dispatches", owner, repo, workflowfilename))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result DispatchWorkflowRun
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -140,19 +104,13 @@ func (s *RepoService) DispatchWorkflow(ctx context.Context, owner string, repo s
 func (s *RepoService) DownloadActionArtifact(ctx context.Context, owner string, repo string, artifactId int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/artifacts/%d/zip", owner, repo, artifactId))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -162,24 +120,16 @@ func (s *RepoService) DownloadActionArtifact(ctx context.Context, owner string, 
 func (s *RepoService) GetActionArtifact(ctx context.Context, owner string, repo string, artifactId int64) (*ActionArtifact, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/artifacts/%d", owner, repo, artifactId))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result ActionArtifact
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -188,24 +138,16 @@ func (s *RepoService) GetActionArtifact(ctx context.Context, owner string, repo 
 func (s *RepoService) GetAnnotatedTag(ctx context.Context, owner string, repo string, sha string) (*AnnotatedTag, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/git/tags/%s", owner, repo, sha))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result AnnotatedTag
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -214,24 +156,16 @@ func (s *RepoService) GetAnnotatedTag(ctx context.Context, owner string, repo st
 func (s *RepoService) GetBlob(ctx context.Context, owner string, repo string, sha string) (*GitBlob, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/git/blobs/%s", owner, repo, sha))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result GitBlob
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -240,29 +174,19 @@ func (s *RepoService) GetBlob(ctx context.Context, owner string, repo string, sh
 func (s *RepoService) GetBlobs(ctx context.Context, owner string, repo string, shas string) ([]GitBlob, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/git/blobs", owner, repo))
 	qry := u.Query()
-	if shas != "" {
-		qry.Set("shas", fmt.Sprintf("%v", shas))
-	}
+	if shas != "" { qry.Set("shas", fmt.Sprintf("%v", shas)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []GitBlob
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -271,35 +195,21 @@ func (s *RepoService) GetBlobs(ctx context.Context, owner string, repo string, s
 func (s *RepoService) GetTree(ctx context.Context, owner string, repo string, sha string, recursive bool, page int, perPage int) (*GitTreeResponse, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/git/trees/%s", owner, repo, sha))
 	qry := u.Query()
-	if recursive != false {
-		qry.Set("recursive", fmt.Sprintf("%v", recursive))
-	}
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if perPage != 0 {
-		qry.Set("per_page", fmt.Sprintf("%v", perPage))
-	}
+	if recursive != false { qry.Set("recursive", fmt.Sprintf("%v", recursive)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if perPage != 0 { qry.Set("per_page", fmt.Sprintf("%v", perPage)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result GitTreeResponse
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -308,35 +218,21 @@ func (s *RepoService) GetTree(ctx context.Context, owner string, repo string, sh
 func (s *RepoService) ListActionArtifacts(ctx context.Context, owner string, repo string, name string, page int, limit int) ([]ActionArtifact, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/artifacts", owner, repo))
 	qry := u.Query()
-	if name != "" {
-		qry.Set("name", fmt.Sprintf("%v", name))
-	}
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if name != "" { qry.Set("name", fmt.Sprintf("%v", name)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []ActionArtifact
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -345,35 +241,21 @@ func (s *RepoService) ListActionArtifacts(ctx context.Context, owner string, rep
 func (s *RepoService) ListActionRunArtifacts(ctx context.Context, owner string, repo string, runId int64, name string, page int, limit int) ([]ActionArtifact, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/runs/%d/artifacts", owner, repo, runId))
 	qry := u.Query()
-	if name != "" {
-		qry.Set("name", fmt.Sprintf("%v", name))
-	}
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if name != "" { qry.Set("name", fmt.Sprintf("%v", name)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []ActionArtifact
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -382,24 +264,16 @@ func (s *RepoService) ListActionRunArtifacts(ctx context.Context, owner string, 
 func (s *RepoService) ListActionRunJobs(ctx context.Context, owner string, repo string, runId int64) ([]ActionRunJob, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/runs/%d/jobs", owner, repo, runId))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []ActionRunJob
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -408,50 +282,26 @@ func (s *RepoService) ListActionRunJobs(ctx context.Context, owner string, repo 
 func (s *RepoService) ListActionRuns(ctx context.Context, owner string, repo string, page int, limit int, event []interface{}, status []interface{}, runNumber int64, headSha string, ref string, workflowId string) (*ListActionRunResponse, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/runs", owner, repo))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
-	if event != nil {
-		qry.Set("event", fmt.Sprintf("%v", event))
-	}
-	if status != nil {
-		qry.Set("status", fmt.Sprintf("%v", status))
-	}
-	if runNumber != 0 {
-		qry.Set("run_number", fmt.Sprintf("%v", runNumber))
-	}
-	if headSha != "" {
-		qry.Set("head_sha", fmt.Sprintf("%v", headSha))
-	}
-	if ref != "" {
-		qry.Set("ref", fmt.Sprintf("%v", ref))
-	}
-	if workflowId != "" {
-		qry.Set("workflow_id", fmt.Sprintf("%v", workflowId))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if event != nil { qry.Set("event", fmt.Sprintf("%v", event)) }
+	if status != nil { qry.Set("status", fmt.Sprintf("%v", status)) }
+	if runNumber != 0 { qry.Set("run_number", fmt.Sprintf("%v", runNumber)) }
+	if headSha != "" { qry.Set("head_sha", fmt.Sprintf("%v", headSha)) }
+	if ref != "" { qry.Set("ref", fmt.Sprintf("%v", ref)) }
+	if workflowId != "" { qry.Set("workflow_id", fmt.Sprintf("%v", workflowId)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result ListActionRunResponse
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -460,35 +310,21 @@ func (s *RepoService) ListActionRuns(ctx context.Context, owner string, repo str
 func (s *RepoService) ListActionTasks(ctx context.Context, owner string, repo string, page int, limit int, status []interface{}) (*ActionTaskResponse, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/tasks", owner, repo))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
-	if status != nil {
-		qry.Set("status", fmt.Sprintf("%v", status))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if status != nil { qry.Set("status", fmt.Sprintf("%v", status)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result ActionTaskResponse
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -497,19 +333,13 @@ func (s *RepoService) ListActionTasks(ctx context.Context, owner string, repo st
 func (s *RepoService) AcceptRepoTransfer(ctx context.Context, owner string, repo string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/transfer/accept", owner, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -519,24 +349,16 @@ func (s *RepoService) AcceptRepoTransfer(ctx context.Context, owner string, repo
 func (s *RepoService) CreateFork(ctx context.Context, owner string, repo string, body *CreateForkOption) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/forks", owner, repo))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -546,24 +368,16 @@ func (s *RepoService) CreateFork(ctx context.Context, owner string, repo string,
 func (s *RepoService) CreateRepoVariable(ctx context.Context, owner string, repo string, variablename string, body *CreateVariableOption) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/variables/%s", owner, repo, variablename))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -573,19 +387,13 @@ func (s *RepoService) CreateRepoVariable(ctx context.Context, owner string, repo
 func (s *RepoService) DeleteRepoRunner(ctx context.Context, owner string, repo string, runnerId string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/runners/%s", owner, repo, runnerId))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -595,19 +403,13 @@ func (s *RepoService) DeleteRepoRunner(ctx context.Context, owner string, repo s
 func (s *RepoService) DeleteRepoSecret(ctx context.Context, owner string, repo string, secretname string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/secrets/%s", owner, repo, secretname))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -617,19 +419,13 @@ func (s *RepoService) DeleteRepoSecret(ctx context.Context, owner string, repo s
 func (s *RepoService) DeleteRepoVariable(ctx context.Context, owner string, repo string, variablename string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/variables/%s", owner, repo, variablename))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -639,29 +435,19 @@ func (s *RepoService) DeleteRepoVariable(ctx context.Context, owner string, repo
 func (s *RepoService) GenerateRepo(ctx context.Context, templateOwner string, templateRepo string, body *GenerateRepoOption) (*Repository, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/generate", templateOwner, templateRepo))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Repository
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -670,24 +456,16 @@ func (s *RepoService) GenerateRepo(ctx context.Context, templateOwner string, te
 func (s *RepoService) GetRepoRunner(ctx context.Context, owner string, repo string, runnerId string) (*ActionRunner, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/runners/%s", owner, repo, runnerId))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result ActionRunner
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -696,35 +474,21 @@ func (s *RepoService) GetRepoRunner(ctx context.Context, owner string, repo stri
 func (s *RepoService) GetRepoRunners(ctx context.Context, owner string, repo string, visible bool, page int, limit int) ([]ActionRunner, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/runners", owner, repo))
 	qry := u.Query()
-	if visible != false {
-		qry.Set("visible", fmt.Sprintf("%v", visible))
-	}
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if visible != false { qry.Set("visible", fmt.Sprintf("%v", visible)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []ActionRunner
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -733,24 +497,16 @@ func (s *RepoService) GetRepoRunners(ctx context.Context, owner string, repo str
 func (s *RepoService) GetRepoVariable(ctx context.Context, owner string, repo string, variablename string) (*ActionVariable, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/variables/%s", owner, repo, variablename))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result ActionVariable
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -759,32 +515,20 @@ func (s *RepoService) GetRepoVariable(ctx context.Context, owner string, repo st
 func (s *RepoService) GetRepoVariablesList(ctx context.Context, owner string, repo string, page int, limit int) ([]ActionVariable, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/variables", owner, repo))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []ActionVariable
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -793,29 +537,19 @@ func (s *RepoService) GetRepoVariablesList(ctx context.Context, owner string, re
 func (s *RepoService) IssueAddLabel(ctx context.Context, owner string, repo string, index int64, body *IssueLabelsOption) ([]Label, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/labels", owner, repo, index))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Label
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -824,19 +558,13 @@ func (s *RepoService) IssueAddLabel(ctx context.Context, owner string, repo stri
 func (s *RepoService) IssueAddSubscription(ctx context.Context, owner string, repo string, index int64, user string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/subscriptions/%s", owner, repo, index, user))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -846,29 +574,19 @@ func (s *RepoService) IssueAddSubscription(ctx context.Context, owner string, re
 func (s *RepoService) IssueAddTime(ctx context.Context, owner string, repo string, index int64, body *AddTimeOption) (*TrackedTime, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/times", owner, repo, index))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result TrackedTime
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -877,24 +595,16 @@ func (s *RepoService) IssueAddTime(ctx context.Context, owner string, repo strin
 func (s *RepoService) IssueCheckSubscription(ctx context.Context, owner string, repo string, index int64) (*WatchInfo, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/subscriptions/check", owner, repo, index))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result WatchInfo
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -903,24 +613,16 @@ func (s *RepoService) IssueCheckSubscription(ctx context.Context, owner string, 
 func (s *RepoService) IssueClearLabels(ctx context.Context, owner string, repo string, index int64, body *DeleteLabelsOption) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/labels", owner, repo, index))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -930,29 +632,19 @@ func (s *RepoService) IssueClearLabels(ctx context.Context, owner string, repo s
 func (s *RepoService) IssueCreateComment(ctx context.Context, owner string, repo string, index int64, body *CreateIssueCommentOption) (*Comment, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/comments", owner, repo, index))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Comment
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -961,29 +653,19 @@ func (s *RepoService) IssueCreateComment(ctx context.Context, owner string, repo
 func (s *RepoService) IssueCreateIssue(ctx context.Context, owner string, repo string, body *CreateIssueOption) (*Issue, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues", owner, repo))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Issue
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -992,32 +674,20 @@ func (s *RepoService) IssueCreateIssue(ctx context.Context, owner string, repo s
 func (s *RepoService) IssueCreateIssueAttachment(ctx context.Context, owner string, repo string, index int64, name string, updatedAt time.Time) (*Attachment, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/assets", owner, repo, index))
 	qry := u.Query()
-	if name != "" {
-		qry.Set("name", fmt.Sprintf("%v", name))
-	}
-	if updatedAt != (time.Time{}) {
-		qry.Set("updated_at", fmt.Sprintf("%v", updatedAt))
-	}
+	if name != "" { qry.Set("name", fmt.Sprintf("%v", name)) }
+	if updatedAt != (time.Time{}) { qry.Set("updated_at", fmt.Sprintf("%v", updatedAt)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Attachment
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -1026,29 +696,19 @@ func (s *RepoService) IssueCreateIssueAttachment(ctx context.Context, owner stri
 func (s *RepoService) IssueCreateIssueBlocking(ctx context.Context, owner string, repo string, index int64, body *IssueMeta) (*Issue, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/blocks", owner, repo, index))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Issue
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -1057,32 +717,20 @@ func (s *RepoService) IssueCreateIssueBlocking(ctx context.Context, owner string
 func (s *RepoService) IssueCreateIssueCommentAttachment(ctx context.Context, owner string, repo string, id int64, name string, updatedAt time.Time) (*Attachment, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/comments/%d/assets", owner, repo, id))
 	qry := u.Query()
-	if name != "" {
-		qry.Set("name", fmt.Sprintf("%v", name))
-	}
-	if updatedAt != (time.Time{}) {
-		qry.Set("updated_at", fmt.Sprintf("%v", updatedAt))
-	}
+	if name != "" { qry.Set("name", fmt.Sprintf("%v", name)) }
+	if updatedAt != (time.Time{}) { qry.Set("updated_at", fmt.Sprintf("%v", updatedAt)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Attachment
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -1091,29 +739,19 @@ func (s *RepoService) IssueCreateIssueCommentAttachment(ctx context.Context, own
 func (s *RepoService) IssueCreateIssueDependencies(ctx context.Context, owner string, repo string, index int64, body *IssueMeta) (*Issue, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/dependencies", owner, repo, index))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Issue
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -1122,29 +760,19 @@ func (s *RepoService) IssueCreateIssueDependencies(ctx context.Context, owner st
 func (s *RepoService) IssueCreateLabel(ctx context.Context, owner string, repo string, body *CreateLabelOption) (*Label, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/labels", owner, repo))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Label
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -1153,29 +781,19 @@ func (s *RepoService) IssueCreateLabel(ctx context.Context, owner string, repo s
 func (s *RepoService) IssueCreateMilestone(ctx context.Context, owner string, repo string, body *CreateMilestoneOption) (*Milestone, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/milestones", owner, repo))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Milestone
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -1184,19 +802,13 @@ func (s *RepoService) IssueCreateMilestone(ctx context.Context, owner string, re
 func (s *RepoService) IssueDelete(ctx context.Context, owner string, repo string, index int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d", owner, repo, index))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -1206,19 +818,13 @@ func (s *RepoService) IssueDelete(ctx context.Context, owner string, repo string
 func (s *RepoService) IssueDeleteComment(ctx context.Context, owner string, repo string, id int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/comments/%d", owner, repo, id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -1228,19 +834,13 @@ func (s *RepoService) IssueDeleteComment(ctx context.Context, owner string, repo
 func (s *RepoService) IssueDeleteCommentDeprecated(ctx context.Context, owner string, repo string, index int, id int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/comments/%d", owner, repo, index, id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -1250,24 +850,16 @@ func (s *RepoService) IssueDeleteCommentDeprecated(ctx context.Context, owner st
 func (s *RepoService) IssueDeleteCommentReaction(ctx context.Context, owner string, repo string, id int64, content *EditReactionOption) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/comments/%d/reactions", owner, repo, id))
 	bodyBytes, err := json.Marshal(content)
-	if err != nil {
-		return nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -1277,19 +869,13 @@ func (s *RepoService) IssueDeleteCommentReaction(ctx context.Context, owner stri
 func (s *RepoService) IssueDeleteIssueAttachment(ctx context.Context, owner string, repo string, index int64, attachmentId int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/assets/%d", owner, repo, index, attachmentId))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -1299,19 +885,13 @@ func (s *RepoService) IssueDeleteIssueAttachment(ctx context.Context, owner stri
 func (s *RepoService) IssueDeleteIssueCommentAttachment(ctx context.Context, owner string, repo string, id int64, attachmentId int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/comments/%d/assets/%d", owner, repo, id, attachmentId))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -1321,24 +901,16 @@ func (s *RepoService) IssueDeleteIssueCommentAttachment(ctx context.Context, own
 func (s *RepoService) IssueDeleteIssueReaction(ctx context.Context, owner string, repo string, index int64, content *EditReactionOption) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/reactions", owner, repo, index))
 	bodyBytes, err := json.Marshal(content)
-	if err != nil {
-		return nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -1348,19 +920,13 @@ func (s *RepoService) IssueDeleteIssueReaction(ctx context.Context, owner string
 func (s *RepoService) IssueDeleteLabel(ctx context.Context, owner string, repo string, id int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/labels/%d", owner, repo, id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -1370,19 +936,13 @@ func (s *RepoService) IssueDeleteLabel(ctx context.Context, owner string, repo s
 func (s *RepoService) IssueDeleteMilestone(ctx context.Context, owner string, repo string, id int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/milestones/%d", owner, repo, id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -1392,19 +952,13 @@ func (s *RepoService) IssueDeleteMilestone(ctx context.Context, owner string, re
 func (s *RepoService) IssueDeleteStopWatch(ctx context.Context, owner string, repo string, index int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/stopwatch/delete", owner, repo, index))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -1414,19 +968,13 @@ func (s *RepoService) IssueDeleteStopWatch(ctx context.Context, owner string, re
 func (s *RepoService) IssueDeleteSubscription(ctx context.Context, owner string, repo string, index int64, user string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/subscriptions/%s", owner, repo, index, user))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -1436,19 +984,13 @@ func (s *RepoService) IssueDeleteSubscription(ctx context.Context, owner string,
 func (s *RepoService) IssueDeleteTime(ctx context.Context, owner string, repo string, index int64, id int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/times/%d", owner, repo, index, id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -1458,29 +1000,19 @@ func (s *RepoService) IssueDeleteTime(ctx context.Context, owner string, repo st
 func (s *RepoService) IssueEditComment(ctx context.Context, owner string, repo string, id int64, body *EditIssueCommentOption) (*Comment, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/comments/%d", owner, repo, id))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Comment
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -1489,29 +1021,19 @@ func (s *RepoService) IssueEditComment(ctx context.Context, owner string, repo s
 func (s *RepoService) IssueEditCommentDeprecated(ctx context.Context, owner string, repo string, index int, id int64, body *EditIssueCommentOption) (*Comment, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/comments/%d", owner, repo, index, id))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Comment
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -1520,29 +1042,19 @@ func (s *RepoService) IssueEditCommentDeprecated(ctx context.Context, owner stri
 func (s *RepoService) IssueEditIssue(ctx context.Context, owner string, repo string, index int64, body *EditIssueOption) (*Issue, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d", owner, repo, index))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Issue
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -1551,29 +1063,19 @@ func (s *RepoService) IssueEditIssue(ctx context.Context, owner string, repo str
 func (s *RepoService) IssueEditIssueAttachment(ctx context.Context, owner string, repo string, index int64, attachmentId int64, body *EditAttachmentOptions) (*Attachment, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/assets/%d", owner, repo, index, attachmentId))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Attachment
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -1582,29 +1084,19 @@ func (s *RepoService) IssueEditIssueAttachment(ctx context.Context, owner string
 func (s *RepoService) IssueEditIssueCommentAttachment(ctx context.Context, owner string, repo string, id int64, attachmentId int64, body *EditAttachmentOptions) (*Attachment, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/comments/%d/assets/%d", owner, repo, id, attachmentId))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Attachment
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -1613,29 +1105,19 @@ func (s *RepoService) IssueEditIssueCommentAttachment(ctx context.Context, owner
 func (s *RepoService) IssueEditIssueDeadline(ctx context.Context, owner string, repo string, index int64, body *EditDeadlineOption) (*IssueDeadline, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/deadline", owner, repo, index))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result IssueDeadline
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -1644,29 +1126,19 @@ func (s *RepoService) IssueEditIssueDeadline(ctx context.Context, owner string, 
 func (s *RepoService) IssueEditLabel(ctx context.Context, owner string, repo string, id int64, body *EditLabelOption) (*Label, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/labels/%d", owner, repo, id))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Label
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -1675,29 +1147,19 @@ func (s *RepoService) IssueEditLabel(ctx context.Context, owner string, repo str
 func (s *RepoService) IssueEditMilestone(ctx context.Context, owner string, repo string, id int64, body *EditMilestoneOption) (*Milestone, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/milestones/%d", owner, repo, id))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Milestone
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -1706,24 +1168,16 @@ func (s *RepoService) IssueEditMilestone(ctx context.Context, owner string, repo
 func (s *RepoService) IssueGetComment(ctx context.Context, owner string, repo string, id int64) (*Comment, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/comments/%d", owner, repo, id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Comment
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -1732,24 +1186,16 @@ func (s *RepoService) IssueGetComment(ctx context.Context, owner string, repo st
 func (s *RepoService) IssueGetCommentReactions(ctx context.Context, owner string, repo string, id int64) ([]Reaction, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/comments/%d/reactions", owner, repo, id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Reaction
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -1758,32 +1204,20 @@ func (s *RepoService) IssueGetCommentReactions(ctx context.Context, owner string
 func (s *RepoService) IssueGetComments(ctx context.Context, owner string, repo string, index int64, since time.Time, before time.Time) ([]Comment, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/comments", owner, repo, index))
 	qry := u.Query()
-	if since != (time.Time{}) {
-		qry.Set("since", fmt.Sprintf("%v", since))
-	}
-	if before != (time.Time{}) {
-		qry.Set("before", fmt.Sprintf("%v", before))
-	}
+	if since != (time.Time{}) { qry.Set("since", fmt.Sprintf("%v", since)) }
+	if before != (time.Time{}) { qry.Set("before", fmt.Sprintf("%v", before)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Comment
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -1792,38 +1226,22 @@ func (s *RepoService) IssueGetComments(ctx context.Context, owner string, repo s
 func (s *RepoService) IssueGetCommentsAndTimeline(ctx context.Context, owner string, repo string, index int64, since time.Time, page int, limit int, before time.Time) ([]TimelineComment, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/timeline", owner, repo, index))
 	qry := u.Query()
-	if since != (time.Time{}) {
-		qry.Set("since", fmt.Sprintf("%v", since))
-	}
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
-	if before != (time.Time{}) {
-		qry.Set("before", fmt.Sprintf("%v", before))
-	}
+	if since != (time.Time{}) { qry.Set("since", fmt.Sprintf("%v", since)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if before != (time.Time{}) { qry.Set("before", fmt.Sprintf("%v", before)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []TimelineComment
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -1832,24 +1250,16 @@ func (s *RepoService) IssueGetCommentsAndTimeline(ctx context.Context, owner str
 func (s *RepoService) IssueGetIssue(ctx context.Context, owner string, repo string, index int64) (*Issue, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d", owner, repo, index))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Issue
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -1858,24 +1268,16 @@ func (s *RepoService) IssueGetIssue(ctx context.Context, owner string, repo stri
 func (s *RepoService) IssueGetIssueAttachment(ctx context.Context, owner string, repo string, index int64, attachmentId int64) (*Attachment, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/assets/%d", owner, repo, index, attachmentId))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Attachment
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -1884,24 +1286,16 @@ func (s *RepoService) IssueGetIssueAttachment(ctx context.Context, owner string,
 func (s *RepoService) IssueGetIssueCommentAttachment(ctx context.Context, owner string, repo string, id int64, attachmentId int64) (*Attachment, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/comments/%d/assets/%d", owner, repo, id, attachmentId))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Attachment
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -1910,32 +1304,20 @@ func (s *RepoService) IssueGetIssueCommentAttachment(ctx context.Context, owner 
 func (s *RepoService) IssueGetIssueReactions(ctx context.Context, owner string, repo string, index int64, page int, limit int) ([]Reaction, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/reactions", owner, repo, index))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Reaction
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -1944,24 +1326,16 @@ func (s *RepoService) IssueGetIssueReactions(ctx context.Context, owner string, 
 func (s *RepoService) IssueGetLabel(ctx context.Context, owner string, repo string, id int64) (*Label, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/labels/%d", owner, repo, id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Label
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -1970,24 +1344,16 @@ func (s *RepoService) IssueGetLabel(ctx context.Context, owner string, repo stri
 func (s *RepoService) IssueGetLabels(ctx context.Context, owner string, repo string, index int64) ([]Label, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/labels", owner, repo, index))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Label
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -1996,24 +1362,16 @@ func (s *RepoService) IssueGetLabels(ctx context.Context, owner string, repo str
 func (s *RepoService) IssueGetMilestone(ctx context.Context, owner string, repo string, id int64) (*Milestone, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/milestones/%d", owner, repo, id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Milestone
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -2022,38 +1380,22 @@ func (s *RepoService) IssueGetMilestone(ctx context.Context, owner string, repo 
 func (s *RepoService) IssueGetMilestonesList(ctx context.Context, owner string, repo string, state string, name string, page int, limit int) ([]Milestone, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/milestones", owner, repo))
 	qry := u.Query()
-	if state != "" {
-		qry.Set("state", fmt.Sprintf("%v", state))
-	}
-	if name != "" {
-		qry.Set("name", fmt.Sprintf("%v", name))
-	}
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if state != "" { qry.Set("state", fmt.Sprintf("%v", state)) }
+	if name != "" { qry.Set("name", fmt.Sprintf("%v", name)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Milestone
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -2062,38 +1404,22 @@ func (s *RepoService) IssueGetMilestonesList(ctx context.Context, owner string, 
 func (s *RepoService) IssueGetRepoComments(ctx context.Context, owner string, repo string, since time.Time, before time.Time, page int, limit int) ([]Comment, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/comments", owner, repo))
 	qry := u.Query()
-	if since != (time.Time{}) {
-		qry.Set("since", fmt.Sprintf("%v", since))
-	}
-	if before != (time.Time{}) {
-		qry.Set("before", fmt.Sprintf("%v", before))
-	}
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if since != (time.Time{}) { qry.Set("since", fmt.Sprintf("%v", since)) }
+	if before != (time.Time{}) { qry.Set("before", fmt.Sprintf("%v", before)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Comment
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -2102,32 +1428,20 @@ func (s *RepoService) IssueGetRepoComments(ctx context.Context, owner string, re
 func (s *RepoService) IssueListBlocks(ctx context.Context, owner string, repo string, index int64, page int, limit int) ([]Issue, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/blocks", owner, repo, index))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Issue
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -2136,24 +1450,16 @@ func (s *RepoService) IssueListBlocks(ctx context.Context, owner string, repo st
 func (s *RepoService) IssueListIssueAttachments(ctx context.Context, owner string, repo string, index int64) ([]Attachment, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/assets", owner, repo, index))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Attachment
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -2162,24 +1468,16 @@ func (s *RepoService) IssueListIssueAttachments(ctx context.Context, owner strin
 func (s *RepoService) IssueListIssueCommentAttachments(ctx context.Context, owner string, repo string, id int64) ([]Attachment, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/comments/%d/assets", owner, repo, id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Attachment
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -2188,32 +1486,20 @@ func (s *RepoService) IssueListIssueCommentAttachments(ctx context.Context, owne
 func (s *RepoService) IssueListIssueDependencies(ctx context.Context, owner string, repo string, index int64, page int, limit int) ([]Issue, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/dependencies", owner, repo, index))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Issue
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -2222,65 +1508,31 @@ func (s *RepoService) IssueListIssueDependencies(ctx context.Context, owner stri
 func (s *RepoService) IssueListIssues(ctx context.Context, owner string, repo string, state string, labels string, q string, type_ string, milestones string, since time.Time, before time.Time, createdBy string, assignedBy string, mentionedBy string, page int, limit int, sort string) ([]Issue, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues", owner, repo))
 	qry := u.Query()
-	if state != "" {
-		qry.Set("state", fmt.Sprintf("%v", state))
-	}
-	if labels != "" {
-		qry.Set("labels", fmt.Sprintf("%v", labels))
-	}
-	if q != "" {
-		qry.Set("q", fmt.Sprintf("%v", q))
-	}
-	if type_ != "" {
-		qry.Set("type", fmt.Sprintf("%v", type_))
-	}
-	if milestones != "" {
-		qry.Set("milestones", fmt.Sprintf("%v", milestones))
-	}
-	if since != (time.Time{}) {
-		qry.Set("since", fmt.Sprintf("%v", since))
-	}
-	if before != (time.Time{}) {
-		qry.Set("before", fmt.Sprintf("%v", before))
-	}
-	if createdBy != "" {
-		qry.Set("created_by", fmt.Sprintf("%v", createdBy))
-	}
-	if assignedBy != "" {
-		qry.Set("assigned_by", fmt.Sprintf("%v", assignedBy))
-	}
-	if mentionedBy != "" {
-		qry.Set("mentioned_by", fmt.Sprintf("%v", mentionedBy))
-	}
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
-	if sort != "" {
-		qry.Set("sort", fmt.Sprintf("%v", sort))
-	}
+	if state != "" { qry.Set("state", fmt.Sprintf("%v", state)) }
+	if labels != "" { qry.Set("labels", fmt.Sprintf("%v", labels)) }
+	if q != "" { qry.Set("q", fmt.Sprintf("%v", q)) }
+	if type_ != "" { qry.Set("type", fmt.Sprintf("%v", type_)) }
+	if milestones != "" { qry.Set("milestones", fmt.Sprintf("%v", milestones)) }
+	if since != (time.Time{}) { qry.Set("since", fmt.Sprintf("%v", since)) }
+	if before != (time.Time{}) { qry.Set("before", fmt.Sprintf("%v", before)) }
+	if createdBy != "" { qry.Set("created_by", fmt.Sprintf("%v", createdBy)) }
+	if assignedBy != "" { qry.Set("assigned_by", fmt.Sprintf("%v", assignedBy)) }
+	if mentionedBy != "" { qry.Set("mentioned_by", fmt.Sprintf("%v", mentionedBy)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if sort != "" { qry.Set("sort", fmt.Sprintf("%v", sort)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Issue
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -2289,35 +1541,21 @@ func (s *RepoService) IssueListIssues(ctx context.Context, owner string, repo st
 func (s *RepoService) IssueListLabels(ctx context.Context, owner string, repo string, sort string, page int, limit int) ([]Label, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/labels", owner, repo))
 	qry := u.Query()
-	if sort != "" {
-		qry.Set("sort", fmt.Sprintf("%v", sort))
-	}
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if sort != "" { qry.Set("sort", fmt.Sprintf("%v", sort)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Label
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -2326,29 +1564,19 @@ func (s *RepoService) IssueListLabels(ctx context.Context, owner string, repo st
 func (s *RepoService) IssuePostCommentReaction(ctx context.Context, owner string, repo string, id int64, content *EditReactionOption) (*Reaction, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/comments/%d/reactions", owner, repo, id))
 	bodyBytes, err := json.Marshal(content)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Reaction
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -2357,29 +1585,19 @@ func (s *RepoService) IssuePostCommentReaction(ctx context.Context, owner string
 func (s *RepoService) IssuePostIssueReaction(ctx context.Context, owner string, repo string, index int64, content *EditReactionOption) (*Reaction, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/reactions", owner, repo, index))
 	bodyBytes, err := json.Marshal(content)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Reaction
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -2388,29 +1606,19 @@ func (s *RepoService) IssuePostIssueReaction(ctx context.Context, owner string, 
 func (s *RepoService) IssueRemoveIssueBlocking(ctx context.Context, owner string, repo string, index int64, body *IssueMeta) (*Issue, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/blocks", owner, repo, index))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Issue
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -2419,29 +1627,19 @@ func (s *RepoService) IssueRemoveIssueBlocking(ctx context.Context, owner string
 func (s *RepoService) IssueRemoveIssueDependencies(ctx context.Context, owner string, repo string, index int64, body *IssueMeta) (*Issue, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/dependencies", owner, repo, index))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Issue
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -2450,24 +1648,16 @@ func (s *RepoService) IssueRemoveIssueDependencies(ctx context.Context, owner st
 func (s *RepoService) IssueRemoveLabel(ctx context.Context, owner string, repo string, index int64, identifier string, body *DeleteLabelsOption) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/labels/%s", owner, repo, index, identifier))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -2477,29 +1667,19 @@ func (s *RepoService) IssueRemoveLabel(ctx context.Context, owner string, repo s
 func (s *RepoService) IssueReplaceLabels(ctx context.Context, owner string, repo string, index int64, body *IssueLabelsOption) ([]Label, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/labels", owner, repo, index))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Label
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -2508,19 +1688,13 @@ func (s *RepoService) IssueReplaceLabels(ctx context.Context, owner string, repo
 func (s *RepoService) IssueResetTime(ctx context.Context, owner string, repo string, index int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/times", owner, repo, index))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -2530,80 +1704,36 @@ func (s *RepoService) IssueResetTime(ctx context.Context, owner string, repo str
 func (s *RepoService) IssueSearchIssues(ctx context.Context, state string, labels string, milestones string, q string, priorityRepoId int64, type_ string, since time.Time, before time.Time, assigned bool, created bool, mentioned bool, reviewRequested bool, reviewed bool, owner string, team string, page int, limit int, sort string) ([]Issue, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/issues/search"))
 	qry := u.Query()
-	if state != "" {
-		qry.Set("state", fmt.Sprintf("%v", state))
-	}
-	if labels != "" {
-		qry.Set("labels", fmt.Sprintf("%v", labels))
-	}
-	if milestones != "" {
-		qry.Set("milestones", fmt.Sprintf("%v", milestones))
-	}
-	if q != "" {
-		qry.Set("q", fmt.Sprintf("%v", q))
-	}
-	if priorityRepoId != 0 {
-		qry.Set("priority_repo_id", fmt.Sprintf("%v", priorityRepoId))
-	}
-	if type_ != "" {
-		qry.Set("type", fmt.Sprintf("%v", type_))
-	}
-	if since != (time.Time{}) {
-		qry.Set("since", fmt.Sprintf("%v", since))
-	}
-	if before != (time.Time{}) {
-		qry.Set("before", fmt.Sprintf("%v", before))
-	}
-	if assigned != false {
-		qry.Set("assigned", fmt.Sprintf("%v", assigned))
-	}
-	if created != false {
-		qry.Set("created", fmt.Sprintf("%v", created))
-	}
-	if mentioned != false {
-		qry.Set("mentioned", fmt.Sprintf("%v", mentioned))
-	}
-	if reviewRequested != false {
-		qry.Set("review_requested", fmt.Sprintf("%v", reviewRequested))
-	}
-	if reviewed != false {
-		qry.Set("reviewed", fmt.Sprintf("%v", reviewed))
-	}
-	if owner != "" {
-		qry.Set("owner", fmt.Sprintf("%v", owner))
-	}
-	if team != "" {
-		qry.Set("team", fmt.Sprintf("%v", team))
-	}
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
-	if sort != "" {
-		qry.Set("sort", fmt.Sprintf("%v", sort))
-	}
+	if state != "" { qry.Set("state", fmt.Sprintf("%v", state)) }
+	if labels != "" { qry.Set("labels", fmt.Sprintf("%v", labels)) }
+	if milestones != "" { qry.Set("milestones", fmt.Sprintf("%v", milestones)) }
+	if q != "" { qry.Set("q", fmt.Sprintf("%v", q)) }
+	if priorityRepoId != 0 { qry.Set("priority_repo_id", fmt.Sprintf("%v", priorityRepoId)) }
+	if type_ != "" { qry.Set("type", fmt.Sprintf("%v", type_)) }
+	if since != (time.Time{}) { qry.Set("since", fmt.Sprintf("%v", since)) }
+	if before != (time.Time{}) { qry.Set("before", fmt.Sprintf("%v", before)) }
+	if assigned != false { qry.Set("assigned", fmt.Sprintf("%v", assigned)) }
+	if created != false { qry.Set("created", fmt.Sprintf("%v", created)) }
+	if mentioned != false { qry.Set("mentioned", fmt.Sprintf("%v", mentioned)) }
+	if reviewRequested != false { qry.Set("review_requested", fmt.Sprintf("%v", reviewRequested)) }
+	if reviewed != false { qry.Set("reviewed", fmt.Sprintf("%v", reviewed)) }
+	if owner != "" { qry.Set("owner", fmt.Sprintf("%v", owner)) }
+	if team != "" { qry.Set("team", fmt.Sprintf("%v", team)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if sort != "" { qry.Set("sort", fmt.Sprintf("%v", sort)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Issue
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -2612,19 +1742,13 @@ func (s *RepoService) IssueSearchIssues(ctx context.Context, state string, label
 func (s *RepoService) IssueStartStopWatch(ctx context.Context, owner string, repo string, index int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/stopwatch/start", owner, repo, index))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -2634,19 +1758,13 @@ func (s *RepoService) IssueStartStopWatch(ctx context.Context, owner string, rep
 func (s *RepoService) IssueStopStopWatch(ctx context.Context, owner string, repo string, index int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/stopwatch/stop", owner, repo, index))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -2656,32 +1774,20 @@ func (s *RepoService) IssueStopStopWatch(ctx context.Context, owner string, repo
 func (s *RepoService) IssueSubscriptions(ctx context.Context, owner string, repo string, index int64, page int, limit int) ([]User, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/subscriptions", owner, repo, index))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []User
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -2690,41 +1796,23 @@ func (s *RepoService) IssueSubscriptions(ctx context.Context, owner string, repo
 func (s *RepoService) IssueTrackedTimes(ctx context.Context, owner string, repo string, index int64, user string, since time.Time, before time.Time, page int, limit int) ([]TrackedTime, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/times", owner, repo, index))
 	qry := u.Query()
-	if user != "" {
-		qry.Set("user", fmt.Sprintf("%v", user))
-	}
-	if since != (time.Time{}) {
-		qry.Set("since", fmt.Sprintf("%v", since))
-	}
-	if before != (time.Time{}) {
-		qry.Set("before", fmt.Sprintf("%v", before))
-	}
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if user != "" { qry.Set("user", fmt.Sprintf("%v", user)) }
+	if since != (time.Time{}) { qry.Set("since", fmt.Sprintf("%v", since)) }
+	if before != (time.Time{}) { qry.Set("before", fmt.Sprintf("%v", before)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []TrackedTime
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -2733,32 +1821,20 @@ func (s *RepoService) IssueTrackedTimes(ctx context.Context, owner string, repo 
 func (s *RepoService) ListForks(ctx context.Context, owner string, repo string, page int, limit int) ([]Repository, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/forks", owner, repo))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Repository
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -2767,19 +1843,13 @@ func (s *RepoService) ListForks(ctx context.Context, owner string, repo string, 
 func (s *RepoService) MoveIssuePin(ctx context.Context, owner string, repo string, index int64, position int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/pin/%d", owner, repo, index, position))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -2789,47 +1859,25 @@ func (s *RepoService) MoveIssuePin(ctx context.Context, owner string, repo strin
 func (s *RepoService) NotifyGetRepoList(ctx context.Context, owner string, repo string, all bool, statusTypes []interface{}, subjectType []interface{}, since time.Time, before time.Time, page int, limit int) ([]NotificationThread, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/notifications", owner, repo))
 	qry := u.Query()
-	if all != false {
-		qry.Set("all", fmt.Sprintf("%v", all))
-	}
-	if statusTypes != nil {
-		qry.Set("status-types", fmt.Sprintf("%v", statusTypes))
-	}
-	if subjectType != nil {
-		qry.Set("subject-type", fmt.Sprintf("%v", subjectType))
-	}
-	if since != (time.Time{}) {
-		qry.Set("since", fmt.Sprintf("%v", since))
-	}
-	if before != (time.Time{}) {
-		qry.Set("before", fmt.Sprintf("%v", before))
-	}
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if all != false { qry.Set("all", fmt.Sprintf("%v", all)) }
+	if statusTypes != nil { qry.Set("status-types", fmt.Sprintf("%v", statusTypes)) }
+	if subjectType != nil { qry.Set("subject-type", fmt.Sprintf("%v", subjectType)) }
+	if since != (time.Time{}) { qry.Set("since", fmt.Sprintf("%v", since)) }
+	if before != (time.Time{}) { qry.Set("before", fmt.Sprintf("%v", before)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []NotificationThread
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -2838,33 +1886,19 @@ func (s *RepoService) NotifyGetRepoList(ctx context.Context, owner string, repo 
 func (s *RepoService) NotifyReadRepoList(ctx context.Context, owner string, repo string, all bool, statusTypes []interface{}, toStatus string, lastReadAt time.Time) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/notifications", owner, repo))
 	qry := u.Query()
-	if all != false {
-		qry.Set("all", fmt.Sprintf("%v", all))
-	}
-	if statusTypes != nil {
-		qry.Set("status-types", fmt.Sprintf("%v", statusTypes))
-	}
-	if toStatus != "" {
-		qry.Set("to-status", fmt.Sprintf("%v", toStatus))
-	}
-	if lastReadAt != (time.Time{}) {
-		qry.Set("last_read_at", fmt.Sprintf("%v", lastReadAt))
-	}
+	if all != false { qry.Set("all", fmt.Sprintf("%v", all)) }
+	if statusTypes != nil { qry.Set("status-types", fmt.Sprintf("%v", statusTypes)) }
+	if toStatus != "" { qry.Set("to-status", fmt.Sprintf("%v", toStatus)) }
+	if lastReadAt != (time.Time{}) { qry.Set("last_read_at", fmt.Sprintf("%v", lastReadAt)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -2874,19 +1908,13 @@ func (s *RepoService) NotifyReadRepoList(ctx context.Context, owner string, repo
 func (s *RepoService) PinIssue(ctx context.Context, owner string, repo string, index int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/pin", owner, repo, index))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -2896,29 +1924,19 @@ func (s *RepoService) PinIssue(ctx context.Context, owner string, repo string, i
 func (s *RepoService) RegisterRepoRunner(ctx context.Context, owner string, repo string, body *RegisterRunnerOptions) (*RegisterRunnerResponse, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/runners", owner, repo))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result RegisterRunnerResponse
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -2927,24 +1945,16 @@ func (s *RepoService) RegisterRepoRunner(ctx context.Context, owner string, repo
 func (s *RepoService) RejectRepoTransfer(ctx context.Context, owner string, repo string) (*Repository, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/transfer/reject", owner, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Repository
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -2953,24 +1963,16 @@ func (s *RepoService) RejectRepoTransfer(ctx context.Context, owner string, repo
 func (s *RepoService) RepoAddCollaborator(ctx context.Context, owner string, repo string, collaborator string, body *AddCollaboratorOption) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/collaborators/%s", owner, repo, collaborator))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -2980,19 +1982,13 @@ func (s *RepoService) RepoAddCollaborator(ctx context.Context, owner string, rep
 func (s *RepoService) RepoAddFlag(ctx context.Context, owner string, repo string, flag string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/flags/%s", owner, repo, flag))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -3002,29 +1998,19 @@ func (s *RepoService) RepoAddFlag(ctx context.Context, owner string, repo string
 func (s *RepoService) RepoAddPushMirror(ctx context.Context, owner string, repo string, body *CreatePushMirrorOption) (*PushMirror, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/push_mirrors", owner, repo))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result PushMirror
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -3033,19 +2019,13 @@ func (s *RepoService) RepoAddPushMirror(ctx context.Context, owner string, repo 
 func (s *RepoService) RepoAddTeam(ctx context.Context, owner string, repo string, team string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/teams/%s", owner, repo, team))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -3055,19 +2035,13 @@ func (s *RepoService) RepoAddTeam(ctx context.Context, owner string, repo string
 func (s *RepoService) RepoAddTopic(ctx context.Context, owner string, repo string, topic string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/topics/%s", owner, repo, topic))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -3077,29 +2051,19 @@ func (s *RepoService) RepoAddTopic(ctx context.Context, owner string, repo strin
 func (s *RepoService) RepoApplyDiffPatch(ctx context.Context, owner string, repo string, body *UpdateFileOptions) (*FileResponse, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/diffpatch", owner, repo))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result FileResponse
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -3108,19 +2072,13 @@ func (s *RepoService) RepoApplyDiffPatch(ctx context.Context, owner string, repo
 func (s *RepoService) RepoCancelScheduledAutoMerge(ctx context.Context, owner string, repo string, index int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/pulls/%d/merge", owner, repo, index))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -3130,29 +2088,19 @@ func (s *RepoService) RepoCancelScheduledAutoMerge(ctx context.Context, owner st
 func (s *RepoService) RepoChangeFiles(ctx context.Context, owner string, repo string, body *ChangeFilesOptions) (*FilesResponse, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/contents", owner, repo))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result FilesResponse
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -3161,19 +2109,13 @@ func (s *RepoService) RepoChangeFiles(ctx context.Context, owner string, repo st
 func (s *RepoService) RepoCheckCollaborator(ctx context.Context, owner string, repo string, collaborator string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/collaborators/%s", owner, repo, collaborator))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -3183,19 +2125,13 @@ func (s *RepoService) RepoCheckCollaborator(ctx context.Context, owner string, r
 func (s *RepoService) RepoCheckFlag(ctx context.Context, owner string, repo string, flag string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/flags/%s", owner, repo, flag))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -3205,24 +2141,16 @@ func (s *RepoService) RepoCheckFlag(ctx context.Context, owner string, repo stri
 func (s *RepoService) RepoCheckTeam(ctx context.Context, owner string, repo string, team string) (*Team, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/teams/%s", owner, repo, team))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Team
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -3231,24 +2159,16 @@ func (s *RepoService) RepoCheckTeam(ctx context.Context, owner string, repo stri
 func (s *RepoService) RepoCompareDiff(ctx context.Context, owner string, repo string, basehead string) (*Compare, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/compare/%s", owner, repo, basehead))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Compare
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -3257,24 +2177,16 @@ func (s *RepoService) RepoCompareDiff(ctx context.Context, owner string, repo st
 func (s *RepoService) RepoConvert(ctx context.Context, owner string, repo string) (*Repository, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/convert", owner, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Repository
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -3283,29 +2195,19 @@ func (s *RepoService) RepoConvert(ctx context.Context, owner string, repo string
 func (s *RepoService) RepoCreateBranch(ctx context.Context, owner string, repo string, body *CreateBranchRepoOption) (*Branch, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/branches", owner, repo))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Branch
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -3314,29 +2216,19 @@ func (s *RepoService) RepoCreateBranch(ctx context.Context, owner string, repo s
 func (s *RepoService) RepoCreateBranchProtection(ctx context.Context, owner string, repo string, body *CreateBranchProtectionOption) (*BranchProtection, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/branch_protections", owner, repo))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result BranchProtection
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -3345,29 +2237,19 @@ func (s *RepoService) RepoCreateBranchProtection(ctx context.Context, owner stri
 func (s *RepoService) RepoCreateFile(ctx context.Context, owner string, repo string, filepath string, body *CreateFileOptions) (*FileResponse, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/contents/%s", owner, repo, filepath))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result FileResponse
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -3376,29 +2258,19 @@ func (s *RepoService) RepoCreateFile(ctx context.Context, owner string, repo str
 func (s *RepoService) RepoCreateHook(ctx context.Context, owner string, repo string, body *CreateHookOption) (*Hook, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/hooks", owner, repo))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Hook
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -3407,29 +2279,19 @@ func (s *RepoService) RepoCreateHook(ctx context.Context, owner string, repo str
 func (s *RepoService) RepoCreateKey(ctx context.Context, owner string, repo string, body *CreateKeyOption) (*DeployKey, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/keys", owner, repo))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result DeployKey
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -3438,29 +2300,19 @@ func (s *RepoService) RepoCreateKey(ctx context.Context, owner string, repo stri
 func (s *RepoService) RepoCreatePullRequest(ctx context.Context, owner string, repo string, body *CreatePullRequestOption) (*PullRequest, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/pulls", owner, repo))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result PullRequest
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -3469,29 +2321,19 @@ func (s *RepoService) RepoCreatePullRequest(ctx context.Context, owner string, r
 func (s *RepoService) RepoCreatePullReview(ctx context.Context, owner string, repo string, index int64, body *CreatePullReviewOptions) (*PullReview, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/pulls/%d/reviews", owner, repo, index))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result PullReview
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -3500,29 +2342,19 @@ func (s *RepoService) RepoCreatePullReview(ctx context.Context, owner string, re
 func (s *RepoService) RepoCreatePullReviewComment(ctx context.Context, owner string, repo string, index int64, id int64, body *CreatePullReviewCommentOptions) (*PullReviewComment, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/pulls/%d/reviews/%d/comments", owner, repo, index, id))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result PullReviewComment
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -3531,29 +2363,19 @@ func (s *RepoService) RepoCreatePullReviewComment(ctx context.Context, owner str
 func (s *RepoService) RepoCreatePullReviewRequests(ctx context.Context, owner string, repo string, index int64, body *PullReviewRequestOptions) ([]PullReview, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/pulls/%d/requested_reviewers", owner, repo, index))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []PullReview
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -3562,29 +2384,19 @@ func (s *RepoService) RepoCreatePullReviewRequests(ctx context.Context, owner st
 func (s *RepoService) RepoCreateRelease(ctx context.Context, owner string, repo string, body *CreateReleaseOption) (*Release, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/releases", owner, repo))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Release
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -3593,29 +2405,19 @@ func (s *RepoService) RepoCreateRelease(ctx context.Context, owner string, repo 
 func (s *RepoService) RepoCreateReleaseAttachment(ctx context.Context, owner string, repo string, id int64, name string) (*Attachment, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/releases/%d/assets", owner, repo, id))
 	qry := u.Query()
-	if name != "" {
-		qry.Set("name", fmt.Sprintf("%v", name))
-	}
+	if name != "" { qry.Set("name", fmt.Sprintf("%v", name)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Attachment
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -3624,29 +2426,19 @@ func (s *RepoService) RepoCreateReleaseAttachment(ctx context.Context, owner str
 func (s *RepoService) RepoCreateStatus(ctx context.Context, owner string, repo string, sha string, body *CreateStatusOption) (*CommitStatus, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/statuses/%s", owner, repo, sha))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result CommitStatus
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -3655,29 +2447,19 @@ func (s *RepoService) RepoCreateStatus(ctx context.Context, owner string, repo s
 func (s *RepoService) RepoCreateTag(ctx context.Context, owner string, repo string, body *CreateTagOption) (*Tag, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/tags", owner, repo))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Tag
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -3686,29 +2468,19 @@ func (s *RepoService) RepoCreateTag(ctx context.Context, owner string, repo stri
 func (s *RepoService) RepoCreateTagProtection(ctx context.Context, owner string, repo string, body *CreateTagProtectionOption) (*TagProtection, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/tag_protections", owner, repo))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result TagProtection
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -3717,29 +2489,19 @@ func (s *RepoService) RepoCreateTagProtection(ctx context.Context, owner string,
 func (s *RepoService) RepoCreateWikiPage(ctx context.Context, owner string, repo string, body *CreateWikiPageOptions) (*WikiPage, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/wiki/new", owner, repo))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result WikiPage
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -3748,19 +2510,13 @@ func (s *RepoService) RepoCreateWikiPage(ctx context.Context, owner string, repo
 func (s *RepoService) RepoDelete(ctx context.Context, owner string, repo string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s", owner, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -3770,19 +2526,13 @@ func (s *RepoService) RepoDelete(ctx context.Context, owner string, repo string)
 func (s *RepoService) RepoDeleteAllFlags(ctx context.Context, owner string, repo string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/flags", owner, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -3792,19 +2542,13 @@ func (s *RepoService) RepoDeleteAllFlags(ctx context.Context, owner string, repo
 func (s *RepoService) RepoDeleteAvatar(ctx context.Context, owner string, repo string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/avatar", owner, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -3814,19 +2558,13 @@ func (s *RepoService) RepoDeleteAvatar(ctx context.Context, owner string, repo s
 func (s *RepoService) RepoDeleteBranch(ctx context.Context, owner string, repo string, branch string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/branches/%s", owner, repo, branch))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -3836,19 +2574,13 @@ func (s *RepoService) RepoDeleteBranch(ctx context.Context, owner string, repo s
 func (s *RepoService) RepoDeleteBranchProtection(ctx context.Context, owner string, repo string, name string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/branch_protections/%s", owner, repo, name))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -3858,19 +2590,13 @@ func (s *RepoService) RepoDeleteBranchProtection(ctx context.Context, owner stri
 func (s *RepoService) RepoDeleteCollaborator(ctx context.Context, owner string, repo string, collaborator string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/collaborators/%s", owner, repo, collaborator))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -3880,29 +2606,19 @@ func (s *RepoService) RepoDeleteCollaborator(ctx context.Context, owner string, 
 func (s *RepoService) RepoDeleteFile(ctx context.Context, owner string, repo string, filepath string, body *DeleteFileOptions) (*FileDeleteResponse, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/contents/%s", owner, repo, filepath))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result FileDeleteResponse
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -3911,19 +2627,13 @@ func (s *RepoService) RepoDeleteFile(ctx context.Context, owner string, repo str
 func (s *RepoService) RepoDeleteFlag(ctx context.Context, owner string, repo string, flag string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/flags/%s", owner, repo, flag))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -3933,19 +2643,13 @@ func (s *RepoService) RepoDeleteFlag(ctx context.Context, owner string, repo str
 func (s *RepoService) RepoDeleteGitHook(ctx context.Context, owner string, repo string, id string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/hooks/git/%s", owner, repo, id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -3955,19 +2659,13 @@ func (s *RepoService) RepoDeleteGitHook(ctx context.Context, owner string, repo 
 func (s *RepoService) RepoDeleteHook(ctx context.Context, owner string, repo string, id int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/hooks/%d", owner, repo, id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -3977,19 +2675,13 @@ func (s *RepoService) RepoDeleteHook(ctx context.Context, owner string, repo str
 func (s *RepoService) RepoDeleteKey(ctx context.Context, owner string, repo string, id int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/keys/%d", owner, repo, id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -3999,19 +2691,13 @@ func (s *RepoService) RepoDeleteKey(ctx context.Context, owner string, repo stri
 func (s *RepoService) RepoDeletePullReview(ctx context.Context, owner string, repo string, index int64, id int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/pulls/%d/reviews/%d", owner, repo, index, id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -4021,19 +2707,13 @@ func (s *RepoService) RepoDeletePullReview(ctx context.Context, owner string, re
 func (s *RepoService) RepoDeletePullReviewComment(ctx context.Context, owner string, repo string, index int64, id int64, comment int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/pulls/%d/reviews/%d/comments/%d", owner, repo, index, id, comment))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -4043,24 +2723,16 @@ func (s *RepoService) RepoDeletePullReviewComment(ctx context.Context, owner str
 func (s *RepoService) RepoDeletePullReviewRequests(ctx context.Context, owner string, repo string, index int64, body *PullReviewRequestOptions) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/pulls/%d/requested_reviewers", owner, repo, index))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -4070,19 +2742,13 @@ func (s *RepoService) RepoDeletePullReviewRequests(ctx context.Context, owner st
 func (s *RepoService) RepoDeletePushMirror(ctx context.Context, owner string, repo string, name string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/push_mirrors/%s", owner, repo, name))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -4092,19 +2758,13 @@ func (s *RepoService) RepoDeletePushMirror(ctx context.Context, owner string, re
 func (s *RepoService) RepoDeleteRelease(ctx context.Context, owner string, repo string, id int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/releases/%d", owner, repo, id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -4114,19 +2774,13 @@ func (s *RepoService) RepoDeleteRelease(ctx context.Context, owner string, repo 
 func (s *RepoService) RepoDeleteReleaseAttachment(ctx context.Context, owner string, repo string, id int64, attachmentId int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/releases/%d/assets/%d", owner, repo, id, attachmentId))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -4136,19 +2790,13 @@ func (s *RepoService) RepoDeleteReleaseAttachment(ctx context.Context, owner str
 func (s *RepoService) RepoDeleteReleaseByTag(ctx context.Context, owner string, repo string, tag string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/releases/tags/%s", owner, repo, tag))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -4158,19 +2806,13 @@ func (s *RepoService) RepoDeleteReleaseByTag(ctx context.Context, owner string, 
 func (s *RepoService) RepoDeleteTag(ctx context.Context, owner string, repo string, tag string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/tags/%s", owner, repo, tag))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -4180,19 +2822,13 @@ func (s *RepoService) RepoDeleteTag(ctx context.Context, owner string, repo stri
 func (s *RepoService) RepoDeleteTagProtection(ctx context.Context, owner string, repo string, id int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/tag_protections/%d", owner, repo, id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -4202,19 +2838,13 @@ func (s *RepoService) RepoDeleteTagProtection(ctx context.Context, owner string,
 func (s *RepoService) RepoDeleteTeam(ctx context.Context, owner string, repo string, team string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/teams/%s", owner, repo, team))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -4224,19 +2854,13 @@ func (s *RepoService) RepoDeleteTeam(ctx context.Context, owner string, repo str
 func (s *RepoService) RepoDeleteTopic(ctx context.Context, owner string, repo string, topic string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/topics/%s", owner, repo, topic))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -4246,19 +2870,13 @@ func (s *RepoService) RepoDeleteTopic(ctx context.Context, owner string, repo st
 func (s *RepoService) RepoDeleteWikiPage(ctx context.Context, owner string, repo string, pageName string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/wiki/page/%s", owner, repo, pageName))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -4268,29 +2886,19 @@ func (s *RepoService) RepoDeleteWikiPage(ctx context.Context, owner string, repo
 func (s *RepoService) RepoDismissPullReview(ctx context.Context, owner string, repo string, index int64, id int64, body *DismissPullReviewOptions) (*PullReview, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/pulls/%d/reviews/%d/dismissals", owner, repo, index, id))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result PullReview
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -4299,24 +2907,16 @@ func (s *RepoService) RepoDismissPullReview(ctx context.Context, owner string, r
 func (s *RepoService) RepoDownloadCommitDiffOrPatch(ctx context.Context, owner string, repo string, sha string, diffType string) (string, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/git/commits/%s.%s", owner, repo, sha, diffType))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return "", nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return "", nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return "", nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return "", nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return "", nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return "", nil, handleError(resp) }
 
 	rawBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", nil, fmt.Errorf("read: %w", err)
-	}
+	if err != nil { return "", nil, fmt.Errorf("read: %w", err) }
 	return string(rawBody), &Response{Response: resp}, nil
 }
 
@@ -4325,29 +2925,19 @@ func (s *RepoService) RepoDownloadCommitDiffOrPatch(ctx context.Context, owner s
 func (s *RepoService) RepoDownloadPullDiffOrPatch(ctx context.Context, owner string, repo string, index int64, diffType string, binary bool) (string, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/pulls/%d.%s", owner, repo, index, diffType))
 	qry := u.Query()
-	if binary != false {
-		qry.Set("binary", fmt.Sprintf("%v", binary))
-	}
+	if binary != false { qry.Set("binary", fmt.Sprintf("%v", binary)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return "", nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return "", nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return "", nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return "", nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return "", nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return "", nil, handleError(resp) }
 
 	rawBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", nil, fmt.Errorf("read: %w", err)
-	}
+	if err != nil { return "", nil, fmt.Errorf("read: %w", err) }
 	return string(rawBody), &Response{Response: resp}, nil
 }
 
@@ -4356,29 +2946,19 @@ func (s *RepoService) RepoDownloadPullDiffOrPatch(ctx context.Context, owner str
 func (s *RepoService) RepoEdit(ctx context.Context, owner string, repo string, body *EditRepoOption) (*Repository, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s", owner, repo))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Repository
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -4387,29 +2967,19 @@ func (s *RepoService) RepoEdit(ctx context.Context, owner string, repo string, b
 func (s *RepoService) RepoEditBranchProtection(ctx context.Context, owner string, repo string, name string, body *EditBranchProtectionOption) (*BranchProtection, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/branch_protections/%s", owner, repo, name))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result BranchProtection
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -4418,29 +2988,19 @@ func (s *RepoService) RepoEditBranchProtection(ctx context.Context, owner string
 func (s *RepoService) RepoEditGitHook(ctx context.Context, owner string, repo string, id string, body *EditGitHookOption) (*GitHook, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/hooks/git/%s", owner, repo, id))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result GitHook
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -4449,29 +3009,19 @@ func (s *RepoService) RepoEditGitHook(ctx context.Context, owner string, repo st
 func (s *RepoService) RepoEditHook(ctx context.Context, owner string, repo string, id int64, body *EditHookOption) (*Hook, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/hooks/%d", owner, repo, id))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Hook
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -4480,29 +3030,19 @@ func (s *RepoService) RepoEditHook(ctx context.Context, owner string, repo strin
 func (s *RepoService) RepoEditPullRequest(ctx context.Context, owner string, repo string, index int64, body *EditPullRequestOption) (*PullRequest, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/pulls/%d", owner, repo, index))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result PullRequest
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -4511,29 +3051,19 @@ func (s *RepoService) RepoEditPullRequest(ctx context.Context, owner string, rep
 func (s *RepoService) RepoEditRelease(ctx context.Context, owner string, repo string, id int64, body *EditReleaseOption) (*Release, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/releases/%d", owner, repo, id))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Release
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -4542,29 +3072,19 @@ func (s *RepoService) RepoEditRelease(ctx context.Context, owner string, repo st
 func (s *RepoService) RepoEditReleaseAttachment(ctx context.Context, owner string, repo string, id int64, attachmentId int64, body *EditAttachmentOptions) (*Attachment, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/releases/%d/assets/%d", owner, repo, id, attachmentId))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Attachment
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -4573,29 +3093,19 @@ func (s *RepoService) RepoEditReleaseAttachment(ctx context.Context, owner strin
 func (s *RepoService) RepoEditTagProtection(ctx context.Context, owner string, repo string, id int64, body *EditTagProtectionOption) (*TagProtection, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/tag_protections/%d", owner, repo, id))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result TagProtection
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -4604,29 +3114,19 @@ func (s *RepoService) RepoEditTagProtection(ctx context.Context, owner string, r
 func (s *RepoService) RepoEditWikiPage(ctx context.Context, owner string, repo string, pageName string, body *CreateWikiPageOptions) (*WikiPage, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/wiki/page/%s", owner, repo, pageName))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result WikiPage
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -4635,24 +3135,16 @@ func (s *RepoService) RepoEditWikiPage(ctx context.Context, owner string, repo s
 func (s *RepoService) RepoGet(ctx context.Context, owner string, repo string) (*Repository, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s", owner, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Repository
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -4661,29 +3153,19 @@ func (s *RepoService) RepoGet(ctx context.Context, owner string, repo string) (*
 func (s *RepoService) RepoGetActionJobLogs(ctx context.Context, owner string, repo string, jobId int64, attempt int64) (string, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/jobs/%d/logs", owner, repo, jobId))
 	qry := u.Query()
-	if attempt != 0 {
-		qry.Set("attempt", fmt.Sprintf("%v", attempt))
-	}
+	if attempt != 0 { qry.Set("attempt", fmt.Sprintf("%v", attempt)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return "", nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return "", nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return "", nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return "", nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return "", nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return "", nil, handleError(resp) }
 
 	rawBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", nil, fmt.Errorf("read: %w", err)
-	}
+	if err != nil { return "", nil, fmt.Errorf("read: %w", err) }
 	return string(rawBody), &Response{Response: resp}, nil
 }
 
@@ -4692,24 +3174,16 @@ func (s *RepoService) RepoGetActionJobLogs(ctx context.Context, owner string, re
 func (s *RepoService) RepoGetActionRunLogs(ctx context.Context, owner string, repo string, runId int64) (string, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/runs/%d/logs", owner, repo, runId))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return "", nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return "", nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return "", nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return "", nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return "", nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return "", nil, handleError(resp) }
 
 	rawBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", nil, fmt.Errorf("read: %w", err)
-	}
+	if err != nil { return "", nil, fmt.Errorf("read: %w", err) }
 	return string(rawBody), &Response{Response: resp}, nil
 }
 
@@ -4718,50 +3192,26 @@ func (s *RepoService) RepoGetActionRunLogs(ctx context.Context, owner string, re
 func (s *RepoService) RepoGetAllCommits(ctx context.Context, owner string, repo string, sha string, path string, stat bool, verification bool, files bool, page int, limit int, not string) ([]Commit, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/commits", owner, repo))
 	qry := u.Query()
-	if sha != "" {
-		qry.Set("sha", fmt.Sprintf("%v", sha))
-	}
-	if path != "" {
-		qry.Set("path", fmt.Sprintf("%v", path))
-	}
-	if stat != false {
-		qry.Set("stat", fmt.Sprintf("%v", stat))
-	}
-	if verification != false {
-		qry.Set("verification", fmt.Sprintf("%v", verification))
-	}
-	if files != false {
-		qry.Set("files", fmt.Sprintf("%v", files))
-	}
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
-	if not != "" {
-		qry.Set("not", fmt.Sprintf("%v", not))
-	}
+	if sha != "" { qry.Set("sha", fmt.Sprintf("%v", sha)) }
+	if path != "" { qry.Set("path", fmt.Sprintf("%v", path)) }
+	if stat != false { qry.Set("stat", fmt.Sprintf("%v", stat)) }
+	if verification != false { qry.Set("verification", fmt.Sprintf("%v", verification)) }
+	if files != false { qry.Set("files", fmt.Sprintf("%v", files)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if not != "" { qry.Set("not", fmt.Sprintf("%v", not)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Commit
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -4770,19 +3220,13 @@ func (s *RepoService) RepoGetAllCommits(ctx context.Context, owner string, repo 
 func (s *RepoService) RepoGetArchive(ctx context.Context, owner string, repo string, archive string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/archive/%s", owner, repo, archive))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -4792,24 +3236,16 @@ func (s *RepoService) RepoGetArchive(ctx context.Context, owner string, repo str
 func (s *RepoService) RepoGetAssignees(ctx context.Context, owner string, repo string) ([]User, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/assignees", owner, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []User
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -4818,24 +3254,16 @@ func (s *RepoService) RepoGetAssignees(ctx context.Context, owner string, repo s
 func (s *RepoService) RepoGetBranch(ctx context.Context, owner string, repo string, branch string) (*Branch, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/branches/%s", owner, repo, branch))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Branch
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -4844,24 +3272,16 @@ func (s *RepoService) RepoGetBranch(ctx context.Context, owner string, repo stri
 func (s *RepoService) RepoGetBranchProtection(ctx context.Context, owner string, repo string, name string) (*BranchProtection, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/branch_protections/%s", owner, repo, name))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result BranchProtection
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -4870,32 +3290,20 @@ func (s *RepoService) RepoGetBranchProtection(ctx context.Context, owner string,
 func (s *RepoService) RepoGetCombinedStatusByRef(ctx context.Context, owner string, repo string, ref string, page int, limit int) (*CombinedStatus, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/commits/%s/status", owner, repo, ref))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result CombinedStatus
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -4904,24 +3312,16 @@ func (s *RepoService) RepoGetCombinedStatusByRef(ctx context.Context, owner stri
 func (s *RepoService) RepoGetCommitPullRequest(ctx context.Context, owner string, repo string, sha string) (*PullRequest, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/commits/%s/pull", owner, repo, sha))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result PullRequest
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -4930,29 +3330,19 @@ func (s *RepoService) RepoGetCommitPullRequest(ctx context.Context, owner string
 func (s *RepoService) RepoGetContents(ctx context.Context, owner string, repo string, filepath string, ref string) (*ContentsResponse, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/contents/%s", owner, repo, filepath))
 	qry := u.Query()
-	if ref != "" {
-		qry.Set("ref", fmt.Sprintf("%v", ref))
-	}
+	if ref != "" { qry.Set("ref", fmt.Sprintf("%v", ref)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result ContentsResponse
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -4961,29 +3351,19 @@ func (s *RepoService) RepoGetContents(ctx context.Context, owner string, repo st
 func (s *RepoService) RepoGetContentsList(ctx context.Context, owner string, repo string, ref string) ([]ContentsResponse, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/contents", owner, repo))
 	qry := u.Query()
-	if ref != "" {
-		qry.Set("ref", fmt.Sprintf("%v", ref))
-	}
+	if ref != "" { qry.Set("ref", fmt.Sprintf("%v", ref)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []ContentsResponse
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -4992,29 +3372,19 @@ func (s *RepoService) RepoGetContentsList(ctx context.Context, owner string, rep
 func (s *RepoService) RepoGetEditorConfig(ctx context.Context, owner string, repo string, filepath string, ref string) (*map[string]string, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/editorconfig/%s", owner, repo, filepath))
 	qry := u.Query()
-	if ref != "" {
-		qry.Set("ref", fmt.Sprintf("%v", ref))
-	}
+	if ref != "" { qry.Set("ref", fmt.Sprintf("%v", ref)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result map[string]string
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -5023,24 +3393,16 @@ func (s *RepoService) RepoGetEditorConfig(ctx context.Context, owner string, rep
 func (s *RepoService) RepoGetGitHook(ctx context.Context, owner string, repo string, id string) (*GitHook, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/hooks/git/%s", owner, repo, id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result GitHook
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -5049,24 +3411,16 @@ func (s *RepoService) RepoGetGitHook(ctx context.Context, owner string, repo str
 func (s *RepoService) RepoGetHook(ctx context.Context, owner string, repo string, id int64) (*Hook, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/hooks/%d", owner, repo, id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Hook
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -5075,24 +3429,16 @@ func (s *RepoService) RepoGetHook(ctx context.Context, owner string, repo string
 func (s *RepoService) RepoGetIssueConfig(ctx context.Context, owner string, repo string) (*IssueConfig, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issue_config", owner, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result IssueConfig
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -5101,24 +3447,16 @@ func (s *RepoService) RepoGetIssueConfig(ctx context.Context, owner string, repo
 func (s *RepoService) RepoGetIssueTemplates(ctx context.Context, owner string, repo string) ([]IssueTemplate, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issue_templates", owner, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []IssueTemplate
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -5127,24 +3465,16 @@ func (s *RepoService) RepoGetIssueTemplates(ctx context.Context, owner string, r
 func (s *RepoService) RepoGetKey(ctx context.Context, owner string, repo string, id int64) (*DeployKey, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/keys/%d", owner, repo, id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result DeployKey
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -5153,24 +3483,16 @@ func (s *RepoService) RepoGetKey(ctx context.Context, owner string, repo string,
 func (s *RepoService) RepoGetLanguages(ctx context.Context, owner string, repo string) (*map[string]int64, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/languages", owner, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result map[string]int64
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -5179,24 +3501,16 @@ func (s *RepoService) RepoGetLanguages(ctx context.Context, owner string, repo s
 func (s *RepoService) RepoGetLatestRelease(ctx context.Context, owner string, repo string) (*Release, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/releases/latest", owner, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Release
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -5205,32 +3519,20 @@ func (s *RepoService) RepoGetLatestRelease(ctx context.Context, owner string, re
 func (s *RepoService) RepoGetNote(ctx context.Context, owner string, repo string, sha string, verification bool, files bool) (*Note, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/git/notes/%s", owner, repo, sha))
 	qry := u.Query()
-	if verification != false {
-		qry.Set("verification", fmt.Sprintf("%v", verification))
-	}
-	if files != false {
-		qry.Set("files", fmt.Sprintf("%v", files))
-	}
+	if verification != false { qry.Set("verification", fmt.Sprintf("%v", verification)) }
+	if files != false { qry.Set("files", fmt.Sprintf("%v", files)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Note
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -5239,24 +3541,16 @@ func (s *RepoService) RepoGetNote(ctx context.Context, owner string, repo string
 func (s *RepoService) RepoGetPullRequest(ctx context.Context, owner string, repo string, index int64) (*PullRequest, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/pulls/%d", owner, repo, index))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result PullRequest
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -5265,24 +3559,16 @@ func (s *RepoService) RepoGetPullRequest(ctx context.Context, owner string, repo
 func (s *RepoService) RepoGetPullRequestByBaseHead(ctx context.Context, owner string, repo string, base string, head string) (*PullRequest, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/pulls/%s/%s", owner, repo, base, head))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result PullRequest
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -5291,38 +3577,22 @@ func (s *RepoService) RepoGetPullRequestByBaseHead(ctx context.Context, owner st
 func (s *RepoService) RepoGetPullRequestCommits(ctx context.Context, owner string, repo string, index int64, page int, limit int, verification bool, files bool) ([]Commit, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/pulls/%d/commits", owner, repo, index))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
-	if verification != false {
-		qry.Set("verification", fmt.Sprintf("%v", verification))
-	}
-	if files != false {
-		qry.Set("files", fmt.Sprintf("%v", files))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if verification != false { qry.Set("verification", fmt.Sprintf("%v", verification)) }
+	if files != false { qry.Set("files", fmt.Sprintf("%v", files)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Commit
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -5331,38 +3601,22 @@ func (s *RepoService) RepoGetPullRequestCommits(ctx context.Context, owner strin
 func (s *RepoService) RepoGetPullRequestFiles(ctx context.Context, owner string, repo string, index int64, skipTo string, whitespace string, page int, limit int) ([]ChangedFile, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/pulls/%d/files", owner, repo, index))
 	qry := u.Query()
-	if skipTo != "" {
-		qry.Set("skip-to", fmt.Sprintf("%v", skipTo))
-	}
-	if whitespace != "" {
-		qry.Set("whitespace", fmt.Sprintf("%v", whitespace))
-	}
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if skipTo != "" { qry.Set("skip-to", fmt.Sprintf("%v", skipTo)) }
+	if whitespace != "" { qry.Set("whitespace", fmt.Sprintf("%v", whitespace)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []ChangedFile
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -5371,24 +3625,16 @@ func (s *RepoService) RepoGetPullRequestFiles(ctx context.Context, owner string,
 func (s *RepoService) RepoGetPullReview(ctx context.Context, owner string, repo string, index int64, id int64) (*PullReview, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/pulls/%d/reviews/%d", owner, repo, index, id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result PullReview
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -5397,24 +3643,16 @@ func (s *RepoService) RepoGetPullReview(ctx context.Context, owner string, repo 
 func (s *RepoService) RepoGetPullReviewComment(ctx context.Context, owner string, repo string, index int64, id int64, comment int64) (*PullReviewComment, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/pulls/%d/reviews/%d/comments/%d", owner, repo, index, id, comment))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result PullReviewComment
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -5423,24 +3661,16 @@ func (s *RepoService) RepoGetPullReviewComment(ctx context.Context, owner string
 func (s *RepoService) RepoGetPullReviewComments(ctx context.Context, owner string, repo string, index int64, id int64) ([]PullReviewComment, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/pulls/%d/reviews/%d/comments", owner, repo, index, id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []PullReviewComment
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -5449,24 +3679,16 @@ func (s *RepoService) RepoGetPullReviewComments(ctx context.Context, owner strin
 func (s *RepoService) RepoGetPushMirrorByRemoteName(ctx context.Context, owner string, repo string, name string) (*PushMirror, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/push_mirrors/%s", owner, repo, name))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result PushMirror
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -5475,29 +3697,19 @@ func (s *RepoService) RepoGetPushMirrorByRemoteName(ctx context.Context, owner s
 func (s *RepoService) RepoGetRawFile(ctx context.Context, owner string, repo string, filepath string, ref string) ([]byte, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/raw/%s", owner, repo, filepath))
 	qry := u.Query()
-	if ref != "" {
-		qry.Set("ref", fmt.Sprintf("%v", ref))
-	}
+	if ref != "" { qry.Set("ref", fmt.Sprintf("%v", ref)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []byte
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -5506,29 +3718,19 @@ func (s *RepoService) RepoGetRawFile(ctx context.Context, owner string, repo str
 func (s *RepoService) RepoGetRawFileOrLFS(ctx context.Context, owner string, repo string, filepath string, ref string) ([]byte, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/media/%s", owner, repo, filepath))
 	qry := u.Query()
-	if ref != "" {
-		qry.Set("ref", fmt.Sprintf("%v", ref))
-	}
+	if ref != "" { qry.Set("ref", fmt.Sprintf("%v", ref)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []byte
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -5537,24 +3739,16 @@ func (s *RepoService) RepoGetRawFileOrLFS(ctx context.Context, owner string, rep
 func (s *RepoService) RepoGetRelease(ctx context.Context, owner string, repo string, id int64) (*Release, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/releases/%d", owner, repo, id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Release
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -5563,24 +3757,16 @@ func (s *RepoService) RepoGetRelease(ctx context.Context, owner string, repo str
 func (s *RepoService) RepoGetReleaseAttachment(ctx context.Context, owner string, repo string, id int64, attachmentId int64) (*Attachment, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/releases/%d/assets/%d", owner, repo, id, attachmentId))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Attachment
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -5589,24 +3775,16 @@ func (s *RepoService) RepoGetReleaseAttachment(ctx context.Context, owner string
 func (s *RepoService) RepoGetReleaseByTag(ctx context.Context, owner string, repo string, tag string) (*Release, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/releases/tags/%s", owner, repo, tag))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Release
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -5615,24 +3793,16 @@ func (s *RepoService) RepoGetReleaseByTag(ctx context.Context, owner string, rep
 func (s *RepoService) RepoGetRepoPermissions(ctx context.Context, owner string, repo string, collaborator string) (*RepoCollaboratorPermission, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/collaborators/%s/permission", owner, repo, collaborator))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result RepoCollaboratorPermission
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -5641,24 +3811,16 @@ func (s *RepoService) RepoGetRepoPermissions(ctx context.Context, owner string, 
 func (s *RepoService) RepoGetReviewers(ctx context.Context, owner string, repo string) ([]User, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/reviewers", owner, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []User
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -5667,24 +3829,16 @@ func (s *RepoService) RepoGetReviewers(ctx context.Context, owner string, repo s
 func (s *RepoService) RepoGetRunnerRegistrationToken(ctx context.Context, owner string, repo string) (*RegistrationToken, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/runners/registration-token", owner, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result RegistrationToken
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -5693,35 +3847,21 @@ func (s *RepoService) RepoGetRunnerRegistrationToken(ctx context.Context, owner 
 func (s *RepoService) RepoGetSingleCommit(ctx context.Context, owner string, repo string, sha string, stat bool, verification bool, files bool) (*Commit, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/git/commits/%s", owner, repo, sha))
 	qry := u.Query()
-	if stat != false {
-		qry.Set("stat", fmt.Sprintf("%v", stat))
-	}
-	if verification != false {
-		qry.Set("verification", fmt.Sprintf("%v", verification))
-	}
-	if files != false {
-		qry.Set("files", fmt.Sprintf("%v", files))
-	}
+	if stat != false { qry.Set("stat", fmt.Sprintf("%v", stat)) }
+	if verification != false { qry.Set("verification", fmt.Sprintf("%v", verification)) }
+	if files != false { qry.Set("files", fmt.Sprintf("%v", files)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Commit
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -5730,24 +3870,16 @@ func (s *RepoService) RepoGetSingleCommit(ctx context.Context, owner string, rep
 func (s *RepoService) RepoGetTag(ctx context.Context, owner string, repo string, tag string) (*Tag, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/tags/%s", owner, repo, tag))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Tag
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -5756,24 +3888,16 @@ func (s *RepoService) RepoGetTag(ctx context.Context, owner string, repo string,
 func (s *RepoService) RepoGetTagProtection(ctx context.Context, owner string, repo string, id int64) (*TagProtection, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/tag_protections/%d", owner, repo, id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result TagProtection
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -5782,24 +3906,16 @@ func (s *RepoService) RepoGetTagProtection(ctx context.Context, owner string, re
 func (s *RepoService) RepoGetWikiPage(ctx context.Context, owner string, repo string, pageName string) (*WikiPage, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/wiki/page/%s", owner, repo, pageName))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result WikiPage
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -5808,29 +3924,19 @@ func (s *RepoService) RepoGetWikiPage(ctx context.Context, owner string, repo st
 func (s *RepoService) RepoGetWikiPageRevisions(ctx context.Context, owner string, repo string, pageName string, page int) (*WikiCommitList, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/wiki/revisions/%s", owner, repo, pageName))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result WikiCommitList
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -5839,32 +3945,20 @@ func (s *RepoService) RepoGetWikiPageRevisions(ctx context.Context, owner string
 func (s *RepoService) RepoGetWikiPages(ctx context.Context, owner string, repo string, page int, limit int) ([]WikiPageMetaData, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/wiki/pages", owner, repo))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []WikiPageMetaData
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -5873,32 +3967,20 @@ func (s *RepoService) RepoGetWikiPages(ctx context.Context, owner string, repo s
 func (s *RepoService) RepoListActionsSecrets(ctx context.Context, owner string, repo string, page int, limit int) ([]Secret, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/secrets", owner, repo))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Secret
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -5907,35 +3989,21 @@ func (s *RepoService) RepoListActionsSecrets(ctx context.Context, owner string, 
 func (s *RepoService) RepoListActivityFeeds(ctx context.Context, owner string, repo string, date string, page int, limit int) ([]Activity, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/activities/feeds", owner, repo))
 	qry := u.Query()
-	if date != "" {
-		qry.Set("date", fmt.Sprintf("%v", date))
-	}
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if date != "" { qry.Set("date", fmt.Sprintf("%v", date)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Activity
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -5944,24 +4012,16 @@ func (s *RepoService) RepoListActivityFeeds(ctx context.Context, owner string, r
 func (s *RepoService) RepoListAllGitRefs(ctx context.Context, owner string, repo string) ([]Reference, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/git/refs", owner, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Reference
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -5970,24 +4030,16 @@ func (s *RepoService) RepoListAllGitRefs(ctx context.Context, owner string, repo
 func (s *RepoService) RepoListBranchProtection(ctx context.Context, owner string, repo string) ([]BranchProtection, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/branch_protections", owner, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []BranchProtection
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -5996,32 +4048,20 @@ func (s *RepoService) RepoListBranchProtection(ctx context.Context, owner string
 func (s *RepoService) RepoListBranches(ctx context.Context, owner string, repo string, page int, limit int) ([]Branch, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/branches", owner, repo))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Branch
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -6030,32 +4070,20 @@ func (s *RepoService) RepoListBranches(ctx context.Context, owner string, repo s
 func (s *RepoService) RepoListCollaborators(ctx context.Context, owner string, repo string, page int, limit int) ([]User, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/collaborators", owner, repo))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []User
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -6064,24 +4092,16 @@ func (s *RepoService) RepoListCollaborators(ctx context.Context, owner string, r
 func (s *RepoService) RepoListFlags(ctx context.Context, owner string, repo string) ([]string, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/flags", owner, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []string
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -6090,24 +4110,16 @@ func (s *RepoService) RepoListFlags(ctx context.Context, owner string, repo stri
 func (s *RepoService) RepoListGitHooks(ctx context.Context, owner string, repo string) ([]GitHook, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/hooks/git", owner, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []GitHook
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -6116,24 +4128,16 @@ func (s *RepoService) RepoListGitHooks(ctx context.Context, owner string, repo s
 func (s *RepoService) RepoListGitRefs(ctx context.Context, owner string, repo string, ref string) ([]Reference, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/git/refs/%s", owner, repo, ref))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Reference
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -6142,32 +4146,20 @@ func (s *RepoService) RepoListGitRefs(ctx context.Context, owner string, repo st
 func (s *RepoService) RepoListHooks(ctx context.Context, owner string, repo string, page int, limit int) ([]Hook, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/hooks", owner, repo))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Hook
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -6176,38 +4168,22 @@ func (s *RepoService) RepoListHooks(ctx context.Context, owner string, repo stri
 func (s *RepoService) RepoListKeys(ctx context.Context, owner string, repo string, keyId int, fingerprint string, page int, limit int) ([]DeployKey, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/keys", owner, repo))
 	qry := u.Query()
-	if keyId != 0 {
-		qry.Set("key_id", fmt.Sprintf("%v", keyId))
-	}
-	if fingerprint != "" {
-		qry.Set("fingerprint", fmt.Sprintf("%v", fingerprint))
-	}
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if keyId != 0 { qry.Set("key_id", fmt.Sprintf("%v", keyId)) }
+	if fingerprint != "" { qry.Set("fingerprint", fmt.Sprintf("%v", fingerprint)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []DeployKey
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -6216,24 +4192,16 @@ func (s *RepoService) RepoListKeys(ctx context.Context, owner string, repo strin
 func (s *RepoService) RepoListPinnedIssues(ctx context.Context, owner string, repo string) ([]Issue, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/pinned", owner, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Issue
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -6242,24 +4210,16 @@ func (s *RepoService) RepoListPinnedIssues(ctx context.Context, owner string, re
 func (s *RepoService) RepoListPinnedPullRequests(ctx context.Context, owner string, repo string) ([]PullRequest, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/pulls/pinned", owner, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []PullRequest
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -6268,53 +4228,27 @@ func (s *RepoService) RepoListPinnedPullRequests(ctx context.Context, owner stri
 func (s *RepoService) RepoListPullRequests(ctx context.Context, owner string, repo string, state string, sort string, milestone int64, labels []interface{}, poster string, base string, head string, page int, limit int) ([]PullRequest, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/pulls", owner, repo))
 	qry := u.Query()
-	if state != "" {
-		qry.Set("state", fmt.Sprintf("%v", state))
-	}
-	if sort != "" {
-		qry.Set("sort", fmt.Sprintf("%v", sort))
-	}
-	if milestone != 0 {
-		qry.Set("milestone", fmt.Sprintf("%v", milestone))
-	}
-	if labels != nil {
-		qry.Set("labels", fmt.Sprintf("%v", labels))
-	}
-	if poster != "" {
-		qry.Set("poster", fmt.Sprintf("%v", poster))
-	}
-	if base != "" {
-		qry.Set("base", fmt.Sprintf("%v", base))
-	}
-	if head != "" {
-		qry.Set("head", fmt.Sprintf("%v", head))
-	}
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if state != "" { qry.Set("state", fmt.Sprintf("%v", state)) }
+	if sort != "" { qry.Set("sort", fmt.Sprintf("%v", sort)) }
+	if milestone != 0 { qry.Set("milestone", fmt.Sprintf("%v", milestone)) }
+	if labels != nil { qry.Set("labels", fmt.Sprintf("%v", labels)) }
+	if poster != "" { qry.Set("poster", fmt.Sprintf("%v", poster)) }
+	if base != "" { qry.Set("base", fmt.Sprintf("%v", base)) }
+	if head != "" { qry.Set("head", fmt.Sprintf("%v", head)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []PullRequest
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -6323,32 +4257,20 @@ func (s *RepoService) RepoListPullRequests(ctx context.Context, owner string, re
 func (s *RepoService) RepoListPullReviews(ctx context.Context, owner string, repo string, index int64, page int, limit int) ([]PullReview, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/pulls/%d/reviews", owner, repo, index))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []PullReview
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -6357,32 +4279,20 @@ func (s *RepoService) RepoListPullReviews(ctx context.Context, owner string, rep
 func (s *RepoService) RepoListPushMirrors(ctx context.Context, owner string, repo string, page int, limit int) ([]PushMirror, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/push_mirrors", owner, repo))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []PushMirror
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -6391,24 +4301,16 @@ func (s *RepoService) RepoListPushMirrors(ctx context.Context, owner string, rep
 func (s *RepoService) RepoListReleaseAttachments(ctx context.Context, owner string, repo string, id int64) ([]Attachment, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/releases/%d/assets", owner, repo, id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Attachment
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -6417,41 +4319,23 @@ func (s *RepoService) RepoListReleaseAttachments(ctx context.Context, owner stri
 func (s *RepoService) RepoListReleases(ctx context.Context, owner string, repo string, draft bool, preRelease bool, q string, page int, limit int) ([]Release, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/releases", owner, repo))
 	qry := u.Query()
-	if draft != false {
-		qry.Set("draft", fmt.Sprintf("%v", draft))
-	}
-	if preRelease != false {
-		qry.Set("pre-release", fmt.Sprintf("%v", preRelease))
-	}
-	if q != "" {
-		qry.Set("q", fmt.Sprintf("%v", q))
-	}
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if draft != false { qry.Set("draft", fmt.Sprintf("%v", draft)) }
+	if preRelease != false { qry.Set("pre-release", fmt.Sprintf("%v", preRelease)) }
+	if q != "" { qry.Set("q", fmt.Sprintf("%v", q)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Release
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -6460,32 +4344,20 @@ func (s *RepoService) RepoListReleases(ctx context.Context, owner string, repo s
 func (s *RepoService) RepoListStargazers(ctx context.Context, owner string, repo string, page int, limit int) ([]User, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/stargazers", owner, repo))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []User
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -6494,38 +4366,22 @@ func (s *RepoService) RepoListStargazers(ctx context.Context, owner string, repo
 func (s *RepoService) RepoListStatuses(ctx context.Context, owner string, repo string, sha string, sort string, state string, page int, limit int) ([]CommitStatus, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/statuses/%s", owner, repo, sha))
 	qry := u.Query()
-	if sort != "" {
-		qry.Set("sort", fmt.Sprintf("%v", sort))
-	}
-	if state != "" {
-		qry.Set("state", fmt.Sprintf("%v", state))
-	}
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if sort != "" { qry.Set("sort", fmt.Sprintf("%v", sort)) }
+	if state != "" { qry.Set("state", fmt.Sprintf("%v", state)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []CommitStatus
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -6534,38 +4390,22 @@ func (s *RepoService) RepoListStatuses(ctx context.Context, owner string, repo s
 func (s *RepoService) RepoListStatusesByRef(ctx context.Context, owner string, repo string, ref string, sort string, state string, page int, limit int) ([]CommitStatus, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/commits/%s/statuses", owner, repo, ref))
 	qry := u.Query()
-	if sort != "" {
-		qry.Set("sort", fmt.Sprintf("%v", sort))
-	}
-	if state != "" {
-		qry.Set("state", fmt.Sprintf("%v", state))
-	}
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if sort != "" { qry.Set("sort", fmt.Sprintf("%v", sort)) }
+	if state != "" { qry.Set("state", fmt.Sprintf("%v", state)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []CommitStatus
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -6574,32 +4414,20 @@ func (s *RepoService) RepoListStatusesByRef(ctx context.Context, owner string, r
 func (s *RepoService) RepoListSubscribers(ctx context.Context, owner string, repo string, page int, limit int) ([]User, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/subscribers", owner, repo))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []User
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -6608,24 +4436,16 @@ func (s *RepoService) RepoListSubscribers(ctx context.Context, owner string, rep
 func (s *RepoService) RepoListTagProtection(ctx context.Context, owner string, repo string) ([]TagProtection, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/tag_protections", owner, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []TagProtection
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -6634,32 +4454,20 @@ func (s *RepoService) RepoListTagProtection(ctx context.Context, owner string, r
 func (s *RepoService) RepoListTags(ctx context.Context, owner string, repo string, page int, limit int) ([]Tag, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/tags", owner, repo))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Tag
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -6668,24 +4476,16 @@ func (s *RepoService) RepoListTags(ctx context.Context, owner string, repo strin
 func (s *RepoService) RepoListTeams(ctx context.Context, owner string, repo string) ([]Team, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/teams", owner, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Team
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -6694,32 +4494,20 @@ func (s *RepoService) RepoListTeams(ctx context.Context, owner string, repo stri
 func (s *RepoService) RepoListTopics(ctx context.Context, owner string, repo string, page int, limit int) (*TopicName, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/topics", owner, repo))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result TopicName
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -6728,24 +4516,16 @@ func (s *RepoService) RepoListTopics(ctx context.Context, owner string, repo str
 func (s *RepoService) RepoMergePullRequest(ctx context.Context, owner string, repo string, index int64, body *MergePullRequestOption) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/pulls/%d/merge", owner, repo, index))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -6755,29 +4535,19 @@ func (s *RepoService) RepoMergePullRequest(ctx context.Context, owner string, re
 func (s *RepoService) RepoMigrate(ctx context.Context, body *MigrateRepoOptions) (*Repository, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/migrate"))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Repository
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -6786,19 +4556,13 @@ func (s *RepoService) RepoMigrate(ctx context.Context, body *MigrateRepoOptions)
 func (s *RepoService) RepoMirrorSync(ctx context.Context, owner string, repo string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/mirror-sync", owner, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -6808,24 +4572,16 @@ func (s *RepoService) RepoMirrorSync(ctx context.Context, owner string, repo str
 func (s *RepoService) RepoNewPinAllowed(ctx context.Context, owner string, repo string) (*NewIssuePinsAllowed, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/new_pin_allowed", owner, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result NewIssuePinsAllowed
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -6834,19 +4590,13 @@ func (s *RepoService) RepoNewPinAllowed(ctx context.Context, owner string, repo 
 func (s *RepoService) RepoPullRequestIsMerged(ctx context.Context, owner string, repo string, index int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/pulls/%d/merge", owner, repo, index))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -6856,19 +4606,13 @@ func (s *RepoService) RepoPullRequestIsMerged(ctx context.Context, owner string,
 func (s *RepoService) RepoPushMirrorSync(ctx context.Context, owner string, repo string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/push_mirrors-sync", owner, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -6878,19 +4622,13 @@ func (s *RepoService) RepoPushMirrorSync(ctx context.Context, owner string, repo
 func (s *RepoService) RepoRemoveNote(ctx context.Context, owner string, repo string, sha string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/git/notes/%s", owner, repo, sha))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -6900,24 +4638,16 @@ func (s *RepoService) RepoRemoveNote(ctx context.Context, owner string, repo str
 func (s *RepoService) RepoReplaceAllFlags(ctx context.Context, owner string, repo string, body *ReplaceFlagsOption) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/flags", owner, repo))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -6927,77 +4657,35 @@ func (s *RepoService) RepoReplaceAllFlags(ctx context.Context, owner string, rep
 func (s *RepoService) RepoSearch(ctx context.Context, q string, topic bool, includeDesc bool, uid int64, priorityOwnerId int64, teamId int64, starredBy int64, private bool, isPrivate bool, template bool, archived bool, mode string, exclusive bool, sort string, order string, page int, limit int) (*SearchResults, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/search"))
 	qry := u.Query()
-	if q != "" {
-		qry.Set("q", fmt.Sprintf("%v", q))
-	}
-	if topic != false {
-		qry.Set("topic", fmt.Sprintf("%v", topic))
-	}
-	if includeDesc != false {
-		qry.Set("includeDesc", fmt.Sprintf("%v", includeDesc))
-	}
-	if uid != 0 {
-		qry.Set("uid", fmt.Sprintf("%v", uid))
-	}
-	if priorityOwnerId != 0 {
-		qry.Set("priority_owner_id", fmt.Sprintf("%v", priorityOwnerId))
-	}
-	if teamId != 0 {
-		qry.Set("team_id", fmt.Sprintf("%v", teamId))
-	}
-	if starredBy != 0 {
-		qry.Set("starredBy", fmt.Sprintf("%v", starredBy))
-	}
-	if private != false {
-		qry.Set("private", fmt.Sprintf("%v", private))
-	}
-	if isPrivate != false {
-		qry.Set("is_private", fmt.Sprintf("%v", isPrivate))
-	}
-	if template != false {
-		qry.Set("template", fmt.Sprintf("%v", template))
-	}
-	if archived != false {
-		qry.Set("archived", fmt.Sprintf("%v", archived))
-	}
-	if mode != "" {
-		qry.Set("mode", fmt.Sprintf("%v", mode))
-	}
-	if exclusive != false {
-		qry.Set("exclusive", fmt.Sprintf("%v", exclusive))
-	}
-	if sort != "" {
-		qry.Set("sort", fmt.Sprintf("%v", sort))
-	}
-	if order != "" {
-		qry.Set("order", fmt.Sprintf("%v", order))
-	}
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if q != "" { qry.Set("q", fmt.Sprintf("%v", q)) }
+	if topic != false { qry.Set("topic", fmt.Sprintf("%v", topic)) }
+	if includeDesc != false { qry.Set("includeDesc", fmt.Sprintf("%v", includeDesc)) }
+	if uid != 0 { qry.Set("uid", fmt.Sprintf("%v", uid)) }
+	if priorityOwnerId != 0 { qry.Set("priority_owner_id", fmt.Sprintf("%v", priorityOwnerId)) }
+	if teamId != 0 { qry.Set("team_id", fmt.Sprintf("%v", teamId)) }
+	if starredBy != 0 { qry.Set("starredBy", fmt.Sprintf("%v", starredBy)) }
+	if private != false { qry.Set("private", fmt.Sprintf("%v", private)) }
+	if isPrivate != false { qry.Set("is_private", fmt.Sprintf("%v", isPrivate)) }
+	if template != false { qry.Set("template", fmt.Sprintf("%v", template)) }
+	if archived != false { qry.Set("archived", fmt.Sprintf("%v", archived)) }
+	if mode != "" { qry.Set("mode", fmt.Sprintf("%v", mode)) }
+	if exclusive != false { qry.Set("exclusive", fmt.Sprintf("%v", exclusive)) }
+	if sort != "" { qry.Set("sort", fmt.Sprintf("%v", sort)) }
+	if order != "" { qry.Set("order", fmt.Sprintf("%v", order)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result SearchResults
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -7006,29 +4694,19 @@ func (s *RepoService) RepoSearch(ctx context.Context, q string, topic bool, incl
 func (s *RepoService) RepoSearchRunJobs(ctx context.Context, owner string, repo string, labels string) ([]ActionRunJob, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/runners/jobs", owner, repo))
 	qry := u.Query()
-	if labels != "" {
-		qry.Set("labels", fmt.Sprintf("%v", labels))
-	}
+	if labels != "" { qry.Set("labels", fmt.Sprintf("%v", labels)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []ActionRunJob
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -7037,29 +4715,19 @@ func (s *RepoService) RepoSearchRunJobs(ctx context.Context, owner string, repo 
 func (s *RepoService) RepoSetNote(ctx context.Context, owner string, repo string, sha string, body *NoteOptions) (*Note, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/git/notes/%s", owner, repo, sha))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Note
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -7068,24 +4736,16 @@ func (s *RepoService) RepoSetNote(ctx context.Context, owner string, repo string
 func (s *RepoService) RepoSigningKey(ctx context.Context, owner string, repo string) (string, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/signing-key.gpg", owner, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return "", nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return "", nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return "", nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return "", nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return "", nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return "", nil, handleError(resp) }
 
 	rawBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", nil, fmt.Errorf("read: %w", err)
-	}
+	if err != nil { return "", nil, fmt.Errorf("read: %w", err) }
 	return string(rawBody), &Response{Response: resp}, nil
 }
 
@@ -7094,29 +4754,19 @@ func (s *RepoService) RepoSigningKey(ctx context.Context, owner string, repo str
 func (s *RepoService) RepoSubmitPullReview(ctx context.Context, owner string, repo string, index int64, id int64, body *SubmitPullReviewOptions) (*PullReview, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/pulls/%d/reviews/%d", owner, repo, index, id))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result PullReview
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -7125,19 +4775,13 @@ func (s *RepoService) RepoSubmitPullReview(ctx context.Context, owner string, re
 func (s *RepoService) RepoSyncForkBranch(ctx context.Context, owner string, repo string, branch string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/sync_fork/%s", owner, repo, branch))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -7147,24 +4791,16 @@ func (s *RepoService) RepoSyncForkBranch(ctx context.Context, owner string, repo
 func (s *RepoService) RepoSyncForkBranchInfo(ctx context.Context, owner string, repo string, branch string) (*SyncForkInfo, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/sync_fork/%s", owner, repo, branch))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result SyncForkInfo
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -7173,19 +4809,13 @@ func (s *RepoService) RepoSyncForkBranchInfo(ctx context.Context, owner string, 
 func (s *RepoService) RepoSyncForkDefault(ctx context.Context, owner string, repo string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/sync_fork", owner, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -7195,24 +4825,16 @@ func (s *RepoService) RepoSyncForkDefault(ctx context.Context, owner string, rep
 func (s *RepoService) RepoSyncForkDefaultInfo(ctx context.Context, owner string, repo string) (*SyncForkInfo, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/sync_fork", owner, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result SyncForkInfo
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -7221,24 +4843,16 @@ func (s *RepoService) RepoSyncForkDefaultInfo(ctx context.Context, owner string,
 func (s *RepoService) RepoTestHook(ctx context.Context, owner string, repo string, id int64, ref string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/hooks/%d/tests", owner, repo, id))
 	qry := u.Query()
-	if ref != "" {
-		qry.Set("ref", fmt.Sprintf("%v", ref))
-	}
+	if ref != "" { qry.Set("ref", fmt.Sprintf("%v", ref)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -7248,41 +4862,23 @@ func (s *RepoService) RepoTestHook(ctx context.Context, owner string, repo strin
 func (s *RepoService) RepoTrackedTimes(ctx context.Context, owner string, repo string, user string, since time.Time, before time.Time, page int, limit int) ([]TrackedTime, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/times", owner, repo))
 	qry := u.Query()
-	if user != "" {
-		qry.Set("user", fmt.Sprintf("%v", user))
-	}
-	if since != (time.Time{}) {
-		qry.Set("since", fmt.Sprintf("%v", since))
-	}
-	if before != (time.Time{}) {
-		qry.Set("before", fmt.Sprintf("%v", before))
-	}
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if user != "" { qry.Set("user", fmt.Sprintf("%v", user)) }
+	if since != (time.Time{}) { qry.Set("since", fmt.Sprintf("%v", since)) }
+	if before != (time.Time{}) { qry.Set("before", fmt.Sprintf("%v", before)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []TrackedTime
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -7291,24 +4887,16 @@ func (s *RepoService) RepoTrackedTimes(ctx context.Context, owner string, repo s
 func (s *RepoService) RepoTransfer(ctx context.Context, owner string, repo string, body *TransferRepoOption) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/transfer", owner, repo))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -7318,24 +4906,16 @@ func (s *RepoService) RepoTransfer(ctx context.Context, owner string, repo strin
 func (s *RepoService) RepoUnDismissPullReview(ctx context.Context, owner string, repo string, index int64, id int64) (*PullReview, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/pulls/%d/reviews/%d/undismissals", owner, repo, index, id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result PullReview
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -7344,24 +4924,16 @@ func (s *RepoService) RepoUnDismissPullReview(ctx context.Context, owner string,
 func (s *RepoService) RepoUpdateAvatar(ctx context.Context, owner string, repo string, body *UpdateRepoAvatarOption) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/avatar", owner, repo))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -7371,24 +4943,16 @@ func (s *RepoService) RepoUpdateAvatar(ctx context.Context, owner string, repo s
 func (s *RepoService) RepoUpdateBranch(ctx context.Context, owner string, repo string, branch string, body *UpdateBranchRepoOption) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/branches/%s", owner, repo, branch))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -7398,29 +4962,19 @@ func (s *RepoService) RepoUpdateBranch(ctx context.Context, owner string, repo s
 func (s *RepoService) RepoUpdateFile(ctx context.Context, owner string, repo string, filepath string, body *UpdateFileOptions) (*FileResponse, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/contents/%s", owner, repo, filepath))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result FileResponse
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -7429,24 +4983,16 @@ func (s *RepoService) RepoUpdateFile(ctx context.Context, owner string, repo str
 func (s *RepoService) RepoUpdatePullRequest(ctx context.Context, owner string, repo string, index int64, style string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/pulls/%d/update", owner, repo, index))
 	qry := u.Query()
-	if style != "" {
-		qry.Set("style", fmt.Sprintf("%v", style))
-	}
+	if style != "" { qry.Set("style", fmt.Sprintf("%v", style)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -7456,24 +5002,16 @@ func (s *RepoService) RepoUpdatePullRequest(ctx context.Context, owner string, r
 func (s *RepoService) RepoUpdateTopics(ctx context.Context, owner string, repo string, body *RepoTopicOptions) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/topics", owner, repo))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -7483,24 +5021,16 @@ func (s *RepoService) RepoUpdateTopics(ctx context.Context, owner string, repo s
 func (s *RepoService) RepoValidateIssueConfig(ctx context.Context, owner string, repo string) (*IssueConfigValidation, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issue_config/validate", owner, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result IssueConfigValidation
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -7509,19 +5039,13 @@ func (s *RepoService) RepoValidateIssueConfig(ctx context.Context, owner string,
 func (s *RepoService) UnpinIssue(ctx context.Context, owner string, repo string, index int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/issues/%d/pin", owner, repo, index))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -7531,24 +5055,16 @@ func (s *RepoService) UnpinIssue(ctx context.Context, owner string, repo string,
 func (s *RepoService) UpdateRepoSecret(ctx context.Context, owner string, repo string, secretname string, body *CreateOrUpdateSecretOption) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/secrets/%s", owner, repo, secretname))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -7558,24 +5074,16 @@ func (s *RepoService) UpdateRepoSecret(ctx context.Context, owner string, repo s
 func (s *RepoService) UpdateRepoVariable(ctx context.Context, owner string, repo string, variablename string, body *UpdateVariableOption) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/variables/%s", owner, repo, variablename))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -7585,24 +5093,16 @@ func (s *RepoService) UpdateRepoVariable(ctx context.Context, owner string, repo
 func (s *RepoService) UserCurrentCheckSubscription(ctx context.Context, owner string, repo string) (*WatchInfo, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/subscription", owner, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result WatchInfo
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -7611,19 +5111,13 @@ func (s *RepoService) UserCurrentCheckSubscription(ctx context.Context, owner st
 func (s *RepoService) UserCurrentDeleteSubscription(ctx context.Context, owner string, repo string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/subscription", owner, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -7633,24 +5127,16 @@ func (s *RepoService) UserCurrentDeleteSubscription(ctx context.Context, owner s
 func (s *RepoService) UserCurrentPutSubscription(ctx context.Context, owner string, repo string) (*WatchInfo, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/subscription", owner, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result WatchInfo
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -7659,23 +5145,16 @@ func (s *RepoService) UserCurrentPutSubscription(ctx context.Context, owner stri
 func (s *RepoService) UserTrackedTimes(ctx context.Context, owner string, repo string, user string) ([]TrackedTime, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/times/%s", owner, repo, user))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []TrackedTime
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
+

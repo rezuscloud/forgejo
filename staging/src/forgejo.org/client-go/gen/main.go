@@ -412,9 +412,12 @@ func zeroVal(t string) string {
 	}
 }
 
-// stripUnusedImports removes import lines for packages not referenced in the code.
+// stripUnusedImports removes import lines for packages not referenced in the
+// generated code. Replaces goimports — the generator produces clean, compilable
+// output without external tools (critical for the CronJob environment).
 func stripUnusedImports(content string) string {
 	lines := strings.Split(content, "\n")
+
 	inImport := false
 	var result []string
 	for _, line := range lines {
@@ -430,15 +433,20 @@ func stripUnusedImports(content string) string {
 			continue
 		}
 		if inImport {
-			// Extract package name from import line like: \t"bytes"
-			impName := strings.Trim(trimmed, `"`)
-			// Special cases: net/http -> "http.", encoding/json -> "json."
-			pkgRef := impName + "."
-			if strings.Contains(content, pkgRef) || strings.Contains(content, strings.TrimSuffix(pkgRef, ".")+"\"") {
+			if strings.HasPrefix(trimmed, "_") || strings.HasPrefix(trimmed, ".") {
+				result = append(result, line)
+				continue
+			}
+			var pkgName string
+			fields := strings.Fields(trimmed)
+			if len(fields) >= 2 {
+				pkgName = fields[0]
+			} else {
+				pkgName = last(strings.Trim(trimmed, "\""))
+			}
+			if strings.Contains(content, pkgName+".") {
 				result = append(result, line)
 			}
-			// Check usage: look for "pkgName." in the content (outside the import block)
-			// More precise: search for the package identifier used as a prefix
 			continue
 		}
 		result = append(result, line)

@@ -15,24 +15,16 @@ import (
 func (s *ActivitypubService) ActivitypubInstanceActor(ctx context.Context) (*ActivityPub, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/activitypub/actor"))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result ActivityPub
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -41,19 +33,13 @@ func (s *ActivitypubService) ActivitypubInstanceActor(ctx context.Context) (*Act
 func (s *ActivitypubService) ActivitypubInstanceActorInbox(ctx context.Context) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/activitypub/actor/inbox"))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -63,24 +49,16 @@ func (s *ActivitypubService) ActivitypubInstanceActorInbox(ctx context.Context) 
 func (s *ActivitypubService) ActivitypubInstanceActorOutbox(ctx context.Context) (*ForgeOutbox, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/activitypub/actor/outbox"))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result ForgeOutbox
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -89,24 +67,16 @@ func (s *ActivitypubService) ActivitypubInstanceActorOutbox(ctx context.Context)
 func (s *ActivitypubService) ActivitypubPerson(ctx context.Context, userId int64) (*ActivityPub, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/activitypub/user-id/%d", userId))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result ActivityPub
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -115,24 +85,16 @@ func (s *ActivitypubService) ActivitypubPerson(ctx context.Context, userId int64
 func (s *ActivitypubService) ActivitypubPersonActivity(ctx context.Context, userId int, activityId int) (*ActivityPub, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/activitypub/user-id/%d/activities/%d/activity", userId, activityId))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result ActivityPub
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -141,24 +103,16 @@ func (s *ActivitypubService) ActivitypubPersonActivity(ctx context.Context, user
 func (s *ActivitypubService) ActivitypubPersonActivityNote(ctx context.Context, userId int, activityId int) (*ActivityPub, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/activitypub/user-id/%d/activities/%d", userId, activityId))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result ActivityPub
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -167,24 +121,16 @@ func (s *ActivitypubService) ActivitypubPersonActivityNote(ctx context.Context, 
 func (s *ActivitypubService) ActivitypubPersonFeed(ctx context.Context, userId int) (*ForgeOutbox, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/activitypub/user-id/%d/outbox", userId))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result ForgeOutbox
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -193,19 +139,13 @@ func (s *ActivitypubService) ActivitypubPersonFeed(ctx context.Context, userId i
 func (s *ActivitypubService) ActivitypubPersonInbox(ctx context.Context, userId int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/activitypub/user-id/%d/inbox", userId))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -215,24 +155,16 @@ func (s *ActivitypubService) ActivitypubPersonInbox(ctx context.Context, userId 
 func (s *ActivitypubService) ActivitypubRepository(ctx context.Context, repositoryId int64) (*ActivityPub, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/activitypub/repository-id/%d", repositoryId))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result ActivityPub
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -241,24 +173,16 @@ func (s *ActivitypubService) ActivitypubRepository(ctx context.Context, reposito
 func (s *ActivitypubService) ActivitypubRepositoryInbox(ctx context.Context, repositoryId int64, body *ForgeLike) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/activitypub/repository-id/%d/inbox", repositoryId))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -268,23 +192,16 @@ func (s *ActivitypubService) ActivitypubRepositoryInbox(ctx context.Context, rep
 func (s *ActivitypubService) ActivitypubRepositoryOutbox(ctx context.Context, repositoryId int64) (*ForgeOutbox, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/activitypub/repository-id/%d/outbox", repositoryId))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result ForgeOutbox
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
+

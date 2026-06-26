@@ -17,29 +17,19 @@ import (
 func (s *MiscService) CreateCurrentUserRepo(ctx context.Context, body *CreateRepoOption) (*Repository, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/repos"))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Repository
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -48,29 +38,19 @@ func (s *MiscService) CreateCurrentUserRepo(ctx context.Context, body *CreateRep
 func (s *MiscService) CreateOrgRepoDeprecated(ctx context.Context, org string, body *CreateRepoOption) (*Repository, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/org/%s/repos", org))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Repository
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -79,24 +59,16 @@ func (s *MiscService) CreateOrgRepoDeprecated(ctx context.Context, org string, b
 func (s *MiscService) CreateUserVariable(ctx context.Context, variablename string, body *CreateVariableOption) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/actions/variables/%s", variablename))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -106,19 +78,13 @@ func (s *MiscService) CreateUserVariable(ctx context.Context, variablename strin
 func (s *MiscService) DeletePackage(ctx context.Context, owner string, type_ string, name string, version string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/packages/%s/%s/%s/%s", owner, type_, name, version))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -128,19 +94,13 @@ func (s *MiscService) DeletePackage(ctx context.Context, owner string, type_ str
 func (s *MiscService) DeleteUserRunner(ctx context.Context, runnerId string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/actions/runners/%s", runnerId))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -150,19 +110,13 @@ func (s *MiscService) DeleteUserRunner(ctx context.Context, runnerId string) (*R
 func (s *MiscService) DeleteUserSecret(ctx context.Context, secretname string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/actions/secrets/%s", secretname))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -172,19 +126,13 @@ func (s *MiscService) DeleteUserSecret(ctx context.Context, secretname string) (
 func (s *MiscService) DeleteUserVariable(ctx context.Context, variablename string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/actions/variables/%s", variablename))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -194,24 +142,16 @@ func (s *MiscService) DeleteUserVariable(ctx context.Context, variablename strin
 func (s *MiscService) GetActionsRun(ctx context.Context) (*ActionRun, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/actions/run"))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result ActionRun
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -220,24 +160,16 @@ func (s *MiscService) GetActionsRun(ctx context.Context) (*ActionRun, *Response,
 func (s *MiscService) GetGeneralAPISettings(ctx context.Context) (*GeneralAPISettings, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/settings/api"))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result GeneralAPISettings
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -246,24 +178,16 @@ func (s *MiscService) GetGeneralAPISettings(ctx context.Context) (*GeneralAPISet
 func (s *MiscService) GetGeneralAttachmentSettings(ctx context.Context) (*GeneralAttachmentSettings, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/settings/attachment"))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result GeneralAttachmentSettings
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -272,24 +196,16 @@ func (s *MiscService) GetGeneralAttachmentSettings(ctx context.Context) (*Genera
 func (s *MiscService) GetGeneralRepositorySettings(ctx context.Context) (*GeneralRepoSettings, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/settings/repository"))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result GeneralRepoSettings
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -298,24 +214,16 @@ func (s *MiscService) GetGeneralRepositorySettings(ctx context.Context) (*Genera
 func (s *MiscService) GetGeneralUISettings(ctx context.Context) (*GeneralUISettings, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/settings/ui"))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result GeneralUISettings
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -324,24 +232,16 @@ func (s *MiscService) GetGeneralUISettings(ctx context.Context) (*GeneralUISetti
 func (s *MiscService) GetGitignoreTemplateInfo(ctx context.Context, name string) (*GitignoreTemplateInfo, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/gitignore/templates/%s", name))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result GitignoreTemplateInfo
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -350,24 +250,16 @@ func (s *MiscService) GetGitignoreTemplateInfo(ctx context.Context, name string)
 func (s *MiscService) GetLabelTemplateInfo(ctx context.Context, name string) ([]LabelTemplate, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/label/templates/%s", name))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []LabelTemplate
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -376,24 +268,16 @@ func (s *MiscService) GetLabelTemplateInfo(ctx context.Context, name string) ([]
 func (s *MiscService) GetLicenseTemplateInfo(ctx context.Context, name string) (*LicenseTemplateInfo, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/licenses/%s", name))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result LicenseTemplateInfo
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -402,24 +286,16 @@ func (s *MiscService) GetLicenseTemplateInfo(ctx context.Context, name string) (
 func (s *MiscService) GetNodeInfo(ctx context.Context) (*NodeInfo, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/nodeinfo"))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result NodeInfo
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -428,24 +304,16 @@ func (s *MiscService) GetNodeInfo(ctx context.Context) (*NodeInfo, *Response, er
 func (s *MiscService) GetPackage(ctx context.Context, owner string, type_ string, name string, version string) (*Package, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/packages/%s/%s/%s/%s", owner, type_, name, version))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Package
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -454,24 +322,16 @@ func (s *MiscService) GetPackage(ctx context.Context, owner string, type_ string
 func (s *MiscService) GetSSHSigningKey(ctx context.Context) (string, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/signing-key.ssh"))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return "", nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return "", nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return "", nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return "", nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return "", nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return "", nil, handleError(resp) }
 
 	rawBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", nil, fmt.Errorf("read: %w", err)
-	}
+	if err != nil { return "", nil, fmt.Errorf("read: %w", err) }
 	return string(rawBody), &Response{Response: resp}, nil
 }
 
@@ -480,24 +340,16 @@ func (s *MiscService) GetSSHSigningKey(ctx context.Context) (string, *Response, 
 func (s *MiscService) GetSigningKey(ctx context.Context) (string, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/signing-key.gpg"))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return "", nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return "", nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return "", nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return "", nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return "", nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return "", nil, handleError(resp) }
 
 	rawBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", nil, fmt.Errorf("read: %w", err)
-	}
+	if err != nil { return "", nil, fmt.Errorf("read: %w", err) }
 	return string(rawBody), &Response{Response: resp}, nil
 }
 
@@ -506,24 +358,16 @@ func (s *MiscService) GetSigningKey(ctx context.Context) (string, *Response, err
 func (s *MiscService) GetUserRunner(ctx context.Context, runnerId string) (*ActionRunner, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/actions/runners/%s", runnerId))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result ActionRunner
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -532,35 +376,21 @@ func (s *MiscService) GetUserRunner(ctx context.Context, runnerId string) (*Acti
 func (s *MiscService) GetUserRunners(ctx context.Context, visible bool, page int, limit int) ([]ActionRunner, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/actions/runners"))
 	qry := u.Query()
-	if visible != false {
-		qry.Set("visible", fmt.Sprintf("%v", visible))
-	}
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if visible != false { qry.Set("visible", fmt.Sprintf("%v", visible)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []ActionRunner
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -569,24 +399,16 @@ func (s *MiscService) GetUserRunners(ctx context.Context, visible bool, page int
 func (s *MiscService) GetUserSettings(ctx context.Context) (*UserSettings, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/settings"))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result UserSettings
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -595,24 +417,16 @@ func (s *MiscService) GetUserSettings(ctx context.Context) (*UserSettings, *Resp
 func (s *MiscService) GetUserVariable(ctx context.Context, variablename string) (*ActionVariable, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/actions/variables/%s", variablename))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result ActionVariable
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -621,32 +435,20 @@ func (s *MiscService) GetUserVariable(ctx context.Context, variablename string) 
 func (s *MiscService) GetUserVariablesList(ctx context.Context, page int, limit int) ([]ActionVariable, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/actions/variables"))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []ActionVariable
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -655,24 +457,16 @@ func (s *MiscService) GetUserVariablesList(ctx context.Context, page int, limit 
 func (s *MiscService) GetVerificationToken(ctx context.Context) (string, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/gpg_key_token"))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return "", nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return "", nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return "", nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return "", nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return "", nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return "", nil, handleError(resp) }
 
 	rawBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", nil, fmt.Errorf("read: %w", err)
-	}
+	if err != nil { return "", nil, fmt.Errorf("read: %w", err) }
 	return string(rawBody), &Response{Response: resp}, nil
 }
 
@@ -681,24 +475,16 @@ func (s *MiscService) GetVerificationToken(ctx context.Context) (string, *Respon
 func (s *MiscService) GetVersion(ctx context.Context) (*ServerVersion, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/version"))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result ServerVersion
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -707,19 +493,13 @@ func (s *MiscService) GetVersion(ctx context.Context) (*ServerVersion, *Response
 func (s *MiscService) LinkPackage(ctx context.Context, owner string, type_ string, name string, repoName string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/packages/%s/%s/%s/-/link/%s", owner, type_, name, repoName))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -729,24 +509,16 @@ func (s *MiscService) LinkPackage(ctx context.Context, owner string, type_ strin
 func (s *MiscService) ListGitignoresTemplates(ctx context.Context) ([]string, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/gitignore/templates"))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []string
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -755,24 +527,16 @@ func (s *MiscService) ListGitignoresTemplates(ctx context.Context) ([]string, *R
 func (s *MiscService) ListLabelTemplates(ctx context.Context) ([]string, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/label/templates"))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []string
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -781,24 +545,16 @@ func (s *MiscService) ListLabelTemplates(ctx context.Context) ([]string, *Respon
 func (s *MiscService) ListLicenseTemplates(ctx context.Context) ([]LicensesTemplateListEntry, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/licenses"))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []LicensesTemplateListEntry
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -807,24 +563,16 @@ func (s *MiscService) ListLicenseTemplates(ctx context.Context) ([]LicensesTempl
 func (s *MiscService) ListPackageFiles(ctx context.Context, owner string, type_ string, name string, version string) ([]PackageFile, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/packages/%s/%s/%s/%s/files", owner, type_, name, version))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []PackageFile
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -833,38 +581,22 @@ func (s *MiscService) ListPackageFiles(ctx context.Context, owner string, type_ 
 func (s *MiscService) ListPackages(ctx context.Context, owner string, page int, limit int, type_ string, q string) ([]Package, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/packages/%s", owner))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
-	if type_ != "" {
-		qry.Set("type", fmt.Sprintf("%v", type_))
-	}
-	if q != "" {
-		qry.Set("q", fmt.Sprintf("%v", q))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if type_ != "" { qry.Set("type", fmt.Sprintf("%v", type_)) }
+	if q != "" { qry.Set("q", fmt.Sprintf("%v", q)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Package
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -873,19 +605,13 @@ func (s *MiscService) ListPackages(ctx context.Context, owner string, page int, 
 func (s *MiscService) OrgAddTeamMember(ctx context.Context, id int64, username string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/teams/%d/members/%s", id, username))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -895,19 +621,13 @@ func (s *MiscService) OrgAddTeamMember(ctx context.Context, id int64, username s
 func (s *MiscService) OrgAddTeamRepository(ctx context.Context, id int64, org string, repo string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/teams/%d/repos/%s/%s", id, org, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -917,19 +637,13 @@ func (s *MiscService) OrgAddTeamRepository(ctx context.Context, id int64, org st
 func (s *MiscService) OrgDeleteTeam(ctx context.Context, id int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/teams/%d", id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -939,29 +653,19 @@ func (s *MiscService) OrgDeleteTeam(ctx context.Context, id int64) (*Response, e
 func (s *MiscService) OrgEditTeam(ctx context.Context, id int64, body *EditTeamOption) (*Team, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/teams/%d", id))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Team
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -970,24 +674,16 @@ func (s *MiscService) OrgEditTeam(ctx context.Context, id int64, body *EditTeamO
 func (s *MiscService) OrgGetTeam(ctx context.Context, id int64) (*Team, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/teams/%d", id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Team
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -996,32 +692,20 @@ func (s *MiscService) OrgGetTeam(ctx context.Context, id int64) (*Team, *Respons
 func (s *MiscService) OrgListCurrentUserOrgs(ctx context.Context, page int, limit int) ([]Organization, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/orgs"))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Organization
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -1030,35 +714,21 @@ func (s *MiscService) OrgListCurrentUserOrgs(ctx context.Context, page int, limi
 func (s *MiscService) OrgListTeamActivityFeeds(ctx context.Context, id int64, date string, page int, limit int) ([]Activity, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/teams/%d/activities/feeds", id))
 	qry := u.Query()
-	if date != "" {
-		qry.Set("date", fmt.Sprintf("%v", date))
-	}
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if date != "" { qry.Set("date", fmt.Sprintf("%v", date)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Activity
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -1067,24 +737,16 @@ func (s *MiscService) OrgListTeamActivityFeeds(ctx context.Context, id int64, da
 func (s *MiscService) OrgListTeamMember(ctx context.Context, id int64, username string) (*User, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/teams/%d/members/%s", id, username))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result User
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -1093,32 +755,20 @@ func (s *MiscService) OrgListTeamMember(ctx context.Context, id int64, username 
 func (s *MiscService) OrgListTeamMembers(ctx context.Context, id int64, page int, limit int) ([]User, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/teams/%d/members", id))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []User
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -1127,24 +777,16 @@ func (s *MiscService) OrgListTeamMembers(ctx context.Context, id int64, page int
 func (s *MiscService) OrgListTeamRepo(ctx context.Context, id int64, org string, repo string) (*Repository, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/teams/%d/repos/%s/%s", id, org, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Repository
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -1153,32 +795,20 @@ func (s *MiscService) OrgListTeamRepo(ctx context.Context, id int64, org string,
 func (s *MiscService) OrgListTeamRepos(ctx context.Context, id int64, page int, limit int) ([]Repository, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/teams/%d/repos", id))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Repository
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -1187,19 +817,13 @@ func (s *MiscService) OrgListTeamRepos(ctx context.Context, id int64, page int, 
 func (s *MiscService) OrgRemoveTeamMember(ctx context.Context, id int64, username string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/teams/%d/members/%s", id, username))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -1209,19 +833,13 @@ func (s *MiscService) OrgRemoveTeamMember(ctx context.Context, id int64, usernam
 func (s *MiscService) OrgRemoveTeamRepository(ctx context.Context, id int64, org string, repo string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/teams/%d/repos/%s/%s", id, org, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -1231,29 +849,19 @@ func (s *MiscService) OrgRemoveTeamRepository(ctx context.Context, id int64, org
 func (s *MiscService) RegisterUserRunner(ctx context.Context, body *RegisterRunnerOptions) (*RegisterRunnerResponse, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/actions/runners"))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result RegisterRunnerResponse
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -1262,29 +870,19 @@ func (s *MiscService) RegisterUserRunner(ctx context.Context, body *RegisterRunn
 func (s *MiscService) RenderMarkdown(ctx context.Context, body *MarkdownOption) (string, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/markdown"))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return "", nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return "", nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return "", nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return "", nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return "", nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return "", nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return "", nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return "", nil, handleError(resp) }
 
 	rawBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", nil, fmt.Errorf("read: %w", err)
-	}
+	if err != nil { return "", nil, fmt.Errorf("read: %w", err) }
 	return string(rawBody), &Response{Response: resp}, nil
 }
 
@@ -1293,29 +891,19 @@ func (s *MiscService) RenderMarkdown(ctx context.Context, body *MarkdownOption) 
 func (s *MiscService) RenderMarkdownRaw(ctx context.Context, body string) (string, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/markdown/raw"))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return "", nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return "", nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return "", nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return "", nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return "", nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return "", nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return "", nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return "", nil, handleError(resp) }
 
 	rawBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", nil, fmt.Errorf("read: %w", err)
-	}
+	if err != nil { return "", nil, fmt.Errorf("read: %w", err) }
 	return string(rawBody), &Response{Response: resp}, nil
 }
 
@@ -1324,29 +912,19 @@ func (s *MiscService) RenderMarkdownRaw(ctx context.Context, body string) (strin
 func (s *MiscService) RenderMarkup(ctx context.Context, body *MarkupOption) (string, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/markup"))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return "", nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return "", nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return "", nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return "", nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return "", nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return "", nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return "", nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return "", nil, handleError(resp) }
 
 	rawBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", nil, fmt.Errorf("read: %w", err)
-	}
+	if err != nil { return "", nil, fmt.Errorf("read: %w", err) }
 	return string(rawBody), &Response{Response: resp}, nil
 }
 
@@ -1355,24 +933,16 @@ func (s *MiscService) RenderMarkup(ctx context.Context, body *MarkupOption) (str
 func (s *MiscService) RepoGetByID(ctx context.Context, id int64) (*Repository, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repositories/%d", id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Repository
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -1381,35 +951,21 @@ func (s *MiscService) RepoGetByID(ctx context.Context, id int64) (*Repository, *
 func (s *MiscService) TopicSearch(ctx context.Context, q string, page int, limit int) (*interface{}, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/topics/search"))
 	qry := u.Query()
-	if q != "" {
-		qry.Set("q", fmt.Sprintf("%v", q))
-	}
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if q != "" { qry.Set("q", fmt.Sprintf("%v", q)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result interface{}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -1418,19 +974,13 @@ func (s *MiscService) TopicSearch(ctx context.Context, q string, page int, limit
 func (s *MiscService) UnlinkPackage(ctx context.Context, owner string, type_ string, name string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/packages/%s/%s/%s/-/unlink", owner, type_, name))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -1440,24 +990,16 @@ func (s *MiscService) UnlinkPackage(ctx context.Context, owner string, type_ str
 func (s *MiscService) UpdateUserSecret(ctx context.Context, secretname string, body *CreateOrUpdateSecretOption) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/actions/secrets/%s", secretname))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -1467,29 +1009,19 @@ func (s *MiscService) UpdateUserSecret(ctx context.Context, secretname string, b
 func (s *MiscService) UpdateUserSettings(ctx context.Context, body *UserSettingsOptions) (*UserSettings, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/settings"))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result UserSettings
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -1498,24 +1030,16 @@ func (s *MiscService) UpdateUserSettings(ctx context.Context, body *UserSettings
 func (s *MiscService) UpdateUserVariable(ctx context.Context, variablename string, body *UpdateVariableOption) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/actions/variables/%s", variablename))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -1525,29 +1049,19 @@ func (s *MiscService) UpdateUserVariable(ctx context.Context, variablename strin
 func (s *MiscService) UserAddEmail(ctx context.Context, body *CreateEmailOption) ([]Email, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/emails"))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Email
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -1556,19 +1070,13 @@ func (s *MiscService) UserAddEmail(ctx context.Context, body *CreateEmailOption)
 func (s *MiscService) UserBlockUser(ctx context.Context, username string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/block/%s", username))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -1578,29 +1086,19 @@ func (s *MiscService) UserBlockUser(ctx context.Context, username string) (*Resp
 func (s *MiscService) UserCheckQuota(ctx context.Context, subject string) (bool, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/quota/check"))
 	qry := u.Query()
-	if subject != "" {
-		qry.Set("subject", fmt.Sprintf("%v", subject))
-	}
+	if subject != "" { qry.Set("subject", fmt.Sprintf("%v", subject)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return false, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return false, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return false, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return false, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return false, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return false, nil, handleError(resp) }
 
 	var result bool
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return false, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return false,  nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -1609,29 +1107,19 @@ func (s *MiscService) UserCheckQuota(ctx context.Context, subject string) (bool,
 func (s *MiscService) UserCreateHook(ctx context.Context, body *CreateHookOption) (*Hook, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/hooks"))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Hook
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -1640,29 +1128,19 @@ func (s *MiscService) UserCreateHook(ctx context.Context, body *CreateHookOption
 func (s *MiscService) UserCreateOAuth2Application(ctx context.Context, body *CreateOAuth2ApplicationOptions) (*OAuth2Application, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/applications/oauth2"))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result OAuth2Application
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -1671,24 +1149,16 @@ func (s *MiscService) UserCreateOAuth2Application(ctx context.Context, body *Cre
 func (s *MiscService) UserCurrentActivityPubFollow(ctx context.Context, body *APRemoteFollowOption) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/activitypub/follow"))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -1698,19 +1168,13 @@ func (s *MiscService) UserCurrentActivityPubFollow(ctx context.Context, body *AP
 func (s *MiscService) UserCurrentCheckFollowing(ctx context.Context, username string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/following/%s", username))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -1720,19 +1184,13 @@ func (s *MiscService) UserCurrentCheckFollowing(ctx context.Context, username st
 func (s *MiscService) UserCurrentCheckStarring(ctx context.Context, owner string, repo string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/starred/%s/%s", owner, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -1742,19 +1200,13 @@ func (s *MiscService) UserCurrentCheckStarring(ctx context.Context, owner string
 func (s *MiscService) UserCurrentDeleteFollow(ctx context.Context, username string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/following/%s", username))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -1764,19 +1216,13 @@ func (s *MiscService) UserCurrentDeleteFollow(ctx context.Context, username stri
 func (s *MiscService) UserCurrentDeleteGPGKey(ctx context.Context, id int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/gpg_keys/%d", id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -1786,19 +1232,13 @@ func (s *MiscService) UserCurrentDeleteGPGKey(ctx context.Context, id int64) (*R
 func (s *MiscService) UserCurrentDeleteKey(ctx context.Context, id int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/keys/%d", id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -1808,19 +1248,13 @@ func (s *MiscService) UserCurrentDeleteKey(ctx context.Context, id int64) (*Resp
 func (s *MiscService) UserCurrentDeleteStar(ctx context.Context, owner string, repo string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/starred/%s/%s", owner, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -1830,24 +1264,16 @@ func (s *MiscService) UserCurrentDeleteStar(ctx context.Context, owner string, r
 func (s *MiscService) UserCurrentGetGPGKey(ctx context.Context, id int64) (*GPGKey, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/gpg_keys/%d", id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result GPGKey
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -1856,24 +1282,16 @@ func (s *MiscService) UserCurrentGetGPGKey(ctx context.Context, id int64) (*GPGK
 func (s *MiscService) UserCurrentGetKey(ctx context.Context, id int64) (*PublicKey, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/keys/%d", id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result PublicKey
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -1882,32 +1300,20 @@ func (s *MiscService) UserCurrentGetKey(ctx context.Context, id int64) (*PublicK
 func (s *MiscService) UserCurrentListFollowers(ctx context.Context, page int, limit int) ([]User, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/followers"))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []User
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -1916,32 +1322,20 @@ func (s *MiscService) UserCurrentListFollowers(ctx context.Context, page int, li
 func (s *MiscService) UserCurrentListFollowing(ctx context.Context, page int, limit int) ([]User, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/following"))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []User
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -1950,32 +1344,20 @@ func (s *MiscService) UserCurrentListFollowing(ctx context.Context, page int, li
 func (s *MiscService) UserCurrentListGPGKeys(ctx context.Context, page int, limit int) ([]GPGKey, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/gpg_keys"))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []GPGKey
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -1984,35 +1366,21 @@ func (s *MiscService) UserCurrentListGPGKeys(ctx context.Context, page int, limi
 func (s *MiscService) UserCurrentListKeys(ctx context.Context, fingerprint string, page int, limit int) ([]PublicKey, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/keys"))
 	qry := u.Query()
-	if fingerprint != "" {
-		qry.Set("fingerprint", fmt.Sprintf("%v", fingerprint))
-	}
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if fingerprint != "" { qry.Set("fingerprint", fmt.Sprintf("%v", fingerprint)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []PublicKey
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -2021,35 +1389,21 @@ func (s *MiscService) UserCurrentListKeys(ctx context.Context, fingerprint strin
 func (s *MiscService) UserCurrentListRepos(ctx context.Context, page int, limit int, orderBy string) ([]Repository, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/repos"))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
-	if orderBy != "" {
-		qry.Set("order_by", fmt.Sprintf("%v", orderBy))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if orderBy != "" { qry.Set("order_by", fmt.Sprintf("%v", orderBy)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Repository
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -2058,32 +1412,20 @@ func (s *MiscService) UserCurrentListRepos(ctx context.Context, page int, limit 
 func (s *MiscService) UserCurrentListStarred(ctx context.Context, page int, limit int) ([]Repository, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/starred"))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Repository
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -2092,32 +1434,20 @@ func (s *MiscService) UserCurrentListStarred(ctx context.Context, page int, limi
 func (s *MiscService) UserCurrentListSubscriptions(ctx context.Context, page int, limit int) ([]Repository, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/subscriptions"))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Repository
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -2126,29 +1456,19 @@ func (s *MiscService) UserCurrentListSubscriptions(ctx context.Context, page int
 func (s *MiscService) UserCurrentPostGPGKey(ctx context.Context, form *CreateGPGKeyOption) (*GPGKey, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/gpg_keys"))
 	bodyBytes, err := json.Marshal(form)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result GPGKey
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -2157,29 +1477,19 @@ func (s *MiscService) UserCurrentPostGPGKey(ctx context.Context, form *CreateGPG
 func (s *MiscService) UserCurrentPostKey(ctx context.Context, body *CreateKeyOption) (*PublicKey, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/keys"))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result PublicKey
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -2188,19 +1498,13 @@ func (s *MiscService) UserCurrentPostKey(ctx context.Context, body *CreateKeyOpt
 func (s *MiscService) UserCurrentPutFollow(ctx context.Context, username string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/following/%s", username))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -2210,19 +1514,13 @@ func (s *MiscService) UserCurrentPutFollow(ctx context.Context, username string)
 func (s *MiscService) UserCurrentPutStar(ctx context.Context, owner string, repo string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/starred/%s/%s", owner, repo))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -2232,38 +1530,22 @@ func (s *MiscService) UserCurrentPutStar(ctx context.Context, owner string, repo
 func (s *MiscService) UserCurrentTrackedTimes(ctx context.Context, page int, limit int, since time.Time, before time.Time) ([]TrackedTime, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/times"))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
-	if since != (time.Time{}) {
-		qry.Set("since", fmt.Sprintf("%v", since))
-	}
-	if before != (time.Time{}) {
-		qry.Set("before", fmt.Sprintf("%v", before))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if since != (time.Time{}) { qry.Set("since", fmt.Sprintf("%v", since)) }
+	if before != (time.Time{}) { qry.Set("before", fmt.Sprintf("%v", before)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []TrackedTime
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -2272,19 +1554,13 @@ func (s *MiscService) UserCurrentTrackedTimes(ctx context.Context, page int, lim
 func (s *MiscService) UserDeleteAvatar(ctx context.Context) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/avatar"))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -2294,24 +1570,16 @@ func (s *MiscService) UserDeleteAvatar(ctx context.Context) (*Response, error) {
 func (s *MiscService) UserDeleteEmail(ctx context.Context, body *DeleteEmailOption) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/emails"))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -2321,19 +1589,13 @@ func (s *MiscService) UserDeleteEmail(ctx context.Context, body *DeleteEmailOpti
 func (s *MiscService) UserDeleteHook(ctx context.Context, id int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/hooks/%d", id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -2343,19 +1605,13 @@ func (s *MiscService) UserDeleteHook(ctx context.Context, id int64) (*Response, 
 func (s *MiscService) UserDeleteOAuth2Application(ctx context.Context, id int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/applications/oauth2/%d", id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -2365,29 +1621,19 @@ func (s *MiscService) UserDeleteOAuth2Application(ctx context.Context, id int64)
 func (s *MiscService) UserEditHook(ctx context.Context, id int64, body *EditHookOption) (*Hook, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/hooks/%d", id))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Hook
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -2396,24 +1642,16 @@ func (s *MiscService) UserEditHook(ctx context.Context, id int64, body *EditHook
 func (s *MiscService) UserGetCurrent(ctx context.Context) (*User, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user"))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result User
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -2422,24 +1660,16 @@ func (s *MiscService) UserGetCurrent(ctx context.Context) (*User, *Response, err
 func (s *MiscService) UserGetHook(ctx context.Context, id int64) (*Hook, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/hooks/%d", id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Hook
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -2448,24 +1678,16 @@ func (s *MiscService) UserGetHook(ctx context.Context, id int64) (*Hook, *Respon
 func (s *MiscService) UserGetOAuth2Application(ctx context.Context, id int64) (*OAuth2Application, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/applications/oauth2/%d", id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result OAuth2Application
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -2474,32 +1696,20 @@ func (s *MiscService) UserGetOAuth2Application(ctx context.Context, id int64) (*
 func (s *MiscService) UserGetOAuth2Applications(ctx context.Context, page int, limit int) ([]OAuth2Application, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/applications/oauth2"))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []OAuth2Application
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -2508,24 +1718,16 @@ func (s *MiscService) UserGetOAuth2Applications(ctx context.Context, page int, l
 func (s *MiscService) UserGetQuota(ctx context.Context) (*QuotaInfo, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/quota"))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result QuotaInfo
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -2534,24 +1736,16 @@ func (s *MiscService) UserGetQuota(ctx context.Context) (*QuotaInfo, *Response, 
 func (s *MiscService) UserGetRunnerRegistrationToken(ctx context.Context) (*RegistrationToken, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/actions/runners/registration-token"))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result RegistrationToken
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -2560,32 +1754,20 @@ func (s *MiscService) UserGetRunnerRegistrationToken(ctx context.Context) (*Regi
 func (s *MiscService) UserGetStopWatches(ctx context.Context, page int, limit int) ([]StopWatch, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/stopwatches"))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []StopWatch
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -2594,32 +1776,20 @@ func (s *MiscService) UserGetStopWatches(ctx context.Context, page int, limit in
 func (s *MiscService) UserListBlockedUsers(ctx context.Context, page int, limit int) ([]BlockedUser, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/list_blocked"))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []BlockedUser
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -2628,24 +1798,16 @@ func (s *MiscService) UserListBlockedUsers(ctx context.Context, page int, limit 
 func (s *MiscService) UserListEmails(ctx context.Context) ([]Email, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/emails"))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Email
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -2654,32 +1816,20 @@ func (s *MiscService) UserListEmails(ctx context.Context) ([]Email, *Response, e
 func (s *MiscService) UserListHooks(ctx context.Context, page int, limit int) ([]Hook, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/hooks"))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Hook
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -2688,32 +1838,20 @@ func (s *MiscService) UserListHooks(ctx context.Context, page int, limit int) ([
 func (s *MiscService) UserListQuotaArtifacts(ctx context.Context, page int, limit int) (*QuotaUsedArtifactList, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/quota/artifacts"))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result QuotaUsedArtifactList
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -2722,32 +1860,20 @@ func (s *MiscService) UserListQuotaArtifacts(ctx context.Context, page int, limi
 func (s *MiscService) UserListQuotaAttachments(ctx context.Context, page int, limit int) (*QuotaUsedAttachmentList, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/quota/attachments"))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result QuotaUsedAttachmentList
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -2756,32 +1882,20 @@ func (s *MiscService) UserListQuotaAttachments(ctx context.Context, page int, li
 func (s *MiscService) UserListQuotaPackages(ctx context.Context, page int, limit int) (*QuotaUsedPackageList, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/quota/packages"))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result QuotaUsedPackageList
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -2790,32 +1904,20 @@ func (s *MiscService) UserListQuotaPackages(ctx context.Context, page int, limit
 func (s *MiscService) UserListTeams(ctx context.Context, page int, limit int) ([]Team, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/teams"))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Team
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -2824,29 +1926,19 @@ func (s *MiscService) UserListTeams(ctx context.Context, page int, limit int) ([
 func (s *MiscService) UserSearchRunJobs(ctx context.Context, labels string) ([]ActionRunJob, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/actions/runners/jobs"))
 	qry := u.Query()
-	if labels != "" {
-		qry.Set("labels", fmt.Sprintf("%v", labels))
-	}
+	if labels != "" { qry.Set("labels", fmt.Sprintf("%v", labels)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []ActionRunJob
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -2855,19 +1947,13 @@ func (s *MiscService) UserSearchRunJobs(ctx context.Context, labels string) ([]A
 func (s *MiscService) UserUnblockUser(ctx context.Context, username string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/unblock/%s", username))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -2877,24 +1963,16 @@ func (s *MiscService) UserUnblockUser(ctx context.Context, username string) (*Re
 func (s *MiscService) UserUpdateAvatar(ctx context.Context, body *UpdateUserAvatarOption) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/avatar"))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -2904,29 +1982,19 @@ func (s *MiscService) UserUpdateAvatar(ctx context.Context, body *UpdateUserAvat
 func (s *MiscService) UserUpdateOAuth2Application(ctx context.Context, id int64, body *CreateOAuth2ApplicationOptions) (*OAuth2Application, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/applications/oauth2/%d", id))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result OAuth2Application
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -2935,28 +2003,19 @@ func (s *MiscService) UserUpdateOAuth2Application(ctx context.Context, id int64,
 func (s *MiscService) UserVerifyGPGKey(ctx context.Context, body *VerifyGPGKeyOption) (*GPGKey, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/gpg_key_verify"))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result GPGKey
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
+

@@ -15,29 +15,19 @@ import (
 func (s *OrgService) CreateOrgRepo(ctx context.Context, org string, body *CreateRepoOption) (*Repository, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/repos", org))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Repository
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -46,24 +36,16 @@ func (s *OrgService) CreateOrgRepo(ctx context.Context, org string, body *Create
 func (s *OrgService) CreateOrgVariable(ctx context.Context, org string, variablename string, body *CreateVariableOption) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/actions/variables/%s", org, variablename))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -73,19 +55,13 @@ func (s *OrgService) CreateOrgVariable(ctx context.Context, org string, variable
 func (s *OrgService) DeleteOrgRunner(ctx context.Context, org string, runnerId string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/actions/runners/%s", org, runnerId))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -95,19 +71,13 @@ func (s *OrgService) DeleteOrgRunner(ctx context.Context, org string, runnerId s
 func (s *OrgService) DeleteOrgSecret(ctx context.Context, org string, secretname string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/actions/secrets/%s", org, secretname))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -117,19 +87,13 @@ func (s *OrgService) DeleteOrgSecret(ctx context.Context, org string, secretname
 func (s *OrgService) DeleteOrgVariable(ctx context.Context, org string, variablename string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/actions/variables/%s", org, variablename))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -139,24 +103,16 @@ func (s *OrgService) DeleteOrgVariable(ctx context.Context, org string, variable
 func (s *OrgService) GetOrgRunner(ctx context.Context, org string, runnerId string) (*ActionRunner, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/actions/runners/%s", org, runnerId))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result ActionRunner
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -165,35 +121,21 @@ func (s *OrgService) GetOrgRunner(ctx context.Context, org string, runnerId stri
 func (s *OrgService) GetOrgRunners(ctx context.Context, org string, visible bool, page int, limit int) ([]ActionRunner, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/actions/runners", org))
 	qry := u.Query()
-	if visible != false {
-		qry.Set("visible", fmt.Sprintf("%v", visible))
-	}
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if visible != false { qry.Set("visible", fmt.Sprintf("%v", visible)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []ActionRunner
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -202,24 +144,16 @@ func (s *OrgService) GetOrgRunners(ctx context.Context, org string, visible bool
 func (s *OrgService) GetOrgVariable(ctx context.Context, org string, variablename string) (*ActionVariable, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/actions/variables/%s", org, variablename))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result ActionVariable
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -228,32 +162,20 @@ func (s *OrgService) GetOrgVariable(ctx context.Context, org string, variablenam
 func (s *OrgService) GetOrgVariablesList(ctx context.Context, org string, page int, limit int) ([]ActionVariable, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/actions/variables", org))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []ActionVariable
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -262,19 +184,13 @@ func (s *OrgService) GetOrgVariablesList(ctx context.Context, org string, page i
 func (s *OrgService) OrgBlockUser(ctx context.Context, org string, username string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/block/%s", org, username))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -284,29 +200,19 @@ func (s *OrgService) OrgBlockUser(ctx context.Context, org string, username stri
 func (s *OrgService) OrgCheckQuota(ctx context.Context, org string, subject string) (bool, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/quota/check", org))
 	qry := u.Query()
-	if subject != "" {
-		qry.Set("subject", fmt.Sprintf("%v", subject))
-	}
+	if subject != "" { qry.Set("subject", fmt.Sprintf("%v", subject)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return false, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return false, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return false, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return false, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return false, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return false, nil, handleError(resp) }
 
 	var result bool
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return false, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return false,  nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -315,19 +221,13 @@ func (s *OrgService) OrgCheckQuota(ctx context.Context, org string, subject stri
 func (s *OrgService) OrgConcealMember(ctx context.Context, org string, username string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/public_members/%s", org, username))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -337,29 +237,19 @@ func (s *OrgService) OrgConcealMember(ctx context.Context, org string, username 
 func (s *OrgService) OrgCreate(ctx context.Context, organization *CreateOrgOption) (*Organization, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs"))
 	bodyBytes, err := json.Marshal(organization)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Organization
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -368,29 +258,19 @@ func (s *OrgService) OrgCreate(ctx context.Context, organization *CreateOrgOptio
 func (s *OrgService) OrgCreateHook(ctx context.Context, org string, body *CreateHookOption) (*Hook, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/hooks", org))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Hook
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -399,29 +279,19 @@ func (s *OrgService) OrgCreateHook(ctx context.Context, org string, body *Create
 func (s *OrgService) OrgCreateLabel(ctx context.Context, org string, body *CreateLabelOption) (*Label, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/labels", org))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Label
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -430,29 +300,19 @@ func (s *OrgService) OrgCreateLabel(ctx context.Context, org string, body *Creat
 func (s *OrgService) OrgCreateTeam(ctx context.Context, org string, body *CreateTeamOption) (*Team, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/teams", org))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Team
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -461,19 +321,13 @@ func (s *OrgService) OrgCreateTeam(ctx context.Context, org string, body *Create
 func (s *OrgService) OrgDelete(ctx context.Context, org string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s", org))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -483,19 +337,13 @@ func (s *OrgService) OrgDelete(ctx context.Context, org string) (*Response, erro
 func (s *OrgService) OrgDeleteAvatar(ctx context.Context, org string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/avatar", org))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -505,19 +353,13 @@ func (s *OrgService) OrgDeleteAvatar(ctx context.Context, org string) (*Response
 func (s *OrgService) OrgDeleteHook(ctx context.Context, org string, id int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/hooks/%d", org, id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -527,19 +369,13 @@ func (s *OrgService) OrgDeleteHook(ctx context.Context, org string, id int64) (*
 func (s *OrgService) OrgDeleteLabel(ctx context.Context, org string, id int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/labels/%d", org, id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -549,19 +385,13 @@ func (s *OrgService) OrgDeleteLabel(ctx context.Context, org string, id int64) (
 func (s *OrgService) OrgDeleteMember(ctx context.Context, org string, username string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/members/%s", org, username))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -571,29 +401,19 @@ func (s *OrgService) OrgDeleteMember(ctx context.Context, org string, username s
 func (s *OrgService) OrgEdit(ctx context.Context, org string, body *EditOrgOption) (*Organization, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s", org))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Organization
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -602,29 +422,19 @@ func (s *OrgService) OrgEdit(ctx context.Context, org string, body *EditOrgOptio
 func (s *OrgService) OrgEditHook(ctx context.Context, org string, id int64, body *EditHookOption) (*Hook, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/hooks/%d", org, id))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Hook
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -633,29 +443,19 @@ func (s *OrgService) OrgEditHook(ctx context.Context, org string, id int64, body
 func (s *OrgService) OrgEditLabel(ctx context.Context, org string, id int64, body *EditLabelOption) (*Label, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/labels/%d", org, id))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Label
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -664,24 +464,16 @@ func (s *OrgService) OrgEditLabel(ctx context.Context, org string, id int64, bod
 func (s *OrgService) OrgGet(ctx context.Context, org string) (*Organization, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s", org))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Organization
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -690,32 +482,20 @@ func (s *OrgService) OrgGet(ctx context.Context, org string) (*Organization, *Re
 func (s *OrgService) OrgGetAll(ctx context.Context, page int, limit int) ([]Organization, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs"))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Organization
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -724,24 +504,16 @@ func (s *OrgService) OrgGetAll(ctx context.Context, page int, limit int) ([]Orga
 func (s *OrgService) OrgGetHook(ctx context.Context, org string, id int64) (*Hook, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/hooks/%d", org, id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Hook
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -750,24 +522,16 @@ func (s *OrgService) OrgGetHook(ctx context.Context, org string, id int64) (*Hoo
 func (s *OrgService) OrgGetLabel(ctx context.Context, org string, id int64) (*Label, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/labels/%d", org, id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result Label
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -776,24 +540,16 @@ func (s *OrgService) OrgGetLabel(ctx context.Context, org string, id int64) (*La
 func (s *OrgService) OrgGetQuota(ctx context.Context, org string) (*QuotaInfo, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/quota", org))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result QuotaInfo
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -802,24 +558,16 @@ func (s *OrgService) OrgGetQuota(ctx context.Context, org string) (*QuotaInfo, *
 func (s *OrgService) OrgGetRunnerRegistrationToken(ctx context.Context, org string) (*RegistrationToken, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/actions/runners/registration-token", org))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result RegistrationToken
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -828,19 +576,13 @@ func (s *OrgService) OrgGetRunnerRegistrationToken(ctx context.Context, org stri
 func (s *OrgService) OrgIsMember(ctx context.Context, org string, username string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/members/%s", org, username))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -850,19 +592,13 @@ func (s *OrgService) OrgIsMember(ctx context.Context, org string, username strin
 func (s *OrgService) OrgIsPublicMember(ctx context.Context, org string, username string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/public_members/%s", org, username))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -872,32 +608,20 @@ func (s *OrgService) OrgIsPublicMember(ctx context.Context, org string, username
 func (s *OrgService) OrgListActionsSecrets(ctx context.Context, org string, page int, limit int) ([]Secret, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/actions/secrets", org))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Secret
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -906,35 +630,21 @@ func (s *OrgService) OrgListActionsSecrets(ctx context.Context, org string, page
 func (s *OrgService) OrgListActivityFeeds(ctx context.Context, org string, date string, page int, limit int) ([]Activity, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/activities/feeds", org))
 	qry := u.Query()
-	if date != "" {
-		qry.Set("date", fmt.Sprintf("%v", date))
-	}
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if date != "" { qry.Set("date", fmt.Sprintf("%v", date)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Activity
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -943,32 +653,20 @@ func (s *OrgService) OrgListActivityFeeds(ctx context.Context, org string, date 
 func (s *OrgService) OrgListBlockedUsers(ctx context.Context, org string, page int, limit int) ([]BlockedUser, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/list_blocked", org))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []BlockedUser
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -977,32 +675,20 @@ func (s *OrgService) OrgListBlockedUsers(ctx context.Context, org string, page i
 func (s *OrgService) OrgListHooks(ctx context.Context, org string, page int, limit int) ([]Hook, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/hooks", org))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Hook
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -1011,35 +697,21 @@ func (s *OrgService) OrgListHooks(ctx context.Context, org string, page int, lim
 func (s *OrgService) OrgListLabels(ctx context.Context, org string, sort string, page int, limit int) ([]Label, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/labels", org))
 	qry := u.Query()
-	if sort != "" {
-		qry.Set("sort", fmt.Sprintf("%v", sort))
-	}
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if sort != "" { qry.Set("sort", fmt.Sprintf("%v", sort)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Label
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -1048,32 +720,20 @@ func (s *OrgService) OrgListLabels(ctx context.Context, org string, sort string,
 func (s *OrgService) OrgListMembers(ctx context.Context, org string, page int, limit int) ([]User, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/members", org))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []User
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -1082,32 +742,20 @@ func (s *OrgService) OrgListMembers(ctx context.Context, org string, page int, l
 func (s *OrgService) OrgListPublicMembers(ctx context.Context, org string, page int, limit int) ([]User, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/public_members", org))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []User
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -1116,32 +764,20 @@ func (s *OrgService) OrgListPublicMembers(ctx context.Context, org string, page 
 func (s *OrgService) OrgListQuotaArtifacts(ctx context.Context, org string, page int, limit int) (*QuotaUsedArtifactList, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/quota/artifacts", org))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result QuotaUsedArtifactList
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -1150,32 +786,20 @@ func (s *OrgService) OrgListQuotaArtifacts(ctx context.Context, org string, page
 func (s *OrgService) OrgListQuotaAttachments(ctx context.Context, org string, page int, limit int) (*QuotaUsedAttachmentList, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/quota/attachments", org))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result QuotaUsedAttachmentList
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -1184,32 +808,20 @@ func (s *OrgService) OrgListQuotaAttachments(ctx context.Context, org string, pa
 func (s *OrgService) OrgListQuotaPackages(ctx context.Context, org string, page int, limit int) (*QuotaUsedPackageList, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/quota/packages", org))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result QuotaUsedPackageList
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -1218,32 +830,20 @@ func (s *OrgService) OrgListQuotaPackages(ctx context.Context, org string, page 
 func (s *OrgService) OrgListRepos(ctx context.Context, org string, page int, limit int) ([]Repository, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/repos", org))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Repository
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -1252,32 +852,20 @@ func (s *OrgService) OrgListRepos(ctx context.Context, org string, page int, lim
 func (s *OrgService) OrgListTeams(ctx context.Context, org string, page int, limit int) ([]Team, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/teams", org))
 	qry := u.Query()
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []Team
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -1286,19 +874,13 @@ func (s *OrgService) OrgListTeams(ctx context.Context, org string, page int, lim
 func (s *OrgService) OrgPublicizeMember(ctx context.Context, org string, username string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/public_members/%s", org, username))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -1308,29 +890,19 @@ func (s *OrgService) OrgPublicizeMember(ctx context.Context, org string, usernam
 func (s *OrgService) OrgSearchRunJobs(ctx context.Context, org string, labels string) ([]ActionRunJob, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/actions/runners/jobs", org))
 	qry := u.Query()
-	if labels != "" {
-		qry.Set("labels", fmt.Sprintf("%v", labels))
-	}
+	if labels != "" { qry.Set("labels", fmt.Sprintf("%v", labels)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result []ActionRunJob
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil, nil, fmt.Errorf("decode: %w", err) }
 	return result, &Response{Response: resp}, nil
 }
 
@@ -1339,19 +911,13 @@ func (s *OrgService) OrgSearchRunJobs(ctx context.Context, org string, labels st
 func (s *OrgService) OrgUnblockUser(ctx context.Context, org string, username string) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/unblock/%s", org, username))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, u.String(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -1361,24 +927,16 @@ func (s *OrgService) OrgUnblockUser(ctx context.Context, org string, username st
 func (s *OrgService) OrgUpdateAvatar(ctx context.Context, org string, body *UpdateUserAvatarOption) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/avatar", org))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -1388,29 +946,19 @@ func (s *OrgService) OrgUpdateAvatar(ctx context.Context, org string, body *Upda
 func (s *OrgService) RegisterOrgRunner(ctx context.Context, org string, body *RegisterRunnerOptions) (*RegisterRunnerResponse, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/actions/runners", org))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result RegisterRunnerResponse
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -1419,24 +967,16 @@ func (s *OrgService) RegisterOrgRunner(ctx context.Context, org string, body *Re
 func (s *OrgService) RenameOrg(ctx context.Context, org string, body *RenameOrgOption) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/rename", org))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -1446,38 +986,22 @@ func (s *OrgService) RenameOrg(ctx context.Context, org string, body *RenameOrgO
 func (s *OrgService) TeamSearch(ctx context.Context, org string, q string, includeDesc bool, page int, limit int) (*interface{}, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/teams/search", org))
 	qry := u.Query()
-	if q != "" {
-		qry.Set("q", fmt.Sprintf("%v", q))
-	}
-	if includeDesc != false {
-		qry.Set("include_desc", fmt.Sprintf("%v", includeDesc))
-	}
-	if page != 0 {
-		qry.Set("page", fmt.Sprintf("%v", page))
-	}
-	if limit != 0 {
-		qry.Set("limit", fmt.Sprintf("%v", limit))
-	}
+	if q != "" { qry.Set("q", fmt.Sprintf("%v", q)) }
+	if includeDesc != false { qry.Set("include_desc", fmt.Sprintf("%v", includeDesc)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result interface{}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, nil, fmt.Errorf("decode: %w", err)
-	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
 
@@ -1486,24 +1010,16 @@ func (s *OrgService) TeamSearch(ctx context.Context, org string, q string, inclu
 func (s *OrgService) UpdateOrgSecret(ctx context.Context, org string, secretname string, body *CreateOrUpdateSecretOption) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/actions/secrets/%s", org, secretname))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
@@ -1513,24 +1029,17 @@ func (s *OrgService) UpdateOrgSecret(ctx context.Context, org string, secretname
 func (s *OrgService) UpdateOrgVariable(ctx context.Context, org string, variablename string, body *UpdateVariableOption) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/orgs/%s/actions/variables/%s", org, variablename))
 	bodyBytes, err := json.Marshal(body)
-	if err != nil {
-		return nil, fmt.Errorf("marshal: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("marshal: %w", err) }
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, u.String(), bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		return nil, fmt.Errorf("request: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 
 	resp, err := s.client.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("do: %w", err)
-	}
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return nil, handleError(resp)
-	}
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
 
 	return &Response{Response: resp}, nil
 }
+
