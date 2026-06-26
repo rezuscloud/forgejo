@@ -137,13 +137,22 @@ jobs:
             --admin --username root --password root123456 \
             --email root@test.local --must-change-password=false \
             || true  # may already exist on re-run
-      - name: Create API token
+      - name: Create API token via CLI (full scope)
         run: |
-          TOKEN=$(curl -sf -X POST http://localhost:3000/api/v1/users/root/tokens \
-            -u root:root123456 \
-            -H "Content-Type: application/json" \
-            -d '{"name":"ci-test","scopes":["write:admin","write:repository","write:issue"]}' \
-            | jq -r .sha1)
+          # Use the forgejo CLI to generate a token with full access — the
+          # API token creation uses fine-grained scopes that vary by version.
+          # The CLI token is simpler and always works.
+          TOKEN=$(docker exec forgejo-test forgejo admin user generate-access-token \
+            --username root --token-name ci-test --scopes 'all' --raw 2>/dev/null \
+            || true)
+          if [ -z "$TOKEN" ]; then
+            # Fallback: API token creation
+            TOKEN=$(curl -sf -X POST http://localhost:3000/api/v1/users/root/tokens \
+              -u root:root123456 \
+              -H "Content-Type: application/json" \
+              -d '{"name":"ci-test","scopes":["all"]}' \
+              | jq -r .sha1)
+          fi
           echo "Token: ${TOKEN:0:8}..."
           echo "FORGEJO_TEST_TOKEN=$TOKEN" >> $GITHUB_ENV
           echo "FORGEJO_TEST_URL=http://localhost:3000" >> $GITHUB_ENV
