@@ -275,7 +275,7 @@ func genMethod(svc string, m MD, spec *SwaggerSpec) string {
 		b.WriteString("\tqry := u.Query()\n")
 		for _, a2 := range qp {
 			// Only set non-zero-value optional query params.
-			b.WriteString(fmt.Sprintf("\tif %s != %s { qry.Set(%q, fmt.Sprintf(\"%v\", %s)) }\n", a2.n, zeroForType(a2.t), a2.sw, a2.n))
+			b.WriteString(fmt.Sprintf("\tif %s != %s { qry.Set(%q, fmt.Sprintf(\"%%v\", %s)) }\n", a2.n, zeroForType(a2.t), a2.sw, a2.n))
 		}
 		b.WriteString("\tu.RawQuery = qry.Encode()\n")
 	}

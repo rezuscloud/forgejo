@@ -231,8 +231,8 @@ func (s *AdminService) AdminCreateUserAccessToken(ctx context.Context, username 
 func (s *AdminService) AdminCronList(ctx context.Context, page int, limit int) ([]Cron, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/cron"))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -333,7 +333,7 @@ func (s *AdminService) AdminDeleteUnadoptedRepository(ctx context.Context, owner
 func (s *AdminService) AdminDeleteUser(ctx context.Context, username string, purge bool) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/users/%s", username))
 	qry := u.Query()
-	if purge != false { qry.Set("purge", fmt.Sprintf("purge", %!s(MISSING))) }
+	if purge != false { qry.Set("purge", fmt.Sprintf("%v", purge)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
 	if err != nil { return nil, fmt.Errorf("request: %w", err) }
@@ -466,7 +466,7 @@ func (s *AdminService) AdminEditUser(ctx context.Context, username string, body 
 func (s *AdminService) AdminGetActionRunJobs(ctx context.Context, labels string) ([]ActionRunJob, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/actions/runners/jobs"))
 	qry := u.Query()
-	if labels != "" { qry.Set("labels", fmt.Sprintf("labels", %!s(MISSING))) }
+	if labels != "" { qry.Set("labels", fmt.Sprintf("%v", labels)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -487,8 +487,8 @@ func (s *AdminService) AdminGetActionRunJobs(ctx context.Context, labels string)
 func (s *AdminService) AdminGetAllEmails(ctx context.Context, page int, limit int) ([]Email, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/emails"))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -509,8 +509,8 @@ func (s *AdminService) AdminGetAllEmails(ctx context.Context, page int, limit in
 func (s *AdminService) AdminGetAllOrgs(ctx context.Context, page int, limit int) ([]Organization, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/orgs"))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -639,8 +639,8 @@ func (s *AdminService) AdminGetUserQuota(ctx context.Context, username string) (
 func (s *AdminService) AdminListHooks(ctx context.Context, page int, limit int) ([]Hook, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/hooks"))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -697,8 +697,8 @@ func (s *AdminService) AdminListQuotaRules(ctx context.Context) ([]QuotaRuleInfo
 func (s *AdminService) AdminListUserAccessTokens(ctx context.Context, username string, page int, limit int) ([]AccessToken, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/users/%s/tokens", username))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -806,9 +806,9 @@ func (s *AdminService) AdminRenameUser(ctx context.Context, username string, bod
 func (s *AdminService) AdminSearchEmails(ctx context.Context, q string, page int, limit int) ([]Email, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/emails/search"))
 	qry := u.Query()
-	if q != "" { qry.Set("q", fmt.Sprintf("q", %!s(MISSING))) }
-	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
+	if q != "" { qry.Set("q", fmt.Sprintf("%v", q)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -829,7 +829,7 @@ func (s *AdminService) AdminSearchEmails(ctx context.Context, q string, page int
 func (s *AdminService) AdminSearchRunJobs(ctx context.Context, labels string) ([]ActionRunJob, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/runners/jobs"))
 	qry := u.Query()
-	if labels != "" { qry.Set("labels", fmt.Sprintf("labels", %!s(MISSING))) }
+	if labels != "" { qry.Set("labels", fmt.Sprintf("%v", labels)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -850,12 +850,12 @@ func (s *AdminService) AdminSearchRunJobs(ctx context.Context, labels string) ([
 func (s *AdminService) AdminSearchUsers(ctx context.Context, sourceId int64, loginName string, is2faEnabled bool, sort string, page int, limit int) ([]User, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/users"))
 	qry := u.Query()
-	if sourceId != 0 { qry.Set("source_id", fmt.Sprintf("sourceId", %!s(MISSING))) }
-	if loginName != "" { qry.Set("login_name", fmt.Sprintf("loginName", %!s(MISSING))) }
-	if is2faEnabled != false { qry.Set("is_2fa_enabled", fmt.Sprintf("is2faEnabled", %!s(MISSING))) }
-	if sort != "" { qry.Set("sort", fmt.Sprintf("sort", %!s(MISSING))) }
-	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
+	if sourceId != 0 { qry.Set("source_id", fmt.Sprintf("%v", sourceId)) }
+	if loginName != "" { qry.Set("login_name", fmt.Sprintf("%v", loginName)) }
+	if is2faEnabled != false { qry.Set("is_2fa_enabled", fmt.Sprintf("%v", is2faEnabled)) }
+	if sort != "" { qry.Set("sort", fmt.Sprintf("%v", sort)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -895,9 +895,9 @@ func (s *AdminService) AdminSetUserQuotaGroups(ctx context.Context, username str
 func (s *AdminService) AdminUnadoptedList(ctx context.Context, page int, limit int, pattern string) ([]string, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/unadopted"))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
-	if pattern != "" { qry.Set("pattern", fmt.Sprintf("pattern", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if pattern != "" { qry.Set("pattern", fmt.Sprintf("%v", pattern)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -952,9 +952,9 @@ func (s *AdminService) GetAdminRunner(ctx context.Context, runnerId string) (*Ac
 func (s *AdminService) GetAdminRunners(ctx context.Context, visible bool, page int, limit int) ([]ActionRunner, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/admin/actions/runners"))
 	qry := u.Query()
-	if visible != false { qry.Set("visible", fmt.Sprintf("visible", %!s(MISSING))) }
-	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
+	if visible != false { qry.Set("visible", fmt.Sprintf("%v", visible)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }

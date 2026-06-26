@@ -376,9 +376,9 @@ func (s *MiscService) GetUserRunner(ctx context.Context, runnerId string) (*Acti
 func (s *MiscService) GetUserRunners(ctx context.Context, visible bool, page int, limit int) ([]ActionRunner, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/actions/runners"))
 	qry := u.Query()
-	if visible != false { qry.Set("visible", fmt.Sprintf("visible", %!s(MISSING))) }
-	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
+	if visible != false { qry.Set("visible", fmt.Sprintf("%v", visible)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -435,8 +435,8 @@ func (s *MiscService) GetUserVariable(ctx context.Context, variablename string) 
 func (s *MiscService) GetUserVariablesList(ctx context.Context, page int, limit int) ([]ActionVariable, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/actions/variables"))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -581,10 +581,10 @@ func (s *MiscService) ListPackageFiles(ctx context.Context, owner string, type_ 
 func (s *MiscService) ListPackages(ctx context.Context, owner string, page int, limit int, type_ string, q string) ([]Package, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/packages/%s", owner))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
-	if type_ != "" { qry.Set("type", fmt.Sprintf("type_", %!s(MISSING))) }
-	if q != "" { qry.Set("q", fmt.Sprintf("q", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if type_ != "" { qry.Set("type", fmt.Sprintf("%v", type_)) }
+	if q != "" { qry.Set("q", fmt.Sprintf("%v", q)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -692,8 +692,8 @@ func (s *MiscService) OrgGetTeam(ctx context.Context, id int64) (*Team, *Respons
 func (s *MiscService) OrgListCurrentUserOrgs(ctx context.Context, page int, limit int) ([]Organization, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/orgs"))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -714,9 +714,9 @@ func (s *MiscService) OrgListCurrentUserOrgs(ctx context.Context, page int, limi
 func (s *MiscService) OrgListTeamActivityFeeds(ctx context.Context, id int64, date string, page int, limit int) ([]Activity, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/teams/%d/activities/feeds", id))
 	qry := u.Query()
-	if date != "" { qry.Set("date", fmt.Sprintf("date", %!s(MISSING))) }
-	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
+	if date != "" { qry.Set("date", fmt.Sprintf("%v", date)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -755,8 +755,8 @@ func (s *MiscService) OrgListTeamMember(ctx context.Context, id int64, username 
 func (s *MiscService) OrgListTeamMembers(ctx context.Context, id int64, page int, limit int) ([]User, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/teams/%d/members", id))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -795,8 +795,8 @@ func (s *MiscService) OrgListTeamRepo(ctx context.Context, id int64, org string,
 func (s *MiscService) OrgListTeamRepos(ctx context.Context, id int64, page int, limit int) ([]Repository, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/teams/%d/repos", id))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -951,9 +951,9 @@ func (s *MiscService) RepoGetByID(ctx context.Context, id int64) (*Repository, *
 func (s *MiscService) TopicSearch(ctx context.Context, q string, page int, limit int) (*interface{}, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/topics/search"))
 	qry := u.Query()
-	if q != "" { qry.Set("q", fmt.Sprintf("q", %!s(MISSING))) }
-	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
+	if q != "" { qry.Set("q", fmt.Sprintf("%v", q)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -1086,7 +1086,7 @@ func (s *MiscService) UserBlockUser(ctx context.Context, username string) (*Resp
 func (s *MiscService) UserCheckQuota(ctx context.Context, subject string) (bool, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/quota/check"))
 	qry := u.Query()
-	if subject != "" { qry.Set("subject", fmt.Sprintf("subject", %!s(MISSING))) }
+	if subject != "" { qry.Set("subject", fmt.Sprintf("%v", subject)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return false, nil, fmt.Errorf("request: %w", err) }
@@ -1300,8 +1300,8 @@ func (s *MiscService) UserCurrentGetKey(ctx context.Context, id int64) (*PublicK
 func (s *MiscService) UserCurrentListFollowers(ctx context.Context, page int, limit int) ([]User, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/followers"))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -1322,8 +1322,8 @@ func (s *MiscService) UserCurrentListFollowers(ctx context.Context, page int, li
 func (s *MiscService) UserCurrentListFollowing(ctx context.Context, page int, limit int) ([]User, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/following"))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -1344,8 +1344,8 @@ func (s *MiscService) UserCurrentListFollowing(ctx context.Context, page int, li
 func (s *MiscService) UserCurrentListGPGKeys(ctx context.Context, page int, limit int) ([]GPGKey, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/gpg_keys"))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -1366,9 +1366,9 @@ func (s *MiscService) UserCurrentListGPGKeys(ctx context.Context, page int, limi
 func (s *MiscService) UserCurrentListKeys(ctx context.Context, fingerprint string, page int, limit int) ([]PublicKey, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/keys"))
 	qry := u.Query()
-	if fingerprint != "" { qry.Set("fingerprint", fmt.Sprintf("fingerprint", %!s(MISSING))) }
-	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
+	if fingerprint != "" { qry.Set("fingerprint", fmt.Sprintf("%v", fingerprint)) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -1389,9 +1389,9 @@ func (s *MiscService) UserCurrentListKeys(ctx context.Context, fingerprint strin
 func (s *MiscService) UserCurrentListRepos(ctx context.Context, page int, limit int, orderBy string) ([]Repository, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/repos"))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
-	if orderBy != "" { qry.Set("order_by", fmt.Sprintf("orderBy", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if orderBy != "" { qry.Set("order_by", fmt.Sprintf("%v", orderBy)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -1412,8 +1412,8 @@ func (s *MiscService) UserCurrentListRepos(ctx context.Context, page int, limit 
 func (s *MiscService) UserCurrentListStarred(ctx context.Context, page int, limit int) ([]Repository, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/starred"))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -1434,8 +1434,8 @@ func (s *MiscService) UserCurrentListStarred(ctx context.Context, page int, limi
 func (s *MiscService) UserCurrentListSubscriptions(ctx context.Context, page int, limit int) ([]Repository, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/subscriptions"))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -1530,10 +1530,10 @@ func (s *MiscService) UserCurrentPutStar(ctx context.Context, owner string, repo
 func (s *MiscService) UserCurrentTrackedTimes(ctx context.Context, page int, limit int, since time.Time, before time.Time) ([]TrackedTime, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/times"))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
-	if since != (time.Time{}) { qry.Set("since", fmt.Sprintf("since", %!s(MISSING))) }
-	if before != (time.Time{}) { qry.Set("before", fmt.Sprintf("before", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
+	if since != (time.Time{}) { qry.Set("since", fmt.Sprintf("%v", since)) }
+	if before != (time.Time{}) { qry.Set("before", fmt.Sprintf("%v", before)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -1696,8 +1696,8 @@ func (s *MiscService) UserGetOAuth2Application(ctx context.Context, id int64) (*
 func (s *MiscService) UserGetOAuth2Applications(ctx context.Context, page int, limit int) ([]OAuth2Application, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/applications/oauth2"))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -1754,8 +1754,8 @@ func (s *MiscService) UserGetRunnerRegistrationToken(ctx context.Context) (*Regi
 func (s *MiscService) UserGetStopWatches(ctx context.Context, page int, limit int) ([]StopWatch, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/stopwatches"))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -1776,8 +1776,8 @@ func (s *MiscService) UserGetStopWatches(ctx context.Context, page int, limit in
 func (s *MiscService) UserListBlockedUsers(ctx context.Context, page int, limit int) ([]BlockedUser, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/list_blocked"))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -1816,8 +1816,8 @@ func (s *MiscService) UserListEmails(ctx context.Context) ([]Email, *Response, e
 func (s *MiscService) UserListHooks(ctx context.Context, page int, limit int) ([]Hook, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/hooks"))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -1838,8 +1838,8 @@ func (s *MiscService) UserListHooks(ctx context.Context, page int, limit int) ([
 func (s *MiscService) UserListQuotaArtifacts(ctx context.Context, page int, limit int) (*QuotaUsedArtifactList, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/quota/artifacts"))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -1860,8 +1860,8 @@ func (s *MiscService) UserListQuotaArtifacts(ctx context.Context, page int, limi
 func (s *MiscService) UserListQuotaAttachments(ctx context.Context, page int, limit int) (*QuotaUsedAttachmentList, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/quota/attachments"))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -1882,8 +1882,8 @@ func (s *MiscService) UserListQuotaAttachments(ctx context.Context, page int, li
 func (s *MiscService) UserListQuotaPackages(ctx context.Context, page int, limit int) (*QuotaUsedPackageList, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/quota/packages"))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -1904,8 +1904,8 @@ func (s *MiscService) UserListQuotaPackages(ctx context.Context, page int, limit
 func (s *MiscService) UserListTeams(ctx context.Context, page int, limit int) ([]Team, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/teams"))
 	qry := u.Query()
-	if page != 0 { qry.Set("page", fmt.Sprintf("page", %!s(MISSING))) }
-	if limit != 0 { qry.Set("limit", fmt.Sprintf("limit", %!s(MISSING))) }
+	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
+	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -1926,7 +1926,7 @@ func (s *MiscService) UserListTeams(ctx context.Context, page int, limit int) ([
 func (s *MiscService) UserSearchRunJobs(ctx context.Context, labels string) ([]ActionRunJob, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/user/actions/runners/jobs"))
 	qry := u.Query()
-	if labels != "" { qry.Set("labels", fmt.Sprintf("labels", %!s(MISSING))) }
+	if labels != "" { qry.Set("labels", fmt.Sprintf("%v", labels)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
