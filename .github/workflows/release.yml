@@ -109,48 +109,47 @@ jobs:
   integration:
     needs: [check-sdk-cli, codegen-check]
     runs-on: ubuntu-latest
-    services:
-      forgejo:
-        image: codeberg.org/forgejo/forgejo:15-rootless
-        ports: [3000:3000]
-        env:
-          FORGEJO__security__INSTALL_LOCK: "true"
-          FORGEJO__database__DB_TYPE: sqlite3
-        options: >-
-          --health-cmd "curl -sf http://localhost:3000/api/v1/version || exit 1"
-          --health-interval 5s
-          --health-timeout 3s
-          --health-retries 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
-      - name: Wait for Forgejo
+      - name: Start Forgejo container
         run: |
-          for i in $(seq 1 30); do
-            curl -sf http://localhost:3000/api/v1/version && break
+          docker run -d --name forgejo-test \
+            -p 3000:3000 \
+            -e FORGEJO__security__INSTALL_LOCK=true \
+            -e FORGEJO__database__DB_TYPE=sqlite3 \
+            codeberg.org/forgejo/forgejo:15-rootless
+      - name: Wait for Forgejo to be healthy
+        run: |
+          for i in $(seq 1 60); do
+            if curl -sf http://localhost:3000/api/v1/version >/dev/null 2>&1; then
+              echo "Forgejo is up"
+              break
+            fi
             sleep 2
           done
-      - name: Create admin user + token
+          curl -sf http://localhost:3000/api/v1/version || { echo "Forgejo did not start"; exit 1; }
+      - name: Create admin user via CLI
         run: |
-          # Create admin user
-          curl -sf -X POST http://localhost:3000/api/v1/admin/users \
-            -H "Authorization: token root" \
-            -H "Content-Type: application/json" \
-            -d '{"username":"root","password":"root123456","email":"root@test.local"}' \
-            || true
-          # Create API token
+          docker exec forgejo-test forgejo admin user create \
+            --admin --username root --password root123456 \
+            --email root@test.local --must-change-password=false \
+            || true  # may already exist on re-run
+      - name: Create API token
+        run: |
           TOKEN=$(curl -sf -X POST http://localhost:3000/api/v1/users/root/tokens \
             -u root:root123456 \
             -H "Content-Type: application/json" \
             -d '{"name":"ci-test","scopes":["write:admin","write:repository","write:issue"]}' \
             | jq -r .sha1)
+          echo "Token: ${TOKEN:0:8}..."
           echo "FORGEJO_TEST_TOKEN=$TOKEN" >> $GITHUB_ENV
           echo "FORGEJO_TEST_URL=http://localhost:3000" >> $GITHUB_ENV
           echo "FORGEJO_TEST_USER=root" >> $GITHUB_ENV
           echo "FORGEJO_REPO_ROOT=$PWD" >> $GITHUB_ENV
-      - name: Run SDK integration tests
+      - name: Run SDK + CLI integration tests
         run: |
           cd staging/src/forgejo.org/fj
           go test -v -tags=integration ./tests/integration/...
