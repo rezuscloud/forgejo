@@ -11,8 +11,8 @@ const SpecTitle = "Forgejo API"
 
 // SpecVersion is info.version of the swagger.json the SDK was generated from
 // (full Forgejo application version, including build metadata).
-const SpecVersion = "16.0.0-dev-507-cbafedda0a+gitea-1.22.0"
+const SpecVersion = "16.0.0-dev"
 
 // SpecAPIVersion is the Gitea REST API compatibility version derived from
 // SpecVersion (the +gitea-<v> suffix). This is the API level the SDK maps.
-const SpecAPIVersion = "1.22.0"
+const SpecAPIVersion = "16.0.0-dev"

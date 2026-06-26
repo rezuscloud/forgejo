@@ -12,6 +12,12 @@ import (
 )
 
 func resolveHostClient(cmd *cobra.Command, host string) (*forgejo.Client, error) {
+	// Read --host from the cobra flags if not explicitly provided
+	if host == "" {
+		if hf := cmd.Flag("host"); hf != nil {
+			host = hf.Value.String()
+		}
+	}
 	if host == "" {
 		if r, e := gitremote.Discover(""); e == nil {
 			host = r.Host

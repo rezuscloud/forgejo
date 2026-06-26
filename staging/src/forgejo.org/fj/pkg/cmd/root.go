@@ -34,6 +34,7 @@ func NewRootCmd() *cobra.Command {
 	root.AddCommand(newWikiCmd())
 	root.AddCommand(newWhoAmICmd())
 	root.AddCommand(newVersionCmd())
+	root.AddCommand(NewGeneratedAPICmd()) // auto-generated from swagger spec
 
 	return root
 }

@@ -14,20 +14,9 @@ name: release
 
 on:
   pull_request:
-    paths:
-      - staging/**
-      - cmd/fj/**
-      - charts/forgejo/**
-      - distributions/forgejo-*.env
-      - .github/workflows/release.yml
+    branches: [rezus/forgejo]   # run check-sdk-cli on every sync PR (not just path-filtered)
   push:
     branches: [forgejo]
-    paths:
-      - staging/**
-      - cmd/fj/**
-      - charts/forgejo/**
-      - distributions/forgejo-*.env
-      - .github/workflows/release.yml
   workflow_dispatch:
     inputs:
       distribution_file:

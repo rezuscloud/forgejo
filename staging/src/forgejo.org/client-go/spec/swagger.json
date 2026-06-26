@@ -19,13 +19,13 @@
       "name": "This file is distributed under the MIT license for the purpose of interoperability",
       "url": "http://opensource.org/licenses/MIT"
     },
-    "version": "16.0.0-dev-507-cbafedda0a+gitea-1.22.0"
+    "version": "16.0.0-dev"
   },
   "basePath": "/api/v1",
   "paths": {
     "/actions/run": {
       "get": {
-        "description": "The automatic actions token must be used as the authentication mechanism (\u003ccode\u003eAuthorization: Bearer $\u0026#x7b;\u0026#x7b; forgejo.token \u0026#x7d;\u0026#x7d;\u003c/code\u003e); other types of tokens cannot be used. The token is associated with the job, which must be still running for the request to this endpoint to succeed.\n",
+        "description": "The automatic actions token must be used as the authentication mechanism (<code>Authorization: Bearer $&#x7b;&#x7b; forgejo.token &#x7d;&#x7d;</code>); other types of tokens cannot be used. The token is associated with the job, which must be still running for the request to this endpoint to succeed.\n",
         "produces": [
           "application/json"
         ],
@@ -2469,7 +2469,7 @@
               "type": "string"
             },
             "collectionFormat": "multi",
-            "description": "Show notifications with the provided status types. Options are: unread, read and/or pinned. Defaults to unread \u0026 pinned.",
+            "description": "Show notifications with the provided status types. Options are: unread, read and/or pinned. Defaults to unread & pinned.",
             "name": "status-types",
             "in": "query"
           },
@@ -6548,7 +6548,7 @@
           {
             "type": "integer",
             "format": "int64",
-            "description": "ID of the workflow run. The ZIP contains the latest attempt of each job in the run, with each entry named `{job-name}-{job-id}-attempt-{N}.log` (the job ID prevents collisions when two jobs share a name; the attempt number records which run the log came from). The run itself has no attempt number — jobs are re-run independently, so use the per-job logs endpoint with `?attempt` to fetch a specific historical attempt of one job.\n",
+            "description": "ID of the workflow run. The ZIP contains the latest attempt of each job in the run, with each entry named `{job-name}-{job-id}-attempt-{N}.log` (the job ID prevents collisions when two jobs share a name; the attempt number records which run the log came from). The run itself has no attempt number \u2014 jobs are re-run independently, so use the per-job logs endpoint with `?attempt` to fetch a specific historical attempt of one job.\n",
             "name": "run_id",
             "in": "path",
             "required": true
@@ -8378,7 +8378,7 @@
           },
           {
             "type": "string",
-            "description": "The name of the commit/branch/tag. Default the repository’s default branch (usually master)",
+            "description": "The name of the commit/branch/tag. Default the repository\u2019s default branch (usually master)",
             "name": "ref",
             "in": "query"
           }
@@ -8487,7 +8487,7 @@
           },
           {
             "type": "string",
-            "description": "The name of the commit/branch/tag. Default the repository’s default branch (usually master)",
+            "description": "The name of the commit/branch/tag. Default the repository\u2019s default branch (usually master)",
             "name": "ref",
             "in": "query"
           }
@@ -8829,7 +8829,7 @@
           },
           {
             "type": "string",
-            "description": "The name of the commit/branch/tag. Default the repository’s default branch (usually master)",
+            "description": "The name of the commit/branch/tag. Default the repository\u2019s default branch (usually master)",
             "name": "ref",
             "in": "query"
           }
@@ -14078,7 +14078,7 @@
           },
           {
             "type": "string",
-            "description": "The name of the commit/branch/tag. Default the repository’s default branch (usually master)",
+            "description": "The name of the commit/branch/tag. Default the repository\u2019s default branch (usually master)",
             "name": "ref",
             "in": "query"
           }
@@ -14453,7 +14453,7 @@
               "type": "string"
             },
             "collectionFormat": "multi",
-            "description": "Show notifications with the provided status types. Options are: unread, read and/or pinned. Defaults to unread \u0026 pinned",
+            "description": "Show notifications with the provided status types. Options are: unread, read and/or pinned. Defaults to unread & pinned",
             "name": "status-types",
             "in": "query"
           },
@@ -16390,7 +16390,7 @@
           },
           {
             "type": "string",
-            "description": "The name of the commit/branch/tag. Default the repository’s default branch (usually master)",
+            "description": "The name of the commit/branch/tag. Default the repository\u2019s default branch (usually master)",
             "name": "ref",
             "in": "query"
           }
@@ -23136,7 +23136,7 @@
           "x-go-name": "IsForkPullRequest"
         },
         "is_ref_deleted": {
-          "description": "has the commit/tag/… the action run ran on been deleted",
+          "description": "has the commit/tag/\u2026 the action run ran on been deleted",
           "type": "boolean",
           "x-go-name": "IsRefDeleted"
         },
@@ -23146,7 +23146,7 @@
           "x-go-name": "NeedApproval"
         },
         "prettyref": {
-          "description": "the commit/tag/… the action run ran on",
+          "description": "the commit/tag/\u2026 the action run ran on",
           "type": "string",
           "x-go-name": "PrettyRef"
         },
@@ -29386,7 +29386,7 @@
       "type": "object",
       "properties": {
         "issues": {
-          "description": "Storage size used for the user's issue \u0026 comment attachments",
+          "description": "Storage size used for the user's issue & comment attachments",
           "type": "integer",
           "format": "int64",
           "x-go-name": "Issues"
