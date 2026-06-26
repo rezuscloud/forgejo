@@ -5,8 +5,6 @@ package integration
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
-	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -114,7 +112,7 @@ func TestCLIApiRepoListTags(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Should be a JSON array (possibly empty)
-	out = bytes.TrimSpace([]byte(out))
+	out = string(bytes.TrimSpace([]byte(out)))
 	if len(out) > 0 && out[0] != '[' {
 		t.Fatalf("expected JSON array, got: %s", out[:min(100, len(out))])
 	}
