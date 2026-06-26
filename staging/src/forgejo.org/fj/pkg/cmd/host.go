@@ -9,6 +9,7 @@ import (
 	"forgejo.org/fj/internal/gitremote"
 	"forgejo.org/fj/internal/keys"
 	"github.com/spf13/cobra"
+"strings"
 )
 
 func resolveHostClient(cmd *cobra.Command, host string) (*forgejo.Client, error) {
@@ -26,15 +27,24 @@ func resolveHostClient(cmd *cobra.Command, host string) (*forgejo.Client, error)
 	if host == "" {
 		return nil, fmt.Errorf("--host is required")
 	}
+	// Normalize: if the host already has a scheme, use it as-is. Otherwise
+	// default to https:// (the production case). This allows integration tests
+	// to pass http://localhost:3000.
+	if !strings.HasPrefix(host, "http://") && !strings.HasPrefix(host, "https://") {
+		host = "https://" + host
+	}
 	ki, _ := keys.Load()
 	if ki != nil {
-		if login := ki.GetLogin(host); login != nil {
-			return client.FromKeys(ki, host)
+		// Try matching by hostname (strip scheme/port for keys lookup)
+		lookupHost := host
+		lookupHost = strings.TrimPrefix(strings.TrimPrefix(lookupHost, "https://"), "http://")
+		if login := ki.GetLogin(lookupHost); login != nil {
+			return client.FromKeysURL(host, ki, lookupHost)
 		}
 	}
 	token := os.Getenv("FORGEJO_TOKEN")
 	if token != "" {
-		return client.FromToken(host, token)
+		return client.FromTokenURL(host, token)
 	}
 	return nil, fmt.Errorf("not logged in to %s", host)
 }
