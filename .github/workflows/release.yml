@@ -145,8 +145,31 @@ jobs:
           name: fj-cli-${{ matrix.goos }}-${{ matrix.goarch }}
           path: dist/fj-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz
 
+  build-repo-map:
+    needs: prepare
+    runs-on: ubuntu-latest
+    permissions: { contents: read }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with: { go-version-file: go.mod }
+      - name: Generate Repository Intelligence Graph (RIG)
+        uses: rezuscloud/llm-wiki/.github/actions/repo-map@docs/k8s-iac-locexec-fresh-deploy
+        with:
+          language: go
+          repo-path: .
+          output-file: repo-map.json
+          focus-package-prefixes: |
+            forgejo.org/cmd/fj
+            forgejo.org/client-go
+            forgejo.org/fj
+      - uses: actions/upload-artifact@v4
+        with:
+          name: repo-map
+          path: repo-map.json
+
   publish-chart-and-release:
-    needs: [prepare, build-server-images, build-cli]
+    needs: [prepare, build-server-images, build-cli, build-repo-map]
     runs-on: ubuntu-latest
     permissions: { contents: write, packages: write }
     steps:
@@ -168,6 +191,8 @@ jobs:
           helm push dist/${{ needs.prepare.outputs.chart_archive }} '${{ needs.prepare.outputs.chart_repository }}'
       - uses: actions/download-artifact@v4
         with: { pattern: fj-cli-*, merge-multiple: true, path: dist-cli }
+      - uses: actions/download-artifact@v4
+        with: { name: repo-map, path: dist-rig }
       - name: Create GitHub release
         if: startsWith(github.ref, 'refs/tags/forgejo-v')
         uses: softprops/action-gh-release@v2
@@ -175,6 +200,7 @@ jobs:
           files: |
             dist/${{ needs.prepare.outputs.chart_archive }}
             dist-cli/fj-*.tar.gz
+            dist-rig/repo-map.json
           generate_release_notes: true
           body: |
             Rezuscloud Forgejo distribution release (this repo is the Forgejo fork).
@@ -183,5 +209,6 @@ jobs:
             - server image: `${{ needs.prepare.outputs.image_repository }}:${{ needs.prepare.outputs.release_version }}` (+ `-rootless`)
             - fj CLI (Client Version matches the release): `fj-{linux,darwin}-{amd64,arm64}.tar.gz`
             - OCI Helm chart: `${{ needs.prepare.outputs.chart_repository }}/forgejo:${{ needs.prepare.outputs.chart_version }}` (appVersion = release version)
+            - Repository Intelligence Graph (RIG): `repo-map.json` (deterministic architecture graph for the wiki C4D2 workflow)
 
             k8s-style monorepo layout — see `staging/README.md`.
