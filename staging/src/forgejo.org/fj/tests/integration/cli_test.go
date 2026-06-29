@@ -55,8 +55,16 @@ func runFj(t *testing.T, binaryPath string, args ...string) (string, error) {
 	err := cmd.Run()
 	if err != nil {
 		t.Logf("fj %v\nstdout: %s\nstderr: %s", args, stdout.String(), stderr.String())
+		combined := stdout.String()
+		if stderr.Len() > 0 {
+			if combined != "" {
+				combined += "\n"
+			}
+			combined += stderr.String()
+		}
+		return combined, err
 	}
-	return stdout.String(), err
+	return stdout.String(), nil
 }
 
 // TestCLIApiVersion tests `fj version` against the live server.
