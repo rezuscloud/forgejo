@@ -16,6 +16,7 @@ var testRepo string
 func TestGenerated_Activitypub(t *testing.T) {
 	skipIfNoInstance(t)
 	binary := buildFjBinary(t)
+	setupTestRepo(t)
 	t.Run("activitypubInstanceActor", func(t *testing.T) {
 		args := []string{"api", "activitypub", "activitypub-instance-actor"}
 		out, err := runFj(t, binary, args...)
@@ -198,6 +199,7 @@ func TestGenerated_Activitypub(t *testing.T) {
 func TestGenerated_Admin(t *testing.T) {
 	skipIfNoInstance(t)
 	binary := buildFjBinary(t)
+	setupTestRepo(t)
 	t.Run("adminAddRuleToQuotaGroup", func(t *testing.T) {
 		args := []string{"api", "admin", "admin-add-rule-to-quota-group",
 			"--quotagroup", "1",
@@ -1000,6 +1002,7 @@ func TestGenerated_Admin(t *testing.T) {
 func TestGenerated_Misc(t *testing.T) {
 	skipIfNoInstance(t)
 	binary := buildFjBinary(t)
+	setupTestRepo(t)
 	t.Run("createCurrentUserRepo", func(t *testing.T) {
 		args := []string{"api", "misc", "create-current-user-repo"}
 		out, err := runFj(t, binary, args...)
@@ -3730,6 +3733,7 @@ func TestGenerated_Org(t *testing.T) {
 func TestGenerated_Repo(t *testing.T) {
 	skipIfNoInstance(t)
 	binary := buildFjBinary(t)
+	setupTestRepo(t)
 	t.Run("ActionRun", func(t *testing.T) {
 		args := []string{"api", "repo", "action-run",
 			"--owner", testUser(),

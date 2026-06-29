@@ -1,0 +1,40 @@
+# Parity contract — fj hand-written UX commands ↔ swagger operationIds.
+#
+# This is the human-authored source of truth for "fj parity with the Rust
+# forgejo-cli". The generator (client-go/gen/main.go, flag --parity-out) reads
+# it and emits fj/pkg/cmd/zz_generated_parity.go, validating that every mapped
+# operationId exists in swagger.json. Generation FAILS if any operationId is
+# absent — so upstream renames/removals break the sync PR's regen step before
+# it is pushed, naming the affected fj command.
+#
+# To add a command: add an entry, run the generator, implement the command in
+# pkg/cmd/. The parity inventory test (tests/integration) then proves the
+# command exists in `fj --help`.
+#
+# Format: "fj command path": "swagger operationId"
+
+commands:
+  # issue
+  "issue create":  issueCreateIssue
+  "issue view":    issueGetIssue
+  "issue list":    issueListIssues
+  "issue comment": issueCreateComment
+  "issue close":   issueEditIssue
+  "issue search":  issueSearchIssues
+  # pr
+  "pr create": repoCreatePullRequest
+  "pr view":   repoGetPullRequest
+  "pr list":   repoListPullRequests
+  "pr merge":  repoMergePullRequest
+  # release
+  "release create": repoCreateRelease
+  "release list":   repoListReleases
+  # tag
+  "tag create": repoCreateTag
+  # repo
+  "repo fork": createFork
+  # user
+  "user key add": userCurrentPostKey
+  # whoami / version (top-level, no subverb)
+  "whoami": userGetCurrent
+  "version": getVersion

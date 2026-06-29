@@ -60,6 +60,8 @@ func main() {
 	outDir := flag.String("out", "api/", "")
 	cliOutDir := flag.String("cli-out", "", "output dir for generated CLI commands (empty = skip)")
 	testOutDir := flag.String("test-out", "", "output dir for generated integration tests (empty = skip)")
+	parityFile := flag.String("parity", "", "parity.yaml annotation table (fj UX command -> swagger operationId); empty = skip")
+	parityOutDir := flag.String("parity-out", "", "output dir for the generated parity map (empty = skip)")
 	flag.Parse()
 	raw, _ := os.ReadFile(*specPath)
 	var spec SwaggerSpec
@@ -98,6 +100,29 @@ func main() {
 	if *testOutDir != "" {
 		writeFile(filepath.Join(*testOutDir, "zz_generated_integration_test.go"), genIntegrationTests(&spec))
 		fmt.Printf("wrote zz_generated_integration_test.go (%d services)\n", len(groupByService(&spec)))
+	}
+
+	// Generate the parity contract: maps each hand-written fj UX command to
+	// the swagger operationId it must call. The annotation table (parity.yaml)
+	// is the human-authored source of truth; the generator validates every
+	// mapped operationId against the spec and FAILS if any is absent, so an
+	// upstream rename/removal breaks the sync PR's regen step before it is
+	// pushed — the monorepo automation payoff (issue #03).
+	if *parityFile != "" && *parityOutDir != "" {
+		entries, err := loadParityYAML(*parityFile)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "parity: %v\n", err)
+			os.Exit(1)
+		}
+		if missing := validateParity(entries, &spec); len(missing) > 0 {
+			fmt.Fprintf(os.Stderr, "PARITY — spec drift: %d mapped operationId(s) no longer exist in swagger.json:\n", len(missing))
+			for _, m := range missing {
+				fmt.Fprintf(os.Stderr, "  %s -> %s  [MISSING]\n", m.Command, m.OperationID)
+			}
+			os.Exit(1)
+		}
+		writeFile(filepath.Join(*parityOutDir, "zz_generated_parity.go"), genParityMap(entries))
+		fmt.Printf("wrote zz_generated_parity.go (%d commands)\n", len(entries))
 	}
 }
 
@@ -816,6 +841,9 @@ func genIntegrationTests(spec *SwaggerSpec) string {
 		b.WriteString(fmt.Sprintf("func TestGenerated_%s(t *testing.T) {\n", pc(svc)))
 		b.WriteString("\tskipIfNoInstance(t)\n")
 		b.WriteString("\tbinary := buildFjBinary(t)\n")
+		if needsTestRepo(methods) {
+			b.WriteString("\tsetupTestRepo(t)\n")
+		}
 
 		for _, m := range methods {
 			totalMethods++
@@ -881,5 +909,131 @@ func genIntegrationTests(spec *SwaggerSpec) string {
 	b.WriteString("}\n\n")
 
 	_ = totalMethods
+	return b.String()
+}
+
+// ---------- PARITY MAP GENERATION ----------
+//
+// Emits fj/pkg/cmd/zz_generated_parity.go: a Go map from each hand-written fj
+// UX command path ("issue create") to the swagger operationId it must call
+// ("issueCreateIssue"). The annotation table (parity.yaml) is the
+// human-authored source of truth. The generator validates every operationId
+// against the spec and fails on drift — see issue #03.
+
+// ParityEntry is one row of the parity contract.
+type ParityEntry struct {
+	Command     string // "issue create"
+	OperationID string // "issueCreateIssue"
+}
+
+// loadParityYAML reads the parity annotation table. We use a tiny purpose-built
+// parser for our restricted format (a single top-level `commands:` map of
+// `"key": value` lines) instead of pulling in a YAML dependency — the
+// generator stays dependency-free, consistent with the "no external tools"
+// design that lets it run in a bare CronJob pod.
+func loadParityYAML(path string) ([]ParityEntry, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, fmt.Errorf("read %s: %w", path, err)
+	}
+	var entries []ParityEntry
+	inCommands := false
+	for _, raw := range strings.Split(string(data), "\n") {
+		line := strings.TrimSpace(raw)
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		if !strings.Contains(line, ":") {
+			continue
+		}
+		// A bare "commands:" header marks the start of the map.
+		if line == "commands:" {
+			inCommands = true
+			continue
+		}
+		// Another top-level key (no indent in the source) ends the map.
+		if inCommands && len(raw) > 0 && raw[0] != ' ' && raw[0] != '\t' && raw[0] != '#' {
+			inCommands = false
+			continue
+		}
+		if !inCommands {
+			continue
+		}
+		key, val, ok := splitKV(line)
+		if !ok {
+			continue
+		}
+		entries = append(entries, ParityEntry{Command: key, OperationID: val})
+	}
+	if len(entries) == 0 {
+		return nil, fmt.Errorf("no entries found under `commands:` in %s", path)
+	}
+	return entries, nil
+}
+
+// splitKV parses a `"issue create":  issueCreateIssue` line into key/value.
+func splitKV(line string) (string, string, bool) {
+	// key may be quoted or bare; value is the remainder after the first ':'.
+	idx := strings.Index(line, ":")
+	if idx < 0 {
+		return "", "", false
+	}
+	key := strings.TrimSpace(line[:idx])
+	val := strings.TrimSpace(line[idx+1:])
+	key = strings.Trim(key, `"`)
+	val = strings.Trim(val, `"`)
+	if key == "" || val == "" {
+		return "", "", false
+	}
+	return key, val, true
+}
+
+// operationIDs returns the set of all operationIds in the spec.
+func operationIDs(spec *SwaggerSpec) map[string]bool {
+	ids := map[string]bool{}
+	for _, methods := range spec.Paths {
+		for method, op := range methods {
+			if strings.EqualFold(method, "parameters") {
+				continue
+			}
+			if op.OperationID != "" {
+				ids[op.OperationID] = true
+			}
+		}
+	}
+	return ids
+}
+
+// validateParity returns the entries whose operationId is absent from the
+// spec (spec drift). Empty result means the contract is consistent.
+func validateParity(entries []ParityEntry, spec *SwaggerSpec) []ParityEntry {
+	ids := operationIDs(spec)
+	var missing []ParityEntry
+	for _, e := range entries {
+		if !ids[e.OperationID] {
+			missing = append(missing, e)
+		}
+	}
+	return missing
+}
+
+func genParityMap(entries []ParityEntry) string {
+	// Stable order for deterministic output.
+	sort.Slice(entries, func(i, j int) bool { return entries[i].Command < entries[j].Command })
+	var b strings.Builder
+	b.WriteString("// Code generated by api/gen from gen/parity.yaml; DO NOT EDIT.\n\n")
+	b.WriteString("package cmd\n\n")
+	b.WriteString("// CommandToOperation maps each hand-written fj UX command to the swagger\n")
+	b.WriteString("// operationId it must call. It is the machine-checked parity contract\n")
+	b.WriteString("// between the fj CLI and the Rust forgejo-cli: the parity inventory test\n")
+	b.WriteString("// (tests/integration) reads this map, verifies every operationId still\n")
+	b.WriteString("// exists in swagger.json, and verifies the command is implemented in fj.\n")
+	b.WriteString("// When upstream renames/removes an operationId, generation fails before\n")
+	b.WriteString("// the sync PR is pushed. See docs/cli-parity/.\n\n")
+	b.WriteString("var CommandToOperation = map[string]string{\n")
+	for _, e := range entries {
+		b.WriteString(fmt.Sprintf("\t%q: %q,\n", e.Command, e.OperationID))
+	}
+	b.WriteString("}\n")
 	return b.String()
 }
