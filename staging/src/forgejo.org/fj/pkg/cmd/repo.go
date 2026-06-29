@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"os"
 	"os/exec"
 	"strings"
@@ -18,6 +19,7 @@ func newRepoCmd() *cobra.Command {
 	}
 	cmd.AddCommand(newRepoViewCmd())
 	cmd.AddCommand(newRepoCloneCmd())
+	cmd.AddCommand(newRepoForkCmd())
 	return cmd
 }
 
@@ -70,9 +72,12 @@ func newRepoCloneCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			cloneURL := r.SshUrl
+			// Prefer HTTPS by default so cloning works against ephemeral test
+			// instances without an SSH listener/host key setup. Fall back to SSH
+			// when no HTTPS clone URL is advertised.
+			cloneURL := r.CloneUrl
 			if cloneURL == "" {
-				cloneURL = r.CloneUrl
+				cloneURL = r.SshUrl
 			}
 			if cloneURL == "" {
 				return fmt.Errorf("no clone URL for %s/%s", owner, repo)
@@ -81,6 +86,7 @@ func newRepoCloneCmd() *cobra.Command {
 			if len(args) > 1 {
 				dir = args[1]
 			}
+			cloneURL = rewriteCloneURLForHost(cmd, cloneURL)
 			fmt.Printf("Cloning %s\n", cloneURL)
 			gitArgs := []string{"clone", cloneURL}
 			if dir != "" {
@@ -93,6 +99,59 @@ func newRepoCloneCmd() *cobra.Command {
 			return gitCmd.Run()
 		},
 	}
+}
+
+// newRepoForkCmd implements `fj repo fork` (operationId createFork). Forks a
+// repo into the authenticated user's namespace (or --org). Mirrors the Rust
+// forgejo-cli's `repo fork`.
+func newRepoForkCmd() *cobra.Command {
+	var org string
+	cmd := &cobra.Command{
+		Use:   "fork [OWNER/NAME]",
+		Short: "Fork a repository",
+		Args:  cobra.MaximumNArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			c, owner, repo, err := resolveClientWithRepoArg(cmd, args)
+			if err != nil {
+				return err
+			}
+			opt := &forgejo.CreateForkOption{}
+			if org != "" {
+				opt.Organization = org
+			}
+			if _, err := c.Repo.CreateFork(context.Background(), owner, repo, opt); err != nil {
+				return err
+			}
+			fmt.Printf("Forked %s/%s", owner, repo)
+			if org != "" {
+				fmt.Printf(" into %s", org)
+			}
+			fmt.Println()
+			return nil
+		},
+	}
+	cmd.Flags().StringVarP(&org, "org", "o", "", "organization to fork into (default: your user)")
+	return cmd
+}
+
+// rewriteCloneURLForHost rewrites an advertised clone URL to the actual host
+// the CLI is targeting. This is critical for ephemeral test containers: the
+// server advertises localhost:3000 inside the container, but the test runner
+// talks to the mapped host port (e.g. localhost:32776). Preserving the path
+// while swapping scheme+host keeps clone working without requiring SSH.
+func rewriteCloneURLForHost(cmd *cobra.Command, cloneURL string) string {
+	hostFlag, _ := cmd.Flags().GetString("host")
+	if hostFlag == "" {
+		return cloneURL
+	}
+	target, err1 := url.Parse(hostFlag)
+		advertised, err2 := url.Parse(cloneURL)
+	if err1 != nil || err2 != nil || target.Host == "" {
+		return cloneURL
+	}
+	advertised.Scheme = target.Scheme
+	advertised.Host = target.Host
+	return advertised.String()
 }
 
 func resolveClientWithRepoArg(cmd *cobra.Command, args []string) (*forgejo.Client, string, string, error) {

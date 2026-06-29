@@ -20,6 +20,7 @@ func newIssueCmd() *cobra.Command {
 	cmd.AddCommand(newIssueListCmd())
 	cmd.AddCommand(newIssueViewCmd())
 	cmd.AddCommand(newIssueCreateCmd())
+	cmd.AddCommand(newIssueSearchCmd())
 	cmd.AddCommand(newIssueCommentCmd())
 	cmd.AddCommand(newIssueCloseCmd())
 	return cmd
@@ -44,7 +45,7 @@ func newIssueListCmd() *cobra.Command {
 				return nil
 			}
 			for _, is := range issues {
-				fmt.Printf("#%d %s [%s] %s\n", is.Id, statusSymbol(stateStr(is.State)), stateStr(is.State), is.Title)
+				fmt.Printf("#%d %s [%s] %s\n", issueNumber(is), statusSymbol(stateStr(is.State)), stateStr(is.State), is.Title)
 			}
 			return nil
 		},
@@ -71,7 +72,7 @@ func newIssueViewCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Printf("#%d %s\n", is.Id, is.Title)
+			fmt.Printf("#%d %s\n", issueNumber(*is), is.Title)
 			fmt.Printf("State: %s\n", stateStr(is.State))
 			if is.Body != "" {
 				fmt.Printf("\n%s\n", is.Body)
@@ -104,13 +105,60 @@ func newIssueCreateCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Printf("Created #%d: %s\n", is.Id, is.Title)
+			fmt.Printf("Created #%d: %s\n", issueNumber(*is), is.Title)
 			return nil
 		},
 	}
 	cmd.Flags().StringVarP(&title, "title", "t", "", "issue title (required)")
 	cmd.Flags().StringVarP(&body, "body", "b", "", "issue body")
 	return cmd
+}
+
+// newIssueSearchCmd implements `fj issue search` (operationId issueSearchIssues).
+// Searches issues across all repos the authenticated user can see, mirroring
+// the Rust forgejo-cli's `issue search`.
+func newIssueSearchCmd() *cobra.Command {
+	var state, q string
+	var limit int
+	cmd := &cobra.Command{
+		Use:   "search",
+		Short: "Search issues across repos",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			host, _ := cmd.Flags().GetString("host")
+			c, err := resolveHostClient(cmd, host)
+			if err != nil {
+				return err
+			}
+			// issueSearchIssues(state, labels, milestones, q, priorityRepoId,
+			//   type_, since, before, assigned, created, mentioned,
+			//   reviewRequested, reviewed, owner, team, page, limit, sort)
+			issues, _, err := c.Repo.IssueSearchIssues(
+				context.Background(), state, "", "", q, 0, "",
+				time.Time{}, time.Time{},
+				false, false, false, false, false,
+				"", "", 1, limit, "",
+			)
+			if err != nil {
+				return err
+			}
+			if len(issues) == 0 {
+				fmt.Println("no issues")
+				return nil
+			}
+			for _, is := range issues {
+				repo := ""
+				if is.Repository != nil {
+					repo = is.Repository.FullName + " "
+				}
+				fmt.Printf("%s#%d %s [%s]\n", repo, is.Id, is.Title, stateStr(is.State))
+			}
+			return nil
+			},
+		}
+		cmd.Flags().StringVarP(&state, "state", "s", "open", "issue state (open/closed/all)")
+		cmd.Flags().StringVarP(&q, "query", "q", "", "search query")
+		cmd.Flags().IntVarP(&limit, "limit", "l", 20, "max results")
+		return cmd
 }
 
 func newIssueCommentCmd() *cobra.Command {
@@ -132,7 +180,8 @@ func newIssueCommentCmd() *cobra.Command {
 				return err
 			}
 			_, _, err = c.Repo.IssueCreateComment(context.Background(), owner, repo, index, &forgejo.CreateIssueCommentOption{
-				Body: body,
+				Body:      body,
+				UpdatedAt: time.Now(),
 			})
 			if err != nil {
 				return err
@@ -143,6 +192,13 @@ func newIssueCommentCmd() *cobra.Command {
 	}
 	cmd.Flags().StringVarP(&body, "body", "b", "", "comment body (required)")
 	return cmd
+}
+
+func issueNumber(is forgejo.Issue) int64 {
+	if is.Number != 0 {
+		return is.Number
+	}
+	return is.Id
 }
 
 func newIssueCloseCmd() *cobra.Command {
@@ -160,7 +216,8 @@ func newIssueCloseCmd() *cobra.Command {
 				return err
 			}
 			_, _, err = c.Repo.IssueEditIssue(context.Background(), owner, repo, index, &forgejo.EditIssueOption{
-				State: "closed",
+				State:     "closed",
+				UpdatedAt: time.Now(),
 			})
 			if err != nil {
 				return err
