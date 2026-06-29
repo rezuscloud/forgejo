@@ -1,0 +1,124 @@
+name: cli-parity
+
+# Separate workflow that integrates Forgejo with its auxiliary tools (the Go
+# SDK + the fj CLI). Deliberately independent of upstream Forgejo's CI:
+#   - upstream uses .forgejo/workflows (this .github/ tree is empty upstream)
+#   - upstream Makefile GO_DIRS excludes staging/ from its own test scope
+#   - this workflow never invokes `make test` or touches tests/integration/
+#
+# Runs the containerized fj integration + parity suite. See
+# docs/cli-parity/README.md and staging/src/forgejo.org/fj/tests/README.md.
+
+on:
+  pull_request:
+    paths:
+      - "staging/**"
+      - "cmd/fj/**"
+      - "distributions/**"
+      - ".github/workflows/cli-parity.yml"
+  push:
+    branches: [rezus/forgejo]
+    paths:
+      - "staging/**"
+      - "cmd/fj/**"
+      - "distributions/**"
+      - ".github/workflows/cli-parity.yml"
+  workflow_dispatch:
+    inputs:
+      test_image:
+        description: Which Forgejo image to run the integration suite against
+        type: choice
+        default: upstream-15
+        options:
+          - upstream-15 # fast path: validated live on 2026-06-29
+          - fork-image   # heavy: build the fork's own image from this repo's Dockerfile
+
+jobs:
+  parity-inventory:
+    # Fast codegen/spec gate — no container, no live instance. Verifies every
+    # mapped fj UX command references a real swagger operationId and that the
+    # expected commands are implemented.
+    name: Parity inventory (spec drift + coverage)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with: { go-version-file: go.mod }
+      - name: Run parity inventory
+        working-directory: staging/src/forgejo.org/fj/tests/integration
+        env:
+          FORGEJO_REPO_ROOT: ${{ github.workspace }}
+        run: |
+          set -euo pipefail
+          # Build from the root module (cmd/fj proves the replace graph).
+          cd "$FORGEJO_REPO_ROOT"
+          go build ./cmd/fj
+          # The test builds its own fj binary for discovery.
+          go test ./staging/src/forgejo.org/fj/tests/integration/ -run TestParityInventory -v
+
+  integration:
+    # Full containerized suite. TestMain (build tag: integration) starts a
+    # Forgejo container, bootstraps an admin + token, and tears it down.
+    name: Containerized integration
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with: { go-version-file: go.mod }
+      - name: Build fj (proves the replace graph compiles)
+        run: go build ./cmd/fj
+      - name: Run integration suite (-tags=integration, serial)
+        env:
+          FORGEJO_REPO_ROOT: ${{ github.workspace }}
+          # Validated live on 2026-06-29.
+          FORGEJO_TEST_IMAGE: codeberg.org/forgejo/forgejo:15
+        run: |
+          set -euo pipefail
+          go test -tags=integration -p 1 -timeout 30m \
+            ./staging/src/forgejo.org/fj/tests/integration/
+
+  integration-fork-image:
+    # OPTIONAL, heavy path: build the fork's own image from this repo's
+    # Dockerfile and run the integration suite against it. This proves the
+    # SDK/CLI work against the exact distribution that ships — including the
+    # Actions log API (PR #12666) absent from upstream :15. Skipped on PR/push
+    # by default; trigger manually via workflow_dispatch with test_image=fork-image.
+    name: Containerized integration (fork image)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.test_image == 'fork-image'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # git describe needs tags for a valid semver
+          fetch-tags: true
+      - uses: actions/setup-go@v5
+        with: { go-version-file: go.mod }
+      - uses: docker/setup-buildx-action@v3
+      - name: Resolve release version from distribution file
+        id: rel
+        run: |
+          set -euo pipefail
+          # Pick the first distribution env file (the current RC line).
+          file=$(ls distributions/forgejo-*.env | head -1)
+          set -a; source "$file"; set +a
+          printf 'version=%s\n' "$FORGEJO_RELEASE_VERSION" >> "$GITHUB_OUTPUT"
+          printf '%s\n' "$FORGEJO_RELEASE_VERSION" > VERSION
+      - name: Build fork image (rootful)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          load: true
+          tags: forgejo-fork-test:local
+          build-args: |
+            RELEASE_VERSION=${{ steps.rel.outputs.version }}
+      - name: Build fj (proves the replace graph compiles)
+        run: go build ./cmd/fj
+      - name: Run integration suite against the fork image
+        env:
+          FORGEJO_REPO_ROOT: ${{ github.workspace }}
+          FORGEJO_TEST_IMAGE: forgejo-fork-test:local
+        run: |
+          set -euo pipefail
+          go test -tags=integration -p 1 -timeout 45m \
+            ./staging/src/forgejo.org/fj/tests/integration/
