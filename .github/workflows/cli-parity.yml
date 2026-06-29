@@ -51,7 +51,10 @@ jobs:
           set -euo pipefail
           # Build from the root module (cmd/fj proves the replace graph).
           cd "$FORGEJO_REPO_ROOT"
-          go build ./cmd/fj
+          # -o /tmp: never drop a `fj` binary at the repo root. A stray root
+          # `fj` file shadows module resolution for the import
+          # forgejo.org/fj/pkg/cmd during the test's own build, breaking it.
+          go build -o /tmp/fj-verify ./cmd/fj
           # The fj tests live in the NESTED staging module (own go.mod), so they
           # must be run from inside that module — `go test ./staging/...` from
           # the root module fails (staging is not part of forgejo.org's package
@@ -70,7 +73,7 @@ jobs:
       - uses: actions/setup-go@v5
         with: { go-version-file: go.mod }
       - name: Build fj (proves the replace graph compiles)
-        run: go build ./cmd/fj
+        run: go build -o /tmp/fj-verify ./cmd/fj
       - name: Run integration suite (-tags=integration, serial)
         env:
           FORGEJO_REPO_ROOT: ${{ github.workspace }}
@@ -119,7 +122,7 @@ jobs:
           build-args: |
             RELEASE_VERSION=${{ steps.rel.outputs.version }}
       - name: Build fj (proves the replace graph compiles)
-        run: go build ./cmd/fj
+        run: go build -o /tmp/fj-verify ./cmd/fj
       - name: Run integration suite against the fork image
         env:
           FORGEJO_REPO_ROOT: ${{ github.workspace }}
