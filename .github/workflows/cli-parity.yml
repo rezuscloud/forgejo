@@ -45,7 +45,6 @@ jobs:
       - uses: actions/setup-go@v5
         with: { go-version-file: go.mod }
       - name: Run parity inventory
-        working-directory: staging/src/forgejo.org/fj/tests/integration
         env:
           FORGEJO_REPO_ROOT: ${{ github.workspace }}
         run: |
@@ -53,8 +52,13 @@ jobs:
           # Build from the root module (cmd/fj proves the replace graph).
           cd "$FORGEJO_REPO_ROOT"
           go build ./cmd/fj
-          # The test builds its own fj binary for discovery.
-          go test ./staging/src/forgejo.org/fj/tests/integration/ -run TestParityInventory -v
+          # The fj tests live in the NESTED staging module (own go.mod), so they
+          # must be run from inside that module — `go test ./staging/...` from
+          # the root module fails (staging is not part of forgejo.org's package
+          # set). FORGEJO_REPO_ROOT still points at the repo root so the test's
+          # buildFjBinary helper finds cmd/fj.
+          cd "$FORGEJO_REPO_ROOT/staging/src/forgejo.org/fj"
+          go test ./tests/integration/ -run TestParityInventory -v
 
   integration:
     # Full containerized suite. TestMain (build tag: integration) starts a
@@ -74,8 +78,10 @@ jobs:
           FORGEJO_TEST_IMAGE: codeberg.org/forgejo/forgejo:15
         run: |
           set -euo pipefail
-          go test -tags=integration -p 1 -timeout 30m \
-            ./staging/src/forgejo.org/fj/tests/integration/
+          # Run from inside the nested fj module (staging modules have their
+          # own go.mod and cannot be tested from the root module).
+          cd "$FORGEJO_REPO_ROOT/staging/src/forgejo.org/fj"
+          go test -tags=integration -p 1 -timeout 30m ./tests/integration/
 
   integration-fork-image:
     # OPTIONAL, heavy path: build the fork's own image from this repo's
@@ -120,5 +126,5 @@ jobs:
           FORGEJO_TEST_IMAGE: forgejo-fork-test:local
         run: |
           set -euo pipefail
-          go test -tags=integration -p 1 -timeout 45m \
-            ./staging/src/forgejo.org/fj/tests/integration/
+          cd "$FORGEJO_REPO_ROOT/staging/src/forgejo.org/fj"
+          go test -tags=integration -p 1 -timeout 45m ./tests/integration/
