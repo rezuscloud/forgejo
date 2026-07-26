@@ -14,6 +14,7 @@ var _ = registerFunctionTestBuilder([]string{"ReqPackageAccess "}, func(_ *testi
 	signatureStringToFunctionTest[signatureString] = functionTest{
 		testCases: []*testCase{
 			{
+<<<<<<< HEAD
 				// pass read / write access because the doer is admin
 				data: newTestData(map[string]string{
 					"packageOwner": "someuser",
@@ -30,6 +31,18 @@ var _ = registerFunctionTestBuilder([]string{"ReqPackageAccess "}, func(_ *testi
 				}, newSharedData().
 					SetDoer(),
 				),
+=======
+				data: newTestData(map[string]string{
+					"packageOwner": "doer",
+					"doer":         "doeradmin",
+				}),
+			},
+			{
+				data: newTestData(map[string]string{
+					"doer":         "userregular",
+					"packageOwner": "userprivate",
+				}),
+>>>>>>> upstream/v16.0/forgejo
 				error: "user should have specific permission or be a site admin",
 			},
 		},
@@ -39,6 +52,7 @@ var _ = registerFunctionTestBuilder([]string{"ReqPackageAccess "}, func(_ *testi
 		},
 		fulfillNeeds: func(t *testing.T, data *testData) {
 			t.Helper()
+<<<<<<< HEAD
 			data.shared.SetDoerDefault()
 			if data.Get("packageOwner") == "doer" {
 				data.Set("packageOwner", data.shared.DoerName())
@@ -47,6 +61,16 @@ var _ = registerFunctionTestBuilder([]string{"ReqPackageAccess "}, func(_ *testi
 		},
 		interpret: func(t *testing.T, permissions *apiv1_permissions.Permissions, data *testData) {
 			fixtureSetPackageOwner(t, permissions, data.Get("packageOwner"), data.Get("packageOwnerVisibility"))
+=======
+			data.SetDefault("doer", "doerregular")
+			if data.Get("packageOwner") == "doer" {
+				data.Set("packageOwner", data.Get("doer"))
+			}
+			data.SetDefault("packageOwner", data.Get("doer"))
+		},
+		interpret: func(t *testing.T, permissions *apiv1_permissions.Permissions, data *testData) {
+			fixtureSetPackageOwner(t, permissions, data)
+>>>>>>> upstream/v16.0/forgejo
 		},
 		staticArgs: 1,
 		call: func(t *testing.T, ctx apiv1_permissions.Context, _ *testData, args []any) {

@@ -13,6 +13,7 @@ import (
 var _ = registerFunctionTest(apiv1_permissions.ReqGitHook, functionTest{
 	testCases: []*testCase{
 		{
+<<<<<<< HEAD
 			// pass because the admin user can edit git hooks
 			data: newTestData(map[string]string{}, newSharedData().
 				SetDoer().
@@ -28,6 +29,17 @@ var _ = registerFunctionTest(apiv1_permissions.ReqGitHook, functionTest{
 				SetDoer().
 				SetDoerAdmin(true),
 			),
+=======
+			data: newTestData(map[string]string{
+				"doer": "doeradmin",
+			}),
+		},
+		{
+			data: newTestData(map[string]string{
+				"doer":            "doeradmin",
+				"DisableGitHooks": "true",
+			}),
+>>>>>>> upstream/v16.0/forgejo
 			error: "must be allowed to edit Git hooks",
 		},
 	},
@@ -36,7 +48,11 @@ var _ = registerFunctionTest(apiv1_permissions.ReqGitHook, functionTest{
 	},
 	fulfillNeeds: func(t *testing.T, data *testData) {
 		t.Helper()
+<<<<<<< HEAD
 		data.shared.SetDoerDefault()
+=======
+		data.SetDefault("doer", "doeradmin")
+>>>>>>> upstream/v16.0/forgejo
 	},
 	interpret: func(t *testing.T, permissions *apiv1_permissions.Permissions, data *testData) {
 		setting.DisableGitHooks = data.Get("DisableGitHooks") == "true"

@@ -13,6 +13,7 @@ import (
 var _ = registerFunctionTest(apiv1_permissions.MustEnableAttachments, functionTest{
 	testCases: []*testCase{
 		{
+<<<<<<< HEAD
 			// pass if attachments are enabled in settings
 			data: newTestData(map[string]string{}, newSharedData()),
 		},
@@ -21,6 +22,14 @@ var _ = registerFunctionTest(apiv1_permissions.MustEnableAttachments, functionTe
 			data: newTestData(map[string]string{
 				"Attachment.Enabled": "false",
 			}, newSharedData()),
+=======
+			data: newTestData(map[string]string{}),
+		},
+		{
+			data: newTestData(map[string]string{
+				"Attachment.Enabled": "false",
+			}),
+>>>>>>> upstream/v16.0/forgejo
 			error: "Not Found",
 		},
 	},
