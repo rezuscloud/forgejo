@@ -15,6 +15,7 @@ var _ = registerFunctionTestBuilder([]string{"ReqOwner ", "ReqOwner"}, func(t *t
 	unitTypes := signature[1].([]unit_model.Type)
 	fixtures := []*testCase{
 		{
+<<<<<<< HEAD
 			// pass because the doer owns the repository
 			data: newTestData(map[string]string{}, newSharedData().
 				SetDoer().SetDoerName("userowner").
@@ -44,6 +45,29 @@ var _ = registerFunctionTestBuilder([]string{"ReqOwner ", "ReqOwner"}, func(t *t
 		fixtures = append(fixtures, &testCase{
 			data: newTestData(map[string]string{}, newSharedData().
 				SetRepositoryDisabledUnits([]unit_model.Type{unitType})),
+=======
+			data: newTestData(map[string]string{
+				"doer":       "userowner",
+				"repository": "userowner/repositorypublic",
+				"scope":      "read:user,write:repository",
+			}),
+		},
+		{
+			data: newTestData(map[string]string{
+				"doer":       "regular",
+				"repository": "userowner/repositorypublic",
+				"scope":      "read:user,write:repository",
+			}),
+			error: "user should be the owner of the repo",
+		},
+	}
+	for _, unitType := range unitTypes {
+		unit := unitsTypeToString(unitType)
+		fixtures = append(fixtures, &testCase{
+			data: newTestData(map[string]string{
+				"disable-units": unit,
+			}),
+>>>>>>> upstream/v16.0/forgejo
 			error: "Not Found",
 		})
 	}
@@ -54,12 +78,20 @@ var _ = registerFunctionTestBuilder([]string{"ReqOwner ", "ReqOwner"}, func(t *t
 			"ReqOwner",
 		},
 		interpret: func(t *testing.T, permissions *apiv1_permissions.Permissions, data *testData) {
+<<<<<<< HEAD
 			fixtureDisableUnits(t, permissions, data.shared.RepositoryDisabledUnits())
 		},
 		fulfillNeeds: func(t *testing.T, data *testData) {
 			t.Helper()
 			data.shared.SetDoer()
 			data.shared.SetDoerAdmin(true)
+=======
+			fixtureDisableUnits(t, permissions, data)
+		},
+		fulfillNeeds: func(t *testing.T, data *testData) {
+			t.Helper()
+			data.Set("doer", "doeradmin")
+>>>>>>> upstream/v16.0/forgejo
 		},
 		testCases:  fixtures,
 		staticArgs: 1,

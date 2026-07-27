@@ -28,6 +28,7 @@ type functionTest struct {
 - The `call` function, if it exists, is expected to call the function for which the test is designed. Fos instance the `call` for `ReqValidCommentID` runs `apiv1_permissions.ReqValidCommentID(ctx, comment)`. The function must not have any side effect. Instead it must use what has been created by the fixtures (using the `interpret` function).
 - The `sequenceFilter` only keeps some permissions function in the sequence leading to the function under test. For instance when testing `ReqOrgOwnership` the sequence `APIAuthorization,TokenRequiresScopes,ReqOrgOwnership` will be used. In some cases it is useful to simplify the tests in case the shortest sequence leading to a function contains functions that will interfere if a particular `testCase` is set.
 
+<<<<<<< HEAD
 ## Test data interpretation
 
 The `testData` of the `testCase` is split into data:
@@ -60,6 +61,8 @@ interactions are difficult to figure out. For instance
 the `ReqAdmin` tests function when it is not last in the sequence,
 otherwise it will fail.
 
+=======
+>>>>>>> upstream/v16.0/forgejo
 ## Permission function signatures
 
 The signature of every permission function has at least one argument which is a `routers/api/v1/permissions.Context` interface. It may also have additional arguments provided when building the routes. For instance `TokenRequiresScopes` may be given a list of scope categories. Such arguments do not vary depending on the context because they are preset when the route is built. In addition the function may have arguments that are extracted from the environment. For instance `ReqValidCommentID` may be given the content of the `id` field from the body of a JSON payload.
@@ -75,11 +78,16 @@ All fixtures are dynamically created (they are not using the global fixtures fou
 
 ## Debugging
 
+<<<<<<< HEAD
 - Running the tests in verbose mode `COVERAGE_TEST_ARGS='-test.v -test.run=TestAPIv1Permissions' make coverage-reset coverage-run-integration-sqlite`
+=======
+- Running the tests in verbose mode `GOTESTCOMPILEDRUNSUFFIX=-test.v TAGS='sqlite sqlite_unlock_notify' make 'test-sqlite#TestAPIv1Permissions'`
+>>>>>>> upstream/v16.0/forgejo
 - Browsing the tests such as
 ```
 ...
 === RUN   TestAPIv1Permissions/APIAuthorization,TokenRequiresScopes_Admin_fixture_0
+<<<<<<< HEAD
     functions.go:93: creating fixture data from doer:doername doer.scope:read:admin token.level:read
     functions.go:96: created fixture data doer:doername doer.scope:read:admin token.level:read
     functions.go:103: 	*auth.AccessToken(ID=5302 Token=ccd381ada3140a9ada3a72901456d7bb3553b3ce)
@@ -90,6 +98,18 @@ All fixtures are dynamically created (they are not using the global fixtures fou
     functions.go:129: 	+ *authz.AllAccessAuthorizationReducer
     token_requires_scopes.go:94: calling TokenRequiresScopes(ctx, [1], 1)
     functions.go:129: 	+ []auth.AccessTokenScopeCategory([1])
+=======
+    functions.go:95: creating fixture data from doer:doerregular,level:read,scope:read:admin
+    functions.go:98: created fixture data doer:doerregular,level:read,scope:read:admin
+    functions.go:105: 	*auth.AccessToken(ID=10 Token=e26bfc1190efcf8c36ef640659af33e87073032c)
+    functions.go:105: 	*user.User(Name=doerregular)
+    functions.go:105: 	isSigned(true)
+    functions.go:105: 	*tests_test.accessTokenAuthenticationResult(*user.User(Name=doerregular) auth.AccessTokenScope(read:admin) *authz.AllAccessAuthorizationReducer)
+    fixture.go:637: calling permissions.APIAuthorization(ctx)
+    functions.go:131: 	+ *authz.AllAccessAuthorizationReducer
+    token_requires_scopes_test.go:67: calling TokenRequiresScopes(ctx, [1], 1)
+    functions.go:131: 	+ []auth.AccessTokenScopeCategory([1])
+>>>>>>> upstream/v16.0/forgejo
 ...
 ```
 - The name of the test is the sequence of middleware under test (`APIAuthorization`, `TokenRequiresScopes`)
@@ -102,7 +122,11 @@ All fixtures are dynamically created (they are not using the global fixtures fou
 
 ## The call function
 
+<<<<<<< HEAD
 `func(t *testing.T, ctx apiv1_permissions.Context, data *testData, staticArgs []any)`
+=======
+`func(t *testing.T, ctx apiv1_permissions.Context, permissions *apiv1_permissions.Permissions, data *testData, signature []any)`
+>>>>>>> upstream/v16.0/forgejo
 
 It is responsible for:
 
@@ -111,14 +135,24 @@ It is responsible for:
 
 The `permissions` and `data` arguments are provided, as computed by the `interpret` function.
 
+<<<<<<< HEAD
 The `args` are the mandatory arguments to the function call.
+=======
+The `signature[0]` is the function itself and could be called with `signature[0].Call`.
+
+The `signature[1:]` list are the mandatory arguments to the function call.
+>>>>>>> upstream/v16.0/forgejo
 
 ## Test coverage
 
 ### `routers/api/v1/permissions`
 
 - At the root of the source tree
+<<<<<<< HEAD
 - `COVERAGE_TEST_ARGS='-test.v -test.run=TestAPIv1Permissions' make coverage-reset coverage-run-integration-sqlite coverage-show-percentage | grep v1/permissions | grep -v v1/permissions/permissions.go | grep -v v1/permissions/test | sed -e 's/\t\t*/ /g' -e 's|forgejo.org/routers/||'`
+=======
+- `COVERAGE_TEST_PACKAGES="forgejo.org/routers/api/v1/permissions forgejo.org/routers/api/v1/permissions/tests" make coverage-run coverage-show-percentage | grep v1/permissions | grep -v v1/permissions/permissions.go | grep -v v1/permissions/tests | sed -e 's/\t\t*/ /g' -e 's|forgejo.org/routers/||'`
+>>>>>>> upstream/v16.0/forgejo
 - `uncover coverage/textfmt.out ReqOrgOwnership`
 
 ### Forgejo development branch

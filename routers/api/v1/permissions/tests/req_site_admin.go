@@ -12,6 +12,7 @@ import (
 var _ = registerFunctionTest(apiv1_permissions.ReqSiteAdmin, functionTest{
 	testCases: []*testCase{
 		{
+<<<<<<< HEAD
 			// pass because the doer is the admin
 			data: newTestData(map[string]string{}, newSharedData().
 				SetDoer().
@@ -23,14 +24,28 @@ var _ = registerFunctionTest(apiv1_permissions.ReqSiteAdmin, functionTest{
 			data: newTestData(map[string]string{}, newSharedData().
 				SetDoer(),
 			),
+=======
+			data: newTestData(map[string]string{
+				"doer": "doeradmin",
+			}),
+		},
+		{
+			data: newTestData(map[string]string{
+				"doer": "regularuser",
+			}),
+>>>>>>> upstream/v16.0/forgejo
 			error: "user should be the site admin",
 		},
 	},
 	fulfillNeeds: func(t *testing.T, data *testData) {
 		t.Helper()
+<<<<<<< HEAD
 		if !data.shared.HasDoerName() {
 			data.shared.SetDoer()
 			data.shared.SetDoerAdmin(true)
 		}
+=======
+		data.SetDefault("doer", "doeradmin")
+>>>>>>> upstream/v16.0/forgejo
 	},
 })
