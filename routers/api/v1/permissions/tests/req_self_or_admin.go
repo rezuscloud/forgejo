@@ -13,6 +13,7 @@ import (
 var _ = registerFunctionTest(apiv1_permissions.ReqSelfOrAdmin, functionTest{
 	testCases: []*testCase{
 		{
+<<<<<<< HEAD
 			// pass because the doer is an admin user
 			data: newTestData(map[string]string{}, newSharedData().
 				SetDoer().
@@ -54,6 +55,38 @@ var _ = registerFunctionTest(apiv1_permissions.ReqSelfOrAdmin, functionTest{
 			name := data.Get("user")
 			fixtureCreateUser(t, &user_model.User{Name: name})
 			permissions.SetUser(fixtureGetUser(t, name))
+=======
+			data: newTestData(map[string]string{
+				"doer": "doeradmin",
+			}),
+		},
+		{
+			data: newTestData(map[string]string{
+				"doer": "regularuser",
+				"user": "regularuser",
+			}),
+		},
+		{
+			data: newTestData(map[string]string{
+				"doer": "regularuser",
+				"user": "otheruser",
+			}),
+			error: "doer should be the site admin or be same as the contextUser",
+		},
+	},
+	fulfillNeeds: func(t *testing.T, data *testData) {
+		t.Helper()
+		data.SetDefault("doer", "doeradmin")
+	},
+	interpret: func(t *testing.T, permissions *apiv1_permissions.Permissions, data *testData) {
+		if data.Has("user") && data.Get("user") != "anonymous" {
+			name := data.Get("user")
+			user := permissions.User()
+			if user == nil {
+				fixtureCreateUser(t, &user_model.User{Name: name})
+				permissions.SetUser(fixtureGetUser(t, name))
+			}
+>>>>>>> upstream/v16.0/forgejo
 		}
 	},
 })

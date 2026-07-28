@@ -13,6 +13,7 @@ import (
 var _ = registerFunctionTest(apiv1_permissions.ReqBasicOrRevProxyAuth, functionTest{
 	testCases: []*testCase{
 		{
+<<<<<<< HEAD
 			// pass if the doer is authenticated via a proxy
 			data: newTestData(map[string]string{
 				"Service.EnableReverseProxyAuthAPI": "true",
@@ -34,14 +35,49 @@ var _ = registerFunctionTest(apiv1_permissions.ReqBasicOrRevProxyAuth, functionT
 				SetDoer().
 				SetDoerAuthentication("token"),
 			),
+=======
+			data: newTestData(map[string]string{
+				"doer":                              "regularuser",
+				"Service.EnableReverseProxyAuthAPI": "true",
+				"authentication":                    "proxy",
+			}),
+		},
+		{
+			data: newTestData(map[string]string{
+				"doer":                              "regularuser",
+				"Service.EnableReverseProxyAuthAPI": "false",
+				"authentication":                    "basic",
+			}),
+		},
+		{
+			data: newTestData(map[string]string{
+				"doer":                              "regularuser",
+				"Service.EnableReverseProxyAuthAPI": "true",
+				"authentication":                    "token",
+			}),
+			error: "auth method not allowed",
+		},
+		{
+			data: newTestData(map[string]string{
+				"doer":                              "regularuser",
+				"Service.EnableReverseProxyAuthAPI": "false",
+				"authentication":                    "token",
+			}),
+>>>>>>> upstream/v16.0/forgejo
 			error: "auth method not allowed",
 		},
 	},
 	fulfillNeeds: func(t *testing.T, data *testData) {
 		t.Helper()
+<<<<<<< HEAD
 		data.shared.SetDoerDefault()
 		data.shared.SetDoerAuthenticationDefault("proxy")
 		data.SetDefault("Service.EnableReverseProxyAuthAPI", "true")
+=======
+		data.SetDefault("doer", "regularuser")
+		data.SetDefault("Service.EnableReverseProxyAuthAPI", "true")
+		data.SetDefault("authentication", "proxy")
+>>>>>>> upstream/v16.0/forgejo
 	},
 	interpret: func(t *testing.T, permissions *apiv1_permissions.Permissions, data *testData) {
 		fixtureSetDoer(t, permissions, data)

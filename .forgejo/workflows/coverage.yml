@@ -59,8 +59,11 @@ jobs:
         options: --tmpfs /bitnami/postgresql
       cacher:
         image: data.forgejo.org/oci/bitnami/redis:7.2
+<<<<<<< HEAD
         env:
           ALLOW_EMPTY_PASSWORD: "yes" # redis & valkey will immediately shutdown with no defined password unless overridden
+=======
+>>>>>>> upstream/v16.0/forgejo
         options: --tmpfs /data:noatime,uid=1000,gid=1000
     steps:
       - uses: https://data.forgejo.org/actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0

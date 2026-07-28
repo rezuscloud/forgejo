@@ -106,6 +106,7 @@
 	"repo.pulls.poster_trust_revoke": "Tühista",
 	"migrate.select.title": "Migreeri hoidla",
 	"repo.files.filename": "Failinimi",
+<<<<<<< HEAD
 	"counters.n_tags": {
 		"one": "%s silt",
 		"other": "%s silti"
@@ -116,6 +117,28 @@
 	},
 	"packages.title": "Paketid",
 	"packages.empty": "Pakette veel pole.",
+=======
+	"repo.files.caption": "Lähtekoodihoidla failid (viimane sissekanne esimesena)",
+	"repo.files.last_commit_message": "Viimase sissekande sõnum",
+	"repo.files.last_commit_date": "Viimase sissekande kuupäev",
+	"issues.filters.labels.exclude": "Välista silt",
+	"issues.filters.labels.unexclude": "Eemalda välistamine",
+	"repo.pulls.auto_merge.no_permission": "Sul ei ole õigust tühistada selle mestimispäringu automaatset mestimist.",
+	"migrate.form.error.url_credentials": "Selles võrguaadressis on autentimiseks vajalik teave, sisesta nad vastavalt kasutajanime (username) ja salasõna (password) väljadele",
+	"migrate.items.merge_requests": "Mestimispäringud",
+	"admin.users.list_status_filter.is_2fa_enabled": "Kaheastmeline autentimine on kasutusel",
+	"admin.users.list_status_filter.not_2fa_enabled": "Kaheastmeline autentimine pole kasutusel",
+	"admin.users.2fa": "Kaheastmeline autentimine",
+	"admin.config.global_2fa_requirement.title": "Üldine kaheastmelise autentimise nõue",
+	"admin.config.global_2fa_requirement.none": "Ei",
+	"admin.config.global_2fa_requirement.all": "Kõik kasutajad",
+	"admin.config.global_2fa_requirement.admin": "Peakasutajad",
+	"settings.twofa_unroll_unavailable": "Kaheastmeline autentimine on sinu kasutajakonto puhul nõutav ja seda ei saa lülitada välja.",
+	"settings.twofa_reenroll": "Võta kaheastmeline autentimine uuesti kasutusele",
+	"settings.twofa_reenroll.description": "Võta oma kaheastmeline autentimine uuesti kasutusele",
+	"settings.must_enable_2fa": "Selle Forgejo serveri reeglid eeldavad, et kasutajad lülitavad enne ligipääsu oma kasutajakontole sisse kaheastmelise autentimise.",
+	"error.must_enable_2fa": "Selle Forgejo serveri reeglid eeldavad, et kasutajad lülitavad enne ligipääsu oma kasutajakontole sisse kaheastmelise autentimise. Seda saad teha siin: %s",
+>>>>>>> upstream/v16.0/forgejo
 	"notification.mark_as_read": "Märgi loetuks",
 	"notification.mark_as_unread": "Märgi mitteloetuks",
 	"notification.mark_all_as_read": "Märgi kõik loetuks",
@@ -133,10 +156,15 @@
 	"munits.data.tib": "TiB",
 	"munits.data.pib": "PiB",
 	"munits.data.eib": "EiB",
+<<<<<<< HEAD
 	"counters.n_commits": {
 		"one": "%s sissekanne",
 		"other": "%s sissekannet"
 	},
+=======
+	"packages.title": "Paketid",
+	"packages.empty": "Pakette veel pole.",
+>>>>>>> upstream/v16.0/forgejo
 	"packages.installation": "Paigaldus",
 	"packages.about": "Selle paketi teave",
 	"packages.requirements": "Nõuded",
@@ -151,6 +179,7 @@
 	"packages.versions": "Versioonid",
 	"packages.versions.view_all": "Vaata kõiki",
 	"packages.dependency.id": "Tunnus",
+<<<<<<< HEAD
 	"packages.dependency.version": "Versioon",
 	"repo.files.caption": "Lähtekoodihoidla failid (viimane sissekanne esimesena)",
 	"repo.files.last_commit_message": "Viimase sissekande sõnum",
@@ -172,4 +201,7 @@
 	"settings.twofa_unroll_unavailable": "Kaheastmeline autentimine on sinu kasutajakonto puhul nõutav ja seda ei saa lülitada välja.",
 	"settings.twofa_reenroll": "Võta kaheastmeline autentimine uuesti kasutusele",
 	"settings.twofa_reenroll.description": "Võta oma kaheastmeline autentimine uuesti kasutusele"
+=======
+	"packages.dependency.version": "Versioon"
+>>>>>>> upstream/v16.0/forgejo
 }
