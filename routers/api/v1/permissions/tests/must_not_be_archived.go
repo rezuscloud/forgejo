@@ -10,6 +10,7 @@ import (
 var _ = registerFunctionTest(apiv1_permissions.MustNotBeArchived, functionTest{
 	testCases: []*testCase{
 		{
+<<<<<<< HEAD
 			// pass if a repository is present
 			data: newTestData(map[string]string{}, newSharedData().
 				SetRepository(),
@@ -21,6 +22,16 @@ var _ = registerFunctionTest(apiv1_permissions.MustNotBeArchived, functionTest{
 				SetRepository().
 				SetRepositoryArchived(true),
 			),
+=======
+			data: newTestData(map[string]string{
+				"repository": "userowner/repositorypublic",
+			}),
+		},
+		{
+			data: newTestData(map[string]string{
+				"repository": "userowner/repositoryarchived",
+			}),
+>>>>>>> upstream/v16.0/forgejo
 			error: "is archived",
 		},
 	},

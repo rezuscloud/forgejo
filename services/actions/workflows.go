@@ -197,10 +197,13 @@ func (entry *Workflow) Dispatch(ctx context.Context, inputGetter InputValueGette
 		return nil, nil, err
 	}
 
+<<<<<<< HEAD
 	if err := ConfigureActionRunTitle(jobs, run); err != nil {
 		return nil, nil, err
 	}
 
+=======
+>>>>>>> upstream/v16.0/forgejo
 	if err := InsertRun(ctx, run, jobs); err != nil {
 		return run, jobNames, err
 	}

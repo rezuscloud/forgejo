@@ -52,6 +52,7 @@ func CompareDiff(ctx *context.APIContext) {
 	//   "404":
 	//     "$ref": "#/responses/notFound"
 
+<<<<<<< HEAD
 	infoPath := ctx.Params("*")
 	infos := [2]string{ctx.Repo().Repository.DefaultBranch, ctx.Repo().Repository.DefaultBranch}
 	if base, head, ok := strings.Cut(infoPath, "..."); ok {
@@ -60,6 +61,27 @@ func CompareDiff(ctx *context.APIContext) {
 		infos[0], infos[1] = base, head
 	} else if infoPath != "" {
 		infos[1] = infoPath
+=======
+	if ctx.Repo().GitRepo == nil {
+		gitRepo, err := gitrepo.OpenRepository(ctx, ctx.Repo().Repository)
+		if err != nil {
+			ctx.Error(http.StatusInternalServerError, "OpenRepository", err)
+			return
+		}
+		ctx.Repo().GitRepo = gitRepo
+		defer gitRepo.Close()
+	}
+
+	infoPath := ctx.Params("*")
+	infos := []string{ctx.Repo().Repository.DefaultBranch, ctx.Repo().Repository.DefaultBranch}
+	if infoPath != "" {
+		infos = strings.SplitN(infoPath, "...", 2)
+		if len(infos) != 2 {
+			if infos = strings.SplitN(infoPath, "..", 2); len(infos) != 2 {
+				infos = []string{ctx.Repo().Repository.DefaultBranch, infoPath}
+			}
+		}
+>>>>>>> upstream/v16.0/forgejo
 	}
 
 	headRepository, headGitRepo, ci, _, _ := parseCompareInfo(ctx, api.CreatePullRequestOption{

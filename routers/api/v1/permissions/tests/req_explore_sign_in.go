@@ -13,6 +13,7 @@ import (
 var _ = registerFunctionTest(apiv1_permissions.ReqExploreSignIn, functionTest{
 	testCases: []*testCase{
 		{
+<<<<<<< HEAD
 			// pass if the doer is signed in
 			data: newTestData(map[string]string{}, newSharedData().
 				SetDoer(),
@@ -32,12 +33,34 @@ var _ = registerFunctionTest(apiv1_permissions.ReqExploreSignIn, functionTest{
 			data: newTestData(map[string]string{
 				"Service.Explore.RequireSigninView": "true",
 			}, newSharedData().SetAnonymous(true)),
+=======
+			data: newTestData(map[string]string{
+				"doer": "regularuser",
+			}),
+		},
+		{
+			data: newTestData(map[string]string{
+				"doer":                      "anonymous",
+				"Service.RequireSignInView": "true",
+			}),
+			error: "you must be signed in",
+		},
+		{
+			data: newTestData(map[string]string{
+				"doer":                              "anonymous",
+				"Service.Explore.RequireSigninView": "true",
+			}),
+>>>>>>> upstream/v16.0/forgejo
 			error: "you must be signed in",
 		},
 	},
 	fulfillNeeds: func(t *testing.T, data *testData) {
 		t.Helper()
+<<<<<<< HEAD
 		data.shared.SetDoerDefault()
+=======
+		data.SetDefault("doer", "regularuser")
+>>>>>>> upstream/v16.0/forgejo
 	},
 	protectSettingsBool: []*bool{
 		&setting.Service.RequireSignInView,
