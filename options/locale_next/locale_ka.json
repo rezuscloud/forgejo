@@ -131,5 +131,10 @@
 	"packages.debian.repository.architectures": "არქიტექტურები",
 	"packages.npm.details.tag": "ჭდე",
 	"packages.rpm.repository.architectures": "არქიტექტურები",
+<<<<<<< HEAD
 	"packages.alt.repository.architectures": "არქიტექტურები"
+=======
+	"packages.alt.repository.architectures": "არქიტექტურები",
+	"meta.last_line": ""
+>>>>>>> upstream/v16.0/forgejo
 }

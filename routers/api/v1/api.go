@@ -447,6 +447,7 @@ func mustNotBeArchived() func(ctx *context.APIContext) {
 
 func mustEnableAttachments() func(ctx *context.APIContext) {
 	return checkPermission(apiv1_permissions.MustEnableAttachments)
+<<<<<<< HEAD
 }
 
 func checkForkDestination() func(*context.APIContext) {
@@ -455,6 +456,8 @@ func checkForkDestination() func(*context.APIContext) {
 		form := web.GetForm(ctx).(*api.CreateForkOption)
 		apiv1_permissions.CheckForkDestination(ctx, form.Organization)
 	}
+=======
+>>>>>>> upstream/v16.0/forgejo
 }
 
 // bind binding an obj to a func(ctx *context.APIContext)

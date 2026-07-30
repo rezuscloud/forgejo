@@ -732,6 +732,7 @@
 	"members.user": "Użytkownik",
 	"members.user_already_member": "Ten użytkownik jest już członkiem tej organizacji.",
 	"members.no_team_selected": "Członkowie organizacji muszą należeć do przynajmniej jednego zespołu.",
+<<<<<<< HEAD
 	"repo.view.gitmodules_too_large": "Plik .gitmodules jest za duży i będzie ignorowany (np. w wywołaniach API)",
 	"relativetime.duration.years": {
 		"one": "%d rok",
@@ -769,4 +770,7 @@
 		"many": "%d miesięcy"
 	},
 	"repo.issues.context.copy_markdown": "Skopiuj Markdown"
+=======
+	"repo.view.gitmodules_too_large": "Plik .gitmodules jest za duży i będzie ignorowany (np. w wywołaniach API)"
+>>>>>>> upstream/v16.0/forgejo
 }

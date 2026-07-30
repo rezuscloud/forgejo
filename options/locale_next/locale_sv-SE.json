@@ -947,6 +947,7 @@
 	"actions.runs.deprioritization_success": "Arbetsflöde körning #%d kommer inte längre att prioriteras.",
 	"actions.workflow.pre_execution_warning": "Arbetsflöde varningar:",
 	"actions.workflow.permissions_warning": "Jobb <code>%[1]s</code> eller dess arbetsflöde har ett <code>behörigheter</code> fält, vilket inte stöds i Forgejo och kommer att ignoreras. Använd <a href=\"%[2]s\">Auktoriserade integrationer</a> för att ge kapabiliteter till det här jobbet istället.",
+<<<<<<< HEAD
 	"repo.issues.context.copy_markdown": "Kopiera Markdown",
 	"relativetime.duration.secs": {
 		"one": "%d sekund",
@@ -977,6 +978,8 @@
 		"other": "%d flera år"
 	},
 	"settings.profile.dotprofile.hint": "Avancerad profilanpassning, inklusive verifieringslänkar, kan uppnås med <code>%s</code>kodförråd.<a href=\"%s\" target=\"_blank\">Läs mer</a>.",
+=======
+>>>>>>> upstream/v16.0/forgejo
 	"repo.watching": "Följa",
 	"repo.watch.issues": "Ärenden",
 	"repo.watch.pull_requests": "Ändringsförfrågningar",
