@@ -869,6 +869,7 @@
 	"settings.authorized_integration.field.name": "Nom",
 	"settings.authorized_integration.field.description": "Description",
 	"settings.authorized_integration.field.description.placeholder": "Sert à publier des paquets lorsque...",
+<<<<<<< HEAD
 	"migrate.in_progress.issues.progress": {
 		"one": "%[1]d issue migré",
 		"many": "%[1]d issues migrés",
@@ -879,6 +880,8 @@
 		"many": "%[1]d pull requests migrés",
 		"other": "%[1]d pull requests migrés"
 	},
+=======
+>>>>>>> upstream/v16.0/forgejo
 	"search.match_inside_quotes": "Inclure uniquement les résultats correspondant au terme entre guillemets",
 	"search.docs": "<a target=\"_blank\" rel=\"noopener noreferrer\" href=\"%[1]s\">Voir la documentation</a> pour plus de détails sur la recherche, les opérateurs et les filtres.",
 	"actions.runs.prioritize_run": "Prioriser l'exécution",

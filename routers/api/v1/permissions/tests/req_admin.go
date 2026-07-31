@@ -15,6 +15,7 @@ var _ = registerFunctionTestBuilder([]string{"ReqAdmin ", "ReqAdmin"}, func(t *t
 	unitTypes := signature[1].([]unit_model.Type)
 	fixtures := []*testCase{
 		{
+<<<<<<< HEAD
 			// pass if the doer is admin
 			data: newTestData(map[string]string{}, newSharedData().
 				SetDoer().
@@ -34,10 +35,29 @@ var _ = registerFunctionTestBuilder([]string{"ReqAdmin ", "ReqAdmin"}, func(t *t
 				SetRepository().
 				SetDoer(),
 			),
+=======
+			data: newTestData(map[string]string{
+				"repository": "userowner/repositorypublic",
+				"doer":       "doeradmin",
+			}),
+		},
+		{
+			data: newTestData(map[string]string{
+				"repository": "userowner/repositorypublic",
+				"doer":       "userowner",
+			}),
+		},
+		{
+			data: newTestData(map[string]string{
+				"repository": "userowner/repositorypublic",
+				"doer":       "regularuser",
+			}),
+>>>>>>> upstream/v16.0/forgejo
 			error: "user should be an owner or a collaborator with admin write of a repository",
 		},
 	}
 	for _, unitType := range unitTypes {
+<<<<<<< HEAD
 		fixtures = append(fixtures, &testCase{
 			data: newTestData(map[string]string{}, newSharedData().
 				SetRepositoryName("userowner/repositorypublic").
@@ -45,6 +65,15 @@ var _ = registerFunctionTestBuilder([]string{"ReqAdmin ", "ReqAdmin"}, func(t *t
 				SetDoerName("root").
 				SetDoerAdmin(true),
 			),
+=======
+		unit := unitsTypeToString(unitType)
+		fixtures = append(fixtures, &testCase{
+			data: newTestData(map[string]string{
+				"repository":    "userowner/repositorypublic",
+				"doer":          "doeradmin",
+				"disable-units": unit,
+			}),
+>>>>>>> upstream/v16.0/forgejo
 			error: "Not Found",
 		})
 	}
@@ -55,12 +84,20 @@ var _ = registerFunctionTestBuilder([]string{"ReqAdmin ", "ReqAdmin"}, func(t *t
 			signatureString,
 		},
 		interpret: func(t *testing.T, permissions *apiv1_permissions.Permissions, data *testData) {
+<<<<<<< HEAD
 			fixtureDisableUnits(t, permissions, data.shared.RepositoryDisabledUnits())
 		},
 		fulfillNeeds: func(t *testing.T, data *testData) {
 			t.Helper()
 			data.shared.SetDoer()
 			data.shared.SetDoerAdmin(true)
+=======
+			fixtureDisableUnits(t, permissions, data)
+		},
+		fulfillNeeds: func(t *testing.T, data *testData) {
+			t.Helper()
+			data.Set("doer", "doeradmin")
+>>>>>>> upstream/v16.0/forgejo
 		},
 		testCases:  fixtures,
 		staticArgs: 1,

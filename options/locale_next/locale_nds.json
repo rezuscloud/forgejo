@@ -947,12 +947,16 @@
 	"actions.runs.deprioritization_success": "Warkwies-Utföhren #%d word nich mehr vörtrucken.",
 	"actions.workflow.pre_execution_warning": "Warkwies-Wahrschauen:",
 	"actions.workflow.permissions_warning": "Upgaav <code>%[1]s</code> of hör Warkwies hett een <code>permissions</code>-Feld, wat in Forgejo nich unnerstütt word un minnacht word. Bruuk in Stee daarvun <a href=\"%[2]s\">tolaten Integratioonen</a>, um deeser Upgaav Künnen to geven.",
+<<<<<<< HEAD
 	"repo.issues.context.copy_markdown": "Markdown koperen",
 	"settings.profile.dotprofile.hint": "Wiedere Profil-Anpassens, to’n Bispööl Nakiekens-Verwiesen, könen mit de Repositorium »<code>%s</code>« torechtkregen worden. <a href=\"%s\" target=\"_blank\">Mehr erfahren</a>.",
+=======
+>>>>>>> upstream/v16.0/forgejo
 	"repo.watching": "Beluren",
 	"repo.watch.issues": "Gefallens",
 	"repo.watch.pull_requests": "Haalvörslagen",
 	"repo.watch.releases": "Publizerens",
+<<<<<<< HEAD
 	"repo.watch.releases.hint": "(blots E-Mail)",
 	"relativetime.duration.secs": {
 		"one": "%d Sekünn",
@@ -982,4 +986,7 @@
 		"one": "%d Jahr",
 		"other": "%d Jahren"
 	}
+=======
+	"repo.watch.releases.hint": "(blots E-Mail)"
+>>>>>>> upstream/v16.0/forgejo
 }
