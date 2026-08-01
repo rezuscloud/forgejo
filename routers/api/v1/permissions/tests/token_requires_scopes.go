@@ -45,6 +45,7 @@ var _ = registerFunctionTestBuilder([]string{"TokenRequiresScopes "}, func(t *te
 	signatureStringToFunctionTest[signatureString] = functionTest{
 		testCases: []*testCase{
 			{
+<<<<<<< HEAD
 				// pass because the doer token has the required scope read
 				// level
 				data: newTestData(map[string]string{}, newSharedData().
@@ -71,11 +72,34 @@ var _ = registerFunctionTestBuilder([]string{"TokenRequiresScopes "}, func(t *te
 					SetDoerScope("read:misc").
 					SetTokenLevel("write"),
 				),
+=======
+				data: newTestData(map[string]string{
+					"doer":  "doerregular",
+					"scope": readscope,
+					"level": "read",
+				}),
+			},
+			{
+				data: newTestData(map[string]string{
+					"doer":  "doerregular",
+					"scope": readscope,
+					"level": "write",
+				}),
+				error: "token does not have at least one of required scope(s)",
+			},
+			{
+				data: newTestData(map[string]string{
+					"doer":  "doerregular",
+					"scope": "read:misc",
+					"level": "read",
+				}),
+>>>>>>> upstream/v16.0/forgejo
 				error: "token does not have at least one of required scope(s)",
 			},
 		},
 		fulfillNeeds: func(t *testing.T, data *testData) {
 			t.Helper()
+<<<<<<< HEAD
 			data.shared.SetRepositoryDefault()
 			data.shared.SetDoerDefault()
 			if data.shared.HasDoerScope() {
@@ -96,6 +120,28 @@ var _ = registerFunctionTestBuilder([]string{"TokenRequiresScopes "}, func(t *te
 		staticArgs: 1,
 		call: func(t *testing.T, ctx apiv1_permissions.Context, data *testData, args []any) {
 			level := levelStringToLevel(data.shared.TokenLevel())
+=======
+			data.SetDefault("repository", "userowner/repositorypublic")
+			data.SetDefault("doer", "doerregular")
+			if data.Has("scope") {
+				scope := data.Get("scope")
+				if !strings.Contains(scope, readscope) {
+					writescope := strings.ReplaceAll(readscope, "read", "write")
+					data.Set("scope", strings.Join([]string{scope, writescope}, ","))
+				}
+			} else {
+				data.Set("scope", readscope)
+			}
+
+			data.SetDefault("level", "read")
+		},
+		interpret: func(t *testing.T, permissions *apiv1_permissions.Permissions, data *testData) {
+			fixtureSetRepository(t, permissions, data)
+		},
+		staticArgs: 1,
+		call: func(t *testing.T, ctx apiv1_permissions.Context, data *testData, args []any) {
+			level := levelStringToLevel(data.Get("level"))
+>>>>>>> upstream/v16.0/forgejo
 			categories := args[0].([]auth_model.AccessTokenScopeCategory)
 			t.Logf("calling TokenRequiresScopes(ctx, %v, %v)", categories, level)
 			apiv1_permissions.TokenRequiresScopes(ctx, categories, level)

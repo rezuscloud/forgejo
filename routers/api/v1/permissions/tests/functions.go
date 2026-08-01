@@ -90,10 +90,17 @@ func testSequence(t *testing.T, signatures [][]any, onlyForSuccess bool) int {
 			_ = unittest.LoadFixtures() // reset the database to clear any side effect of running the test
 			permissions := &apiv1_permissions.Permissions{}
 			permissions.SetContext(t.Context())
+<<<<<<< HEAD
 			t.Logf("creating fixture data from %s", fixture.data)
 			modifiedFixture := fixture.Clone()
 			createFixture(t, signatures, permissions, modifiedFixture.data)
 			t.Logf("created fixture data %s", modifiedFixture.data)
+=======
+			t.Logf("creating fixture data from %v", fixture.data)
+			modifiedFixture := fixture.Clone()
+			createFixture(t, signatures, permissions, modifiedFixture.data)
+			t.Logf("created fixture data %v", modifiedFixture.data)
+>>>>>>> upstream/v16.0/forgejo
 
 			var previousPerms []string
 			showPermissionsDiff := func() {

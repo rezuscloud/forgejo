@@ -16,6 +16,7 @@ import (
 var _ = registerFunctionTest(apiv1_permissions.ReqTeamMembership, functionTest{
 	testCases: []*testCase{
 		{
+<<<<<<< HEAD
 			// pass because the doer is the owner of the org and therefore member of the owner team
 			data: newTestData(map[string]string{
 				"org":  "ReqTeamMembership",
@@ -64,10 +65,47 @@ var _ = registerFunctionTest(apiv1_permissions.ReqTeamMembership, functionTest{
 			// fail because the doer is not a member of the context team
 			// team2
 			data: newTestData(map[string]string{
+=======
+			data: newTestData(map[string]string{
+				"org":  "ReqTeamMembership",
+				"team": org_model.OwnerTeamName,
+			}),
+		},
+		{
+			data: newTestData(map[string]string{
+				"doer": "doeradmin",
+				"org":  "ReqTeamMembership",
+				"team": org_model.OwnerTeamName,
+			}),
+		},
+		{
+			data: newTestData(map[string]string{
+				"doer":     "regularuser",
+				"orgOwner": "orgOwner",
+				"org":      "ReqTeamMembership",
+				"teams":    "team1:regularuser",
+				"team":     "team1",
+			}),
+		},
+		{
+			data: newTestData(map[string]string{
+				"doer":     "regularuser",
+				"orgOwner": "orgOwner",
+				"org":      "ReqTeamMembership",
+				"teams":    "team1:regularuser,team2:otheruser",
+				"team":     "team2",
+			}),
+			error: "Must be a team member",
+		},
+		{
+			data: newTestData(map[string]string{
+				"doer":     "regularuser",
+>>>>>>> upstream/v16.0/forgejo
 				"orgOwner": "orgOwner",
 				"org":      "ReqTeamMembership",
 				"teams":    "team2:otheruser",
 				"team":     "team2",
+<<<<<<< HEAD
 			}, newSharedData().
 				SetDoer(),
 			),
@@ -78,6 +116,15 @@ var _ = registerFunctionTest(apiv1_permissions.ReqTeamMembership, functionTest{
 			data: newTestData(map[string]string{
 				"org": "ReqTeamMembership",
 			}, newSharedData()),
+=======
+			}),
+			error: "Not Found",
+		},
+		{
+			data: newTestData(map[string]string{
+				"org": "ReqTeamMembership",
+			}),
+>>>>>>> upstream/v16.0/forgejo
 			error: "reqTeamMembership: unprepared context",
 		},
 	},
@@ -92,7 +139,11 @@ var _ = registerFunctionTest(apiv1_permissions.ReqTeamMembership, functionTest{
 		data.SetDefault("team", org_model.OwnerTeamName)
 	},
 	interpret: func(t *testing.T, permissions *apiv1_permissions.Permissions, data *testData) {
+<<<<<<< HEAD
 		orgOwner := data.shared.DoerName()
+=======
+		orgOwner := data.Get("doer")
+>>>>>>> upstream/v16.0/forgejo
 		if data.Has("orgOwner") {
 			orgOwner = data.Get("orgOwner")
 		}
