@@ -16,10 +16,15 @@ import (
 var _ = registerFunctionTestBuilder([]string{"ReqRepoWriter "}, func(t *testing.T, signatureString string, signature []any) {
 	t.Helper()
 	unitTypes := signature[1].([]unit_model.Type)
+<<<<<<< HEAD
+=======
+	units := unitsTypeToString(unitTypes...)
+>>>>>>> upstream/v16.0/forgejo
 	scopes := unitsToScopes(unitTypes, "write")
 	signatureStringToFunctionTest[signatureString] = functionTest{
 		testCases: []*testCase{
 			{
+<<<<<<< HEAD
 				// pass because the doer is the owner of the repository
 				data: newTestData(map[string]string{}, newSharedData().
 					SetDoer().SetDoerName("userowner").
@@ -42,6 +47,26 @@ var _ = registerFunctionTestBuilder([]string{"ReqRepoWriter "}, func(t *testing.
 					SetDoerScope(scopes).
 					SetRepositoryName("userowner/repositorypublic"),
 				),
+=======
+				data: newTestData(map[string]string{
+					"repository": "userowner/repositorypublic",
+					"doer":       "userowner",
+					"scope":      scopes,
+				}),
+			},
+			{
+				data: newTestData(map[string]string{
+					"disable-units": units,
+				}),
+				error: "Not Found",
+			},
+			{
+				data: newTestData(map[string]string{
+					"doer":       "regularuser",
+					"repository": "userowner/repositorypublic",
+					"scope":      "write:issue",
+				}),
+>>>>>>> upstream/v16.0/forgejo
 				error: "user should have a permission to write to a repo",
 			},
 		},
@@ -51,6 +76,7 @@ var _ = registerFunctionTestBuilder([]string{"ReqRepoWriter "}, func(t *testing.
 			signatureString,
 		},
 		interpret: func(t *testing.T, permissions *apiv1_permissions.Permissions, data *testData) {
+<<<<<<< HEAD
 			fixtureDisableUnits(t, permissions, data.shared.RepositoryDisabledUnits())
 		},
 		fulfillNeeds: func(t *testing.T, data *testData) {
@@ -67,6 +93,21 @@ var _ = registerFunctionTestBuilder([]string{"ReqRepoWriter "}, func(t *testing.
 				data.shared.SetDoerNameDefault("userowner")
 			}
 			data.shared.SetTokenLevelDefault("write")
+=======
+			fixtureDisableUnits(t, permissions, data)
+		},
+		fulfillNeeds: func(t *testing.T, data *testData) {
+			t.Helper()
+			if data.Has("repository") {
+				owner, _, found := strings.Cut(data.Get("repository"), "/")
+				require.True(t, found)
+				data.Set("doer", owner)
+			} else {
+				data.SetDefault("repository", "userowner/repositorypublic")
+				data.SetDefault("doer", "userowner")
+			}
+			data.SetDefault("level", "write")
+>>>>>>> upstream/v16.0/forgejo
 		},
 		staticArgs: 1,
 		call: func(t *testing.T, ctx apiv1_permissions.Context, _ *testData, args []any) {

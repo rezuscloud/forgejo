@@ -11,7 +11,11 @@ require (
 	code.forgejo.org/forgejo/go-rpmutils v1.0.0
 	code.forgejo.org/forgejo/levelqueue v1.1.0
 	code.forgejo.org/forgejo/reply v1.0.2
+<<<<<<< HEAD
 	code.forgejo.org/forgejo/runner/v12 v12.13.0
+=======
+	code.forgejo.org/forgejo/runner/v12 v12.13.2
+>>>>>>> upstream/v16.0/forgejo
 	code.forgejo.org/go-chi/binding v1.0.1
 	code.forgejo.org/go-chi/cache v1.0.1
 	code.forgejo.org/go-chi/captcha v1.0.3
@@ -22,7 +26,7 @@ require (
 	connectrpc.com/connect v1.20.0
 	github.com/42wim/httpsig v1.2.3
 	github.com/42wim/sshsig v0.0.0-20250502153856-5100632e8920
-	github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358
+	github.com/Azure/go-ntlmssp v0.1.1
 	github.com/ProtonMail/go-crypto v1.4.1
 	github.com/PuerkitoBio/goquery v1.12.0
 	github.com/SaveTheRbtz/zstd-seekable-format-go/pkg v0.9.0
@@ -44,12 +48,21 @@ require (
 	github.com/gliderlabs/ssh v0.3.8
 	github.com/go-ap/activitypub v0.0.0-20260208110334-902f6cf8c2cc
 	github.com/go-ap/jsonld v0.0.0-20251216162253-e38fa664ea77
+<<<<<<< HEAD
 	github.com/go-chi/chi/v5 v5.3.1
 	github.com/go-chi/cors v1.2.2
 	github.com/go-co-op/gocron v1.37.0
 	github.com/go-enry/go-enry/v2 v2.9.6
 	github.com/go-ldap/ldap/v3 v3.4.12
 	github.com/go-openapi/spec v0.22.6
+=======
+	github.com/go-chi/chi/v5 v5.3.0
+	github.com/go-chi/cors v1.2.2
+	github.com/go-co-op/gocron v1.37.0
+	github.com/go-enry/go-enry/v2 v2.9.6
+	github.com/go-ldap/ldap/v3 v3.4.14
+	github.com/go-openapi/spec v0.22.5
+>>>>>>> upstream/v16.0/forgejo
 	github.com/go-sql-driver/mysql v1.10.0
 	github.com/go-webauthn/webauthn v0.16.5
 	github.com/gobwas/glob v0.2.3
@@ -70,11 +83,19 @@ require (
 	github.com/jhillyerd/enmime/v2 v2.2.0
 	github.com/json-iterator/go v1.1.12
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51
+<<<<<<< HEAD
 	github.com/klauspost/compress v1.19.0
 	github.com/klauspost/cpuid/v2 v2.3.0
 	github.com/markbates/goth v1.82.0
 	github.com/mattn/go-isatty v0.0.22
 	github.com/mattn/go-sqlite3 v1.14.48
+=======
+	github.com/klauspost/compress v1.18.7
+	github.com/klauspost/cpuid/v2 v2.3.0
+	github.com/markbates/goth v1.82.0
+	github.com/mattn/go-isatty v0.0.22
+	github.com/mattn/go-sqlite3 v1.14.46
+>>>>>>> upstream/v16.0/forgejo
 	github.com/meilisearch/meilisearch-go v0.36.2
 	github.com/mholt/archives v0.1.5
 	github.com/microcosm-cc/bluemonday v1.0.27
@@ -86,7 +107,11 @@ require (
 	github.com/opencontainers/image-spec v1.1.1
 	github.com/pquerna/otp v1.5.0
 	github.com/prometheus/client_golang v1.21.1
+<<<<<<< HEAD
 	github.com/redis/go-redis/v9 v9.21.0
+=======
+	github.com/redis/go-redis/v9 v9.20.1
+>>>>>>> upstream/v16.0/forgejo
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2
 	github.com/sergi/go-diff v1.4.0
 	github.com/sourcegraph/zoekt v0.0.0-20260114143800-c747a3bccc2a
@@ -102,7 +127,11 @@ require (
 	go.yaml.in/yaml/v3 v3.0.4
 	golang.org/x/crypto v0.54.0
 	golang.org/x/image v0.43.0
+<<<<<<< HEAD
 	golang.org/x/net v0.56.0
+=======
+	golang.org/x/net v0.57.0
+>>>>>>> upstream/v16.0/forgejo
 	golang.org/x/oauth2 v0.36.0
 	golang.org/x/sync v0.22.0
 	golang.org/x/sys v0.47.0
@@ -165,7 +194,7 @@ require (
 	github.com/fatih/color v1.19.0 // indirect
 	github.com/fxamacker/cbor/v2 v2.9.1 // indirect
 	github.com/go-ap/errors v0.0.0-20260208110149-e1b309365966 // indirect
-	github.com/go-asn1-ber/asn1-ber v1.5.8-0.20250403174932-29230038a667 // indirect
+	github.com/go-asn1-ber/asn1-ber v1.5.8 // indirect
 	github.com/go-enry/go-oniguruma v1.2.1 // indirect
 	github.com/go-fed/httpsig v1.1.0 // indirect
 	github.com/go-ini/ini v1.67.0 // indirect
@@ -252,8 +281,13 @@ require (
 	go4.org v0.0.0-20230225012048-214862532bf5 // indirect
 	golang.org/x/mod v0.37.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
+<<<<<<< HEAD
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251202230838-ff82c1b0f217 // indirect
 	google.golang.org/grpc v1.79.3 // indirect
+=======
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260414002931-afd174a4e478 // indirect
+	google.golang.org/grpc v1.82.1 // indirect
+>>>>>>> upstream/v16.0/forgejo
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

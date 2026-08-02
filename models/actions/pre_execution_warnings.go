@@ -5,6 +5,11 @@ package actions
 
 import (
 	"fmt"
+<<<<<<< HEAD
+=======
+	"html"
+	"html/template"
+>>>>>>> upstream/v16.0/forgejo
 
 	"forgejo.org/modules/translation"
 )
@@ -19,6 +24,7 @@ const (
 	WarningCodePermissions PreExecutionWarning = iota + 1
 )
 
+<<<<<<< HEAD
 func TranslatePreExecutionWarning(lang translation.Locale, run *ActionRun) []string {
 	warnings := make([]string, len(run.PreExecutionWarningCodes))
 	for i, code := range run.PreExecutionWarningCodes {
@@ -27,6 +33,16 @@ func TranslatePreExecutionWarning(lang translation.Locale, run *ActionRun) []str
 			warnings[i] = lang.TrString("actions.workflow.permissions_warning", run.PreExecutionWarningDetails[i]...)
 		default:
 			warnings[i] = fmt.Sprintf("unsupported warning: code=%v details=%#v", code, run.PreExecutionWarningDetails[i])
+=======
+func TranslatePreExecutionWarning(lang translation.Locale, run *ActionRun) []template.HTML {
+	warnings := make([]template.HTML, len(run.PreExecutionWarningCodes))
+	for i, code := range run.PreExecutionWarningCodes {
+		switch code {
+		case WarningCodePermissions:
+			warnings[i] = lang.Tr("actions.workflow.permissions_warning", run.PreExecutionWarningDetails[i]...)
+		default:
+			warnings[i] = template.HTML(html.EscapeString(fmt.Sprintf("unsupported warning: code=%v details=%#v", code, run.PreExecutionWarningDetails[i])))
+>>>>>>> upstream/v16.0/forgejo
 		}
 	}
 	if len(warnings) == 0 {

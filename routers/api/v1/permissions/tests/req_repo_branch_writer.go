@@ -15,6 +15,7 @@ import (
 var _ = registerFunctionTestWithCall(apiv1_permissions.ReqRepoBranchWriter, functionTest{
 	testCases: []*testCase{
 		{
+<<<<<<< HEAD
 			// pass because the doer is the owner of the repository
 			data: newTestData(map[string]string{
 				"pullRequestAuthor": "userowner",
@@ -37,6 +38,26 @@ var _ = registerFunctionTestWithCall(apiv1_permissions.ReqRepoBranchWriter, func
 				SetRepositoryName("userowner/repositorypublic").
 				SetRepositoryInit(true),
 			),
+=======
+			data: newTestData(map[string]string{
+				"doer":              "userowner",
+				"repository":        "userowner/repositorypublic",
+				"repository-init":   "true",
+				"pullRequestAuthor": "userowner",
+				"pullRequestBranch": "ReqRepoBranchWriter",
+				"pullRequest":       "ReqRepoBranchWriter",
+			}),
+		},
+		{
+			data: newTestData(map[string]string{
+				"doer":              "regularuser",
+				"repository":        "userowner/repositorypublic",
+				"repository-init":   "true",
+				"pullRequestAuthor": "userowner",
+				"pullRequestBranch": "ReqRepoBranchWriter",
+				"pullRequest":       "ReqRepoBranchWriter",
+			}),
+>>>>>>> upstream/v16.0/forgejo
 			error: "user should have a permission to write to this branch",
 		},
 	},
@@ -45,6 +66,7 @@ var _ = registerFunctionTestWithCall(apiv1_permissions.ReqRepoBranchWriter, func
 		fixtureCreateBranch(t, permissions, data.Get("pullRequestBranch"))
 		require.True(t, data.Has("pullRequestAuthor"))
 		require.True(t, data.Has("pullRequest"))
+<<<<<<< HEAD
 		fixtureCreatePullRequest(t, permissions, data.Get("pullRequest"), data.Get("pullRequestAuthor"), data.Get("pullRequestBranch"))
 	},
 	fulfillNeeds: func(t *testing.T, data *testData) {
@@ -54,6 +76,16 @@ var _ = registerFunctionTestWithCall(apiv1_permissions.ReqRepoBranchWriter, func
 		data.shared.SetDoer()
 		data.shared.SetDoerName(owner)
 		data.shared.SetRepositoryInitDefault(true)
+=======
+		fixtureCreatePullRequest(t, permissions, data)
+	},
+	fulfillNeeds: func(t *testing.T, data *testData) {
+		t.Helper()
+		owner, _, found := strings.Cut(data.Get("repository"), "/")
+		require.True(t, found)
+		data.Set("doer", owner)
+		data.SetDefault("repository-init", "true")
+>>>>>>> upstream/v16.0/forgejo
 		data.SetDefault("pullRequestAuthor", owner)
 		data.SetDefault("pullRequestBranch", "ReqRepoBranchWriter")
 		data.SetDefault("pullRequest", "ReqRepoBranchWriter")

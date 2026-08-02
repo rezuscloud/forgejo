@@ -37,6 +37,7 @@ var DefaultVerifier *jwtx.Verifier
 
 // Init initializes the oauth source
 func Init(ctx context.Context) error {
+<<<<<<< HEAD
 	var err error
 	if !setting.OAuth2.Enabled {
 		return nil
@@ -46,6 +47,8 @@ func Init(ctx context.Context) error {
 		return err
 	}
 
+=======
+>>>>>>> upstream/v16.0/forgejo
 	// Lock our mutex
 	gothRWMutex.Lock()
 
@@ -65,6 +68,16 @@ func Init(ctx context.Context) error {
 
 	// Unlock our mutex
 	gothRWMutex.Unlock()
+
+	if !setting.OAuth2.Enabled {
+		return nil
+	}
+
+	var err error
+	DefaultSigningKey, err = jwtx.InitSigningKey(&setting.OAuth2.KeyCfg.Signing)
+	if err != nil {
+		return err
+	}
 
 	return initOAuth2Sources(ctx)
 }

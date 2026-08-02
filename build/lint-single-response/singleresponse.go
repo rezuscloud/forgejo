@@ -27,7 +27,11 @@ func run(pass *analysis.Pass) (any, error) {
 	insp := pass.ResultOf[inspect.Analyzer].(*inspector.Inspector)
 	cfgs := pass.ResultOf[ctrlflow.Analyzer].(*ctrlflow.CFGs)
 
+<<<<<<< HEAD
 	terminatingFuncs := map[string]map[string]any{
+=======
+	webFuncs := map[string]map[string]any{
+>>>>>>> upstream/v16.0/forgejo
 		"*forgejo.org/services/context.APIContext": {
 			"Error":                 true,
 			"InternalServerError":   true,
@@ -56,11 +60,14 @@ func run(pass *analysis.Pass) (any, error) {
 			"RenderWithErr":         true,
 			"ServerError":           true,
 		},
+<<<<<<< HEAD
 		"forgejo.org/routers/api/v1/permissions.Context": {
 			"Error":               true,
 			"InternalServerError": true,
 			"NotFound":            true,
 		},
+=======
+>>>>>>> upstream/v16.0/forgejo
 		// Future: RedirectToUser does not accept a ctx LHS, but rather a first parameter -- needs different
 		// implementation of detection, or, refactoring: "RedirectToUser": true,
 	}
@@ -79,13 +86,21 @@ func run(pass *analysis.Pass) (any, error) {
 			if cfg == nil {
 				return true
 			}
+<<<<<<< HEAD
 			inspectFunction(cfg, pass, terminatingFuncs)
+=======
+			inspectFunction(cfg, pass, webFuncs)
+>>>>>>> upstream/v16.0/forgejo
 		case *ast.FuncLit:
 			cfg := cfgs.FuncLit(fn)
 			if cfg == nil {
 				return true
 			}
+<<<<<<< HEAD
 			inspectFunction(cfg, pass, terminatingFuncs)
+=======
+			inspectFunction(cfg, pass, webFuncs)
+>>>>>>> upstream/v16.0/forgejo
 		}
 		return false
 	})
@@ -93,7 +108,11 @@ func run(pass *analysis.Pass) (any, error) {
 	return nil, nil //nolint:nilnil
 }
 
+<<<<<<< HEAD
 func inspectFunction(cfg *cfg.CFG, pass *analysis.Pass, terminatingFuncs map[string]map[string]any) {
+=======
+func inspectFunction(cfg *cfg.CFG, pass *analysis.Pass, webFuncs map[string]map[string]any) {
+>>>>>>> upstream/v16.0/forgejo
 	for _, block := range cfg.Blocks {
 		for nodeIdx, node := range block.Nodes {
 			ast.Inspect(node, func(n ast.Node) bool {
@@ -139,7 +158,11 @@ func inspectFunction(cfg *cfg.CFG, pass *analysis.Pass, terminatingFuncs map[str
 				}
 				callType := fnSig.Recv().Type().String()
 
+<<<<<<< HEAD
 				typeMap, inTypeMap := terminatingFuncs[callType]
+=======
+				typeMap, inTypeMap := webFuncs[callType]
+>>>>>>> upstream/v16.0/forgejo
 				if inTypeMap {
 					callName := selector.Sel.Name
 					_, inFuncMap := typeMap[callName]

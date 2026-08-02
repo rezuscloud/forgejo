@@ -5,6 +5,7 @@ package tests
 
 import (
 	"fmt"
+<<<<<<< HEAD
 	"math/rand"
 	"strings"
 	"time"
@@ -27,6 +28,14 @@ func randomName() string {
 	return string(b)
 }
 
+=======
+	"strings"
+
+	auth_model "forgejo.org/models/auth"
+	unit_model "forgejo.org/models/unit"
+)
+
+>>>>>>> upstream/v16.0/forgejo
 func levelStringToLevel(levelString string) auth_model.AccessTokenScopeLevel {
 	level := auth_model.Read
 	if levelString != "" {
@@ -81,6 +90,7 @@ func unitsToScopes(unitTypes []unit_model.Type, levelString string) string {
 	}
 	return strings.Join(scopeStrings, ",")
 }
+<<<<<<< HEAD
 
 func stringToVisibility(str string) api.VisibleType {
 	switch str {
@@ -94,3 +104,5 @@ func stringToVisibility(str string) api.VisibleType {
 		panic(fmt.Sprintf("unexpected %s", str))
 	}
 }
+=======
+>>>>>>> upstream/v16.0/forgejo

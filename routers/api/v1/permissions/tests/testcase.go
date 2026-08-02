@@ -12,6 +12,7 @@ import (
 	"strings"
 	"testing"
 
+<<<<<<< HEAD
 	unit_model "forgejo.org/models/unit"
 	"forgejo.org/modules/web/routing"
 	apiv1_permissions "forgejo.org/routers/api/v1/permissions"
@@ -468,6 +469,27 @@ type testData struct {
 
 func (o *testData) Set(key, value string) {
 	o.own[key] = value
+=======
+	"forgejo.org/modules/web/routing"
+	apiv1_permissions "forgejo.org/routers/api/v1/permissions"
+	apiv1_permissions_testhelpers "forgejo.org/routers/api/v1/permissions/testhelpers"
+
+	"github.com/stretchr/testify/require"
+)
+
+func dataToString(t *testing.T, testData *testData, key string) string {
+	t.Helper()
+	require.True(t, testData.Has(key))
+	return testData.Get(key)
+}
+
+type testData struct {
+	entries map[string]string
+}
+
+func (o *testData) Set(key, value string) {
+	o.entries[key] = value
+>>>>>>> upstream/v16.0/forgejo
 }
 
 func (o *testData) SetDefault(key, value string) {
@@ -477,41 +499,65 @@ func (o *testData) SetDefault(key, value string) {
 }
 
 func (o *testData) Get(key string) string {
+<<<<<<< HEAD
 	return o.own[key]
 }
 
 func (o *testData) Has(key string) bool {
 	_, has := o.own[key]
+=======
+	return o.entries[key]
+}
+
+func (o *testData) Has(key string) bool {
+	_, has := o.entries[key]
+>>>>>>> upstream/v16.0/forgejo
 	return has
 }
 
 func (o *testData) String() string {
 	var s []string
+<<<<<<< HEAD
 	s = append(s, o.shared.String())
 	for k, e := range o.own {
+=======
+	for k, e := range o.entries {
+>>>>>>> upstream/v16.0/forgejo
 		s = append(s, fmt.Sprintf("%s:%s", k, e))
 	}
 	slices.Sort(s)
 	return strings.Join(s, ",")
 }
 
+<<<<<<< HEAD
 func newTestData(own map[string]string, shared *sharedData) *testData {
 	testData := &testData{
 		own:    make(map[string]string, 10),
 		shared: shared,
 	}
 	for key, value := range own {
+=======
+func newTestData(data map[string]string) *testData {
+	testData := &testData{
+		entries: make(map[string]string, 10),
+	}
+	for key, value := range data {
+>>>>>>> upstream/v16.0/forgejo
 		testData.Set(key, value)
 	}
 	return testData
 }
 
 func (o *testData) Clone() *testData {
+<<<<<<< HEAD
 	sharedClone := o.shared.Clone()
 	return &testData{
 		own:    maps.Clone(o.own),
 		shared: &sharedClone,
 	}
+=======
+	return &testData{entries: maps.Clone(o.entries)}
+>>>>>>> upstream/v16.0/forgejo
 }
 
 type testCase struct {
