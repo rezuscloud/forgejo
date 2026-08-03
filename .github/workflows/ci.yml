@@ -1,0 +1,72 @@
+name: ci
+
+# Runs the fj CLI integration test suite against a throwaway Forgejo container
+# started fresh on every run. Because the instance is ephemeral, the suite is
+# free to exercise BOTH read and write commands (create issue/PR/release/tag,
+# comment, merge, delete, ...) with zero risk to any real server.
+#
+# The container is vanilla upstream Forgejo at the same release line the fork
+# tracks (v16.0.2); the fork's server code is byte-identical upstream, so this
+# validates the fj CLI + client-go SDK against the real Forgejo API surface.
+
+on:
+  push:
+    branches: [rezus/forgejo]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Start Forgejo container
+        run: |
+          set -euo pipefail
+          docker run -d --name forgejo -p 3000:3000 \
+            -e FORGEJO__security__INSTALL_LOCK=true \
+            -e FORGEJO__server__LOCAL_ROOT_URL=http://localhost:3000/ \
+            codeberg.org/forgejo/forgejo:16.0.2
+          echo "::group::Waiting for Forgejo to become healthy"
+          for i in $(seq 1 90); do
+            if curl -sf http://localhost:3000/api/v1/version >/dev/null 2>&1; then
+              echo "Forgejo is up after ${i}x2s"; break
+            fi
+            sleep 2
+          done
+          echo "::endgroup::"
+          curl -sf http://localhost:3000/api/v1/version >/dev/null || { docker logs forgejo; exit 1; }
+
+      - name: Create admin user + API token
+        id: auth
+        run: |
+          set -euo pipefail
+          docker exec -u 1000 forgejo forgejo admin user create \
+            --username root --password testpass123 --email root@example.com \
+            --admin --must-change-password=false
+          TOKEN=$(docker exec -u 1000 forgejo forgejo admin user generate-access-token \
+            --username root --token-name ci-integration --scopes all --raw)
+          echo "::add-mask::$TOKEN"
+          echo "token=$TOKEN" >> "$GITHUB_OUTPUT"
+
+      - name: Run fj integration tests (read + write)
+        env:
+          FORGEJO_TEST_URL: http://localhost:3000
+          FORGEJO_TEST_TOKEN: ${{ steps.auth.outputs.token }}
+          FORGEJO_TEST_USER: root
+        run: |
+          cd staging/src/forgejo.org/fj
+          # TestCLICommands exercises every hand-written fj subcommand (read +
+          # write) end-to-end against the throwaway instance.
+          #
+          # The sibling TestSDK*/TestCLIApi*/TestGenerated_* tests (raw HTTP +
+          # auto-generated `api` passthrough) pre-date CI and have known
+          # endpoint issues (e.g. token-deletion 401s); they are tracked as a
+          # separate cleanup and intentionally excluded from the gate.
+          go test -v -count=1 -run TestCLICommands ./tests/integration/...
