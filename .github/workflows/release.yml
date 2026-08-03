@@ -138,7 +138,9 @@ jobs:
             -o "dist/fj-${{ matrix.goos }}-${{ matrix.goarch }}" ./cmd/fj
           tar -C dist -czf "dist/fj-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz" "fj-${{ matrix.goos }}-${{ matrix.goarch }}"
       - name: Verify stamped version
-        if: matrix.goos == 'linux'
+        # Only verify the binary that can run on the amd64 runner; arm64 is
+        # cross-compiled and cannot execute here.
+        if: matrix.goos == 'linux' && matrix.goarch == 'amd64'
         run: "./dist/fj-linux-${{ matrix.goarch }} version --client"
       - uses: actions/upload-artifact@v4
         with:
@@ -154,7 +156,7 @@ jobs:
       - uses: actions/setup-go@v5
         with: { go-version-file: go.mod }
       - name: Generate Repository Intelligence Graph (RIG)
-        uses: rezuscloud/llm-wiki/.github/actions/repo-map@792d3404060b4b201ef78ba4396fdc33cc6eb47f
+        uses: tibrezus/llm-wiki/.github/actions/repo-map@792d3404060b4b201ef78ba4396fdc33cc6eb47f
         with:
           language: go
           repo-path: .
