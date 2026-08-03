@@ -156,7 +156,7 @@ jobs:
       - uses: actions/setup-go@v5
         with: { go-version-file: go.mod }
       - name: Generate Repository Intelligence Graph (RIG)
-        uses: tibrezus/llm-wiki/.github/actions/repo-map@792d3404060b4b201ef78ba4396fdc33cc6eb47f
+        uses: tibrezus/llm-wiki/.github/actions/repo-map@2b22cbe6273aac7ad9fe9e88f3452947c54f2d81
         with:
           language: go
           repo-path: .
