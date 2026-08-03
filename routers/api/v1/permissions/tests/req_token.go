@@ -13,6 +13,7 @@ import (
 var _ = registerFunctionTest(apiv1_permissions.ReqToken, functionTest{
 	testCases: []*testCase{
 		{
+<<<<<<< HEAD
 			// pass because the doer is authenticated with a token
 			data: newTestData(map[string]string{}, newSharedData().
 				SetDoer(),
@@ -30,11 +31,30 @@ var _ = registerFunctionTest(apiv1_permissions.ReqToken, functionTest{
 			data: newTestData(map[string]string{}, newSharedData().
 				SetAnonymous(true),
 			),
+=======
+			data: newTestData(map[string]string{
+				"doer": "doerregular",
+			}),
+		},
+		{
+			data: newTestData(map[string]string{
+				"doer": user_model.ActionsUserName,
+			}),
+		},
+		{
+			data: newTestData(map[string]string{
+				"doer": "anonymous",
+			}),
+>>>>>>> upstream/v16.0/forgejo
 			error: "token is required",
 		},
 	},
 	fulfillNeeds: func(t *testing.T, data *testData) {
 		t.Helper()
+<<<<<<< HEAD
 		data.shared.SetDoerDefault()
+=======
+		data.SetDefault("doer", "doerregular")
+>>>>>>> upstream/v16.0/forgejo
 	},
 })

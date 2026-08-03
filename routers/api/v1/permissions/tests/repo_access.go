@@ -13,6 +13,7 @@ import (
 var _ = registerFunctionTest(apiv1_permissions.RepoAccess, functionTest{
 	testCases: []*testCase{
 		{
+<<<<<<< HEAD
 			// The authenticated doer can access to a publicly
 			// readable repository
 			data: newTestData(map[string]string{}, newSharedData().
@@ -88,13 +89,73 @@ var _ = registerFunctionTest(apiv1_permissions.RepoAccess, functionTest{
 				SetDoerActionsIsForkPullRequest(true).
 				SetRepository(),
 			),
+=======
+			data: newTestData(map[string]string{
+				"doer":       "doerregular",
+				"repository": "userowner/repositorypublic",
+			}),
+		},
+		{
+			data: newTestData(map[string]string{
+				"doer":       "anonymous",
+				"repository": "userowner/repositorypublic",
+			}),
+		},
+		{
+			data: newTestData(map[string]string{
+				"doer":       "doeradmin",
+				"repository": "userowner/repositoryprivate",
+			}),
+		},
+		{
+			data: newTestData(map[string]string{
+				"doer":       "doerregular",
+				"repository": "userowner/repositoryprivate",
+			}),
+			error: "Not Found",
+		},
+		{
+			data: newTestData(map[string]string{
+				"doer":       "anonymous",
+				"repository": "userowner/repositoryprivate",
+			}),
+			error: "Not Found",
+		},
+		{
+			data: newTestData(map[string]string{
+				"doer":       user_model.ActionsUserName,
+				"repository": "userowner/repositorypublic",
+			}),
+		},
+		{
+			data: newTestData(map[string]string{
+				"doer":        user_model.ActionsUserName,
+				"repository":  "userowner/repositorypublic",
+				"task.RepoID": "unrelated",
+			}),
+			error: "Not Found",
+		},
+		{
+			data: newTestData(map[string]string{
+				"doer":                   user_model.ActionsUserName,
+				"repository":             "userowner/repositorypublic",
+				"task.IsForkPullRequest": "true",
+			}),
+>>>>>>> upstream/v16.0/forgejo
 		},
 	},
 	fulfillNeeds: func(t *testing.T, data *testData) {
 		t.Helper()
+<<<<<<< HEAD
 		data.shared.SetRepositoryDefault()
 	},
 	interpret: func(t *testing.T, permissions *apiv1_permissions.Permissions, data *testData) {
 		fixtureSetRepository(t, permissions, data.shared.RepositoryName(), data.shared.RepositoryInit(), data.shared.RepositoryPrivate(), data.shared.RepositoryArchived())
+=======
+		data.SetDefault("repository", "userowner/repositorypublic")
+	},
+	interpret: func(t *testing.T, permissions *apiv1_permissions.Permissions, data *testData) {
+		fixtureSetRepository(t, permissions, data)
+>>>>>>> upstream/v16.0/forgejo
 	},
 })

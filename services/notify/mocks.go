@@ -556,6 +556,7 @@ func (_c *MockNotifier_DeleteIssue_Call) RunAndReturn(run func(ctx context.Conte
 	return _c
 }
 
+<<<<<<< HEAD
 // DeleteReaction provides a mock function for the type MockNotifier
 func (_mock *MockNotifier) DeleteReaction(ctx context.Context, reaction *issues.Reaction) {
 	_mock.Called(ctx, reaction)
@@ -602,6 +603,8 @@ func (_c *MockNotifier_DeleteReaction_Call) RunAndReturn(run func(ctx context.Co
 	return _c
 }
 
+=======
+>>>>>>> upstream/v16.0/forgejo
 // DeleteRef provides a mock function for the type MockNotifier
 func (_mock *MockNotifier) DeleteRef(ctx context.Context, doer *user.User, repo1 *repo.Repository, refFullName git.RefName) {
 	_mock.Called(ctx, doer, repo1, refFullName)
@@ -1646,6 +1649,7 @@ func (_c *MockNotifier_NewPullRequest_Call) RunAndReturn(run func(ctx context.Co
 	return _c
 }
 
+<<<<<<< HEAD
 // NewReaction provides a mock function for the type MockNotifier
 func (_mock *MockNotifier) NewReaction(ctx context.Context, reaction *issues.Reaction) {
 	_mock.Called(ctx, reaction)
@@ -1692,6 +1696,8 @@ func (_c *MockNotifier_NewReaction_Call) RunAndReturn(run func(ctx context.Conte
 	return _c
 }
 
+=======
+>>>>>>> upstream/v16.0/forgejo
 // NewRelease provides a mock function for the type MockNotifier
 func (_mock *MockNotifier) NewRelease(ctx context.Context, rel *repo.Release) {
 	_mock.Called(ctx, rel)

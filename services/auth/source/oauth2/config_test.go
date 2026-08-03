@@ -10,10 +10,18 @@ import (
 	"forgejo.org/modules/test"
 	"forgejo.org/services/auth/source/oauth2"
 
+<<<<<<< HEAD
 	"github.com/stretchr/testify/require"
 )
 
 // regression #13478
+=======
+	"github.com/markbates/goth/gothic"
+	"github.com/stretchr/testify/require"
+)
+
+// regressions: Components used even if OAuth2 disabled
+>>>>>>> upstream/v16.0/forgejo
 func TestOAuth2Disabled(t *testing.T) {
 	cfg, _ := setting.NewConfigProviderFromData(`
 [oauth2]
@@ -22,5 +30,13 @@ ENABLED=false
 	defer test.MockVariableValue(&setting.CfgProvider, cfg)()
 	setting.LoadCommonSettings()
 	err := oauth2.Init(t.Context())
+<<<<<<< HEAD
 	require.NoError(t, err)
+=======
+	// #13478
+	require.NoError(t, err)
+
+	// #13561 #13563
+	require.IsType(t, &oauth2.SessionsStore{}, gothic.Store)
+>>>>>>> upstream/v16.0/forgejo
 }

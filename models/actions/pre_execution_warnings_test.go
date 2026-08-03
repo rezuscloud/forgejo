@@ -4,6 +4,10 @@
 package actions
 
 import (
+<<<<<<< HEAD
+=======
+	"html/template"
+>>>>>>> upstream/v16.0/forgejo
 	"testing"
 
 	"forgejo.org/modules/translation"
@@ -18,7 +22,11 @@ func TestTranslatePreExecutionWarning(t *testing.T) {
 	tests := []struct {
 		name     string
 		run      *ActionRun
+<<<<<<< HEAD
 		expected []string
+=======
+		expected []template.HTML
+>>>>>>> upstream/v16.0/forgejo
 	}{
 		{
 			name:     "no warning",
@@ -26,6 +34,19 @@ func TestTranslatePreExecutionWarning(t *testing.T) {
 			expected: nil,
 		},
 		{
+<<<<<<< HEAD
+=======
+			name: "unexpected warning",
+			run: &ActionRun{
+				PreExecutionWarningCodes: []PreExecutionWarning{-10000},
+				PreExecutionWarningDetails: [][]any{
+					{"<img src=x onerror=alert(document.domain)>"},
+				},
+			},
+			expected: []template.HTML{"unsupported warning: code=-10000 details=[]interface {}{&#34;&lt;img src=x onerror=alert(document.domain)&gt;&#34;}"},
+		},
+		{
+>>>>>>> upstream/v16.0/forgejo
 			name: "WarningCodePermissions",
 			run: &ActionRun{
 				PreExecutionWarningCodes: []PreExecutionWarning{WarningCodePermissions},
@@ -33,7 +54,22 @@ func TestTranslatePreExecutionWarning(t *testing.T) {
 					{"job1", "https://forgejo.org/docs/latest/user/authorized-integrations/"},
 				},
 			},
+<<<<<<< HEAD
 			expected: []string{"Job <code>job1</code> or its workflow has a <code>permissions</code> field, which is not supported in Forgejo and will be ignored. Use <a href=\"https://forgejo.org/docs/latest/user/authorized-integrations/\">Authorized Integrations</a> to grant capabilities to this job instead."},
+=======
+			expected: []template.HTML{"Job <code>job1</code> or its workflow has a <code>permissions</code> field, which is not supported in Forgejo and will be ignored. Use <a href=\"https://forgejo.org/docs/latest/user/authorized-integrations/\">Authorized Integrations</a> to grant capabilities to this job instead."},
+		},
+		{
+			name: "WarningCodePermissionsEncoding",
+			run: &ActionRun{
+				PreExecutionWarningCodes: []PreExecutionWarning{WarningCodePermissions},
+				PreExecutionWarningDetails: [][]any{
+					// job IDs are arbitrary YAML strings, even though we don't often treat them this way:
+					{"<img src=x onerror=alert(document.domain)>", "https://forgejo.org/docs/latest/user/authorized-integrations/"},
+				},
+			},
+			expected: []template.HTML{"Job <code>&lt;img src=x onerror=alert(document.domain)&gt;</code> or its workflow has a <code>permissions</code> field, which is not supported in Forgejo and will be ignored. Use <a href=\"https://forgejo.org/docs/latest/user/authorized-integrations/\">Authorized Integrations</a> to grant capabilities to this job instead."},
+>>>>>>> upstream/v16.0/forgejo
 		},
 		{
 			name: "MultipleWarnings",
@@ -44,7 +80,11 @@ func TestTranslatePreExecutionWarning(t *testing.T) {
 					{"job4", "https://forgejo.org/docs/latest/user/authorized-integrations/"},
 				},
 			},
+<<<<<<< HEAD
 			expected: []string{
+=======
+			expected: []template.HTML{
+>>>>>>> upstream/v16.0/forgejo
 				"Job <code>job1</code> or its workflow has a <code>permissions</code> field, which is not supported in Forgejo and will be ignored. Use <a href=\"https://forgejo.org/docs/latest/user/authorized-integrations/\">Authorized Integrations</a> to grant capabilities to this job instead.",
 				"Job <code>job4</code> or its workflow has a <code>permissions</code> field, which is not supported in Forgejo and will be ignored. Use <a href=\"https://forgejo.org/docs/latest/user/authorized-integrations/\">Authorized Integrations</a> to grant capabilities to this job instead.",
 			},

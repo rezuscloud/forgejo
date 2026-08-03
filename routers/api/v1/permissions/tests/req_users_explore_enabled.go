@@ -13,6 +13,7 @@ import (
 var _ = registerFunctionTest(apiv1_permissions.ReqUsersExploreEnabled, functionTest{
 	testCases: []*testCase{
 		{
+<<<<<<< HEAD
 			// pass because the Service.Explore.DisableUsersPage setting is false by default
 			data: newTestData(map[string]string{}, newSharedData()),
 		},
@@ -21,6 +22,14 @@ var _ = registerFunctionTest(apiv1_permissions.ReqUsersExploreEnabled, functionT
 			data: newTestData(map[string]string{
 				"Service.Explore.DisableUsersPage": "true",
 			}, newSharedData()),
+=======
+			data: newTestData(map[string]string{}),
+		},
+		{
+			data: newTestData(map[string]string{
+				"Service.Explore.DisableUsersPage": "true",
+			}),
+>>>>>>> upstream/v16.0/forgejo
 			error: "Not Found",
 		},
 	},

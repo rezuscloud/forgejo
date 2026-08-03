@@ -16,6 +16,7 @@ import (
 var _ = registerFunctionTest(apiv1_permissions.ReqOrgOwnership, functionTest{
 	testCases: []*testCase{
 		{
+<<<<<<< HEAD
 			// pass because the doer is the owner of the org
 			data: newTestData(map[string]string{
 				"org":    "ReqOrgOwnershipOrg",
@@ -74,6 +75,55 @@ var _ = registerFunctionTest(apiv1_permissions.ReqOrgOwnership, functionTest{
 			data: newTestData(map[string]string{
 				"setOrg": "true",
 			}, newSharedData()),
+=======
+			data: newTestData(map[string]string{
+				"org":    "ReqOrgOwnershipOrg",
+				"setOrg": "true",
+			}),
+		},
+		{
+			data: newTestData(map[string]string{
+				"doer":   "doeradmin",
+				"setOrg": "true",
+			}),
+		},
+		{
+			data: newTestData(map[string]string{
+				"org":    "ReqOrgOwnershipOrg",
+				"doer":   "regularuser",
+				"setOrg": "true",
+			}),
+		},
+		{
+			data: newTestData(map[string]string{
+				"org":      "ReqOrgOwnershipOrg",
+				"orgOwner": "ReqOrgOwnershipOrgOwner",
+				"doer":     "regularuser",
+				"setOrg":   "true",
+			}),
+			error: "Must be an organization owner",
+		},
+		{
+			data: newTestData(map[string]string{
+				"org":     "ReqOrgOwnershipOrg",
+				"doer":    "regularuser",
+				"setTeam": "true",
+			}),
+		},
+		{
+			data: newTestData(map[string]string{
+				"org":      "ReqOrgOwnershipOrg",
+				"orgOwner": "ReqOrgOwnershipOrgOwner",
+				"doer":     "regularuser",
+				"setTeam":  "true",
+			}),
+			error: "Not Found",
+		},
+		{
+			data: newTestData(map[string]string{
+				"setOrg": "true",
+			}),
+>>>>>>> upstream/v16.0/forgejo
 			error: "reqOrgOwnership: unprepared context",
 		},
 	},
@@ -88,7 +138,11 @@ var _ = registerFunctionTest(apiv1_permissions.ReqOrgOwnership, functionTest{
 		data.SetDefault("setOrg", "true")
 	},
 	interpret: func(t *testing.T, permissions *apiv1_permissions.Permissions, data *testData) {
+<<<<<<< HEAD
 		orgOwner := data.shared.DoerName()
+=======
+		orgOwner := data.Get("doer")
+>>>>>>> upstream/v16.0/forgejo
 		if data.Has("orgOwner") {
 			orgOwner = data.Get("orgOwner")
 		}

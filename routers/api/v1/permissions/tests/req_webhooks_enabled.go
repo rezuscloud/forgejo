@@ -13,6 +13,7 @@ import (
 var _ = registerFunctionTest(apiv1_permissions.ReqWebhooksEnabled, functionTest{
 	testCases: []*testCase{
 		{
+<<<<<<< HEAD
 			// pass because the DisableWebhooks setting is false by default
 			data: newTestData(map[string]string{}, newSharedData()),
 		},
@@ -21,6 +22,14 @@ var _ = registerFunctionTest(apiv1_permissions.ReqWebhooksEnabled, functionTest{
 			data: newTestData(map[string]string{
 				"DisableWebhooks": "true",
 			}, newSharedData()),
+=======
+			data: newTestData(map[string]string{}),
+		},
+		{
+			data: newTestData(map[string]string{
+				"DisableWebhooks": "true",
+			}),
+>>>>>>> upstream/v16.0/forgejo
 			error: "webhooks disabled by administrator",
 		},
 	},
