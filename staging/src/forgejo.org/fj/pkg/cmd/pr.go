@@ -19,6 +19,7 @@ func newPrCmd() *cobra.Command {
 	cmd.AddCommand(newPrViewCmd())
 	cmd.AddCommand(newPrCreateCmd())
 	cmd.AddCommand(newPrMergeCmd())
+	cmd.AddCommand(newPrStatusCmd())
 	return cmd
 }
 
@@ -122,6 +123,7 @@ func newPrCreateCmd() *cobra.Command {
 
 func newPrMergeCmd() *cobra.Command {
 	var style string
+	var deleteBranch bool
 	cmd := &cobra.Command{
 		Use:   "merge <INDEX>",
 		Short: "Merge a pull request",
@@ -135,16 +137,85 @@ func newPrMergeCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			body := &forgejo.MergePullRequestOption{Do: style}
+			body := &forgejo.MergePullRequestOption{
+				Do:                     style,
+				DeleteBranchAfterMerge: deleteBranch,
+			}
 			_, err = c.Repo.RepoMergePullRequest(context.Background(), owner, repo, index, body)
 			if err != nil {
 				return err
 			}
-			fmt.Printf("Merged #%d (%s)\n", index, style)
+			extra := ""
+			if deleteBranch {
+				extra = " (branch deleted)"
+			}
+			fmt.Printf("Merged #%d (%s)%s\n", index, style, extra)
 			return nil
 		},
 	}
 	cmd.Flags().StringVarP(&style, "style", "s", "merge", "merge style (merge/rebase/squash/rebase-merge/fast-forward-only)")
+	cmd.Flags().BoolVarP(&deleteBranch, "delete-branch", "d", false, "delete the head branch after merging")
 	return cmd
 }
 
+// newPrStatusCmd shows the CI status checks for a pull request's head commit.
+// It resolves the PR's head SHA, then fetches the combined commit status.
+func newPrStatusCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "status <INDEX>",
+		Short: "Show CI status checks for a pull request",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			index, err := strconv.ParseInt(args[0], 10, 64)
+			if err != nil {
+				return fmt.Errorf("invalid PR number: %s", args[0])
+			}
+			c, owner, repo, err := resolveClient(cmd)
+			if err != nil {
+				return err
+			}
+			pr, _, err := c.Repo.RepoGetPullRequest(context.Background(), owner, repo, index)
+			if err != nil {
+				return err
+			}
+			sha := ""
+			ref := ""
+			if pr.Head != nil {
+				sha = pr.Head.Sha
+				ref = pr.Head.Sha
+				if ref == "" {
+					ref = pr.Head.Ref
+				}
+			}
+			if ref == "" {
+				return fmt.Errorf("could not determine head SHA for PR #%d", index)
+			}
+			cs, _, err := c.Repo.RepoGetCombinedStatusByRef(context.Background(), owner, repo, ref, 1, 50)
+			if err != nil {
+				return err
+			}
+			overall := commitStateStr(cs.State)
+			fmt.Printf("#%d %s\n", pr.Number, pr.Title)
+			if sha != "" {
+				fmt.Printf("Head: %s\n", sha)
+			}
+			fmt.Printf("Overall: %s %s\n", statusSymbol(overall), overall)
+			if len(cs.Statuses) == 0 {
+				fmt.Println("no status checks reported")
+				return nil
+			}
+			fmt.Println()
+			for _, st := range cs.Statuses {
+				state := commitStateStr(st.Status)
+				fmt.Printf("  %s %-9s %s\n", statusSymbol(state), state, st.Context)
+				if st.Description != "" {
+					fmt.Printf("      %s\n", st.Description)
+				}
+				if st.TargetUrl != "" {
+					fmt.Printf("      %s\n", st.TargetUrl)
+				}
+			}
+			return nil
+		},
+	}
+}

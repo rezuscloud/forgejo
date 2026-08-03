@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	forgejo "forgejo.org/client-go"
 	"forgejo.org/fj/internal/client"
@@ -78,6 +79,25 @@ func valI64(p *int64) int64 {
 func stateStr(s *forgejo.StateType) string {
 	if s == nil {
 		return ""
+	}
+	return string(*s)
+}
+
+// timeStr formats an optional timestamp for display ("" if absent/zero).
+func timeStr(t *time.Time) string {
+	if t == nil || t.IsZero() {
+		return ""
+	}
+	return t.Format(time.RFC3339)
+}
+
+// commitStateStr safely stringifies a *CommitStatusState, treating nil or
+// empty-string as "unknown". Forgejo can return an empty status for checks
+// attached to a superseded SHA (e.g. after a force-push); this must never
+// crash or be passed raw to the renderer.
+func commitStateStr(s *forgejo.CommitStatusState) string {
+	if s == nil || string(*s) == "" {
+		return "unknown"
 	}
 	return string(*s)
 }

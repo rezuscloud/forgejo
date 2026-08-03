@@ -1,6 +1,5 @@
 package cmd
 
-
 import (
 	"context"
 	"fmt"
@@ -13,8 +12,8 @@ import (
 
 func newIssueCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "issue",
-		Short: "Manage issues",
+		Use:     "issue",
+		Short:   "Manage issues",
 		Aliases: []string{"issues"},
 	}
 	cmd.AddCommand(newIssueListCmd())
@@ -44,7 +43,7 @@ func newIssueListCmd() *cobra.Command {
 				return nil
 			}
 			for _, is := range issues {
-				fmt.Printf("#%d %s [%s] %s\n", is.Id, statusSymbol(stateStr(is.State)), stateStr(is.State), is.Title)
+				fmt.Printf("#%d %s [%s] %s\n", is.Number, statusSymbol(stateStr(is.State)), stateStr(is.State), is.Title)
 			}
 			return nil
 		},
@@ -54,7 +53,8 @@ func newIssueListCmd() *cobra.Command {
 }
 
 func newIssueViewCmd() *cobra.Command {
-	return &cobra.Command{
+	var showComments bool
+	cmd := &cobra.Command{
 		Use:   "view <INDEX>",
 		Short: "View an issue",
 		Args:  cobra.ExactArgs(1),
@@ -71,10 +71,31 @@ func newIssueViewCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Printf("#%d %s\n", is.Id, is.Title)
+			fmt.Printf("#%d %s\n", is.Number, is.Title)
 			fmt.Printf("State: %s\n", stateStr(is.State))
 			if is.Body != "" {
 				fmt.Printf("\n%s\n", is.Body)
+			}
+			if showComments {
+				comments, _, err := c.Repo.IssueGetComments(context.Background(), owner, repo, index, time.Time{}, time.Time{})
+				if err != nil {
+					return fmt.Errorf("fetch comments: %w", err)
+				}
+				fmt.Printf("\n— Comments (%d) —\n", len(comments))
+				for _, cm := range comments {
+					author := "unknown"
+					if cm.User != nil && cm.User.Login != "" {
+						author = cm.User.Login
+					}
+					if ts := timeStr(cm.CreatedAt); ts != "" {
+						fmt.Printf("\n[%s] %s:\n", ts, author)
+					} else {
+						fmt.Printf("\n%s:\n", author)
+					}
+					if cm.Body != "" {
+						fmt.Println(cm.Body)
+					}
+				}
 			}
 			if is.HtmlUrl != "" {
 				fmt.Printf("\nView online at %s\n", is.HtmlUrl)
@@ -82,6 +103,8 @@ func newIssueViewCmd() *cobra.Command {
 			return nil
 		},
 	}
+	cmd.Flags().BoolVarP(&showComments, "comments", "c", false, "show the comment thread")
+	return cmd
 }
 
 func newIssueCreateCmd() *cobra.Command {
@@ -104,7 +127,7 @@ func newIssueCreateCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Printf("Created #%d: %s\n", is.Id, is.Title)
+			fmt.Printf("Created #%d: %s\n", is.Number, is.Title)
 			return nil
 		},
 	}
@@ -170,4 +193,3 @@ func newIssueCloseCmd() *cobra.Command {
 		},
 	}
 }
-

@@ -40,7 +40,7 @@ func isTerminal() bool {
 	return (fi.Mode() & os.ModeCharDevice) != 0
 }
 
-// statusSymbol returns a colored status glyph for action/issue/PR states.
+// statusSymbol returns a colored status glyph for action/issue/PR/commit states.
 func statusSymbol(status string) string {
 	if !colorEnabled {
 		return plainStatusSymbol(status)
@@ -48,9 +48,9 @@ func statusSymbol(status string) string {
 	switch status {
 	case "success", "open", "merged":
 		return green.Sprint("✓")
-	case "failure", "closed":
+	case "failure", "closed", "error":
 		return red.Sprint("✗")
-	case "running":
+	case "running", "pending", "warning":
 		return yellow.Sprint("●")
 	case "waiting", "queued", "blocked":
 		return grey.Sprint("⋯")
@@ -65,10 +65,12 @@ func plainStatusSymbol(status string) string {
 	switch status {
 	case "success", "open", "merged":
 		return "OK"
-	case "failure", "closed":
+	case "failure", "closed", "error":
 		return "FAIL"
-	case "running":
+	case "running", "pending":
 		return "RUN"
+	case "warning":
+		return "WARN"
 	case "waiting", "queued", "blocked":
 		return "WAIT"
 	case "cancelled", "skipped":
