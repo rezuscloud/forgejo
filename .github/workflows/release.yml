@@ -19,7 +19,7 @@ on:
       distribution_file:
         description: Release metadata file under distributions/
         required: true
-        default: distributions/forgejo-16.0.0-rc.1.env
+        default: distributions/forgejo-16.0.2.env
 
 jobs:
   prepare:
