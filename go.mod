@@ -237,6 +237,8 @@ require (
 	github.com/sorairolake/lzip-go v0.3.8 // indirect
 	github.com/sourcegraph/go-ctags v0.0.0-20250729094530-349a251d78d8 // indirect
 	github.com/spf13/afero v1.15.0 // indirect
+	github.com/spf13/cobra v1.10.2 // indirect
+	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/tinylib/msgp v1.6.4 // indirect
@@ -265,3 +267,18 @@ replace github.com/mholt/archiver/v3 => code.forgejo.org/forgejo/archiver/v3 v3.
 replace github.com/gliderlabs/ssh => code.forgejo.org/forgejo/ssh v0.0.0-20241211213324-5fc306ca0616
 
 replace git.sr.ht/~mariusor/go-xsd-duration => code.forgejo.org/forgejo/go-xsd-duration v0.0.0-20220703122237-02e73435a078
+
+// In-tree staging modules: the Forgejo Go API client (forgejo.org/client-go,
+// the analogue of k8s.io/client-go) and the fj CLI command library
+// (forgejo.org/fj, the analogue of k8s.io/kubectl). Developed in staging/ and
+// referenced from the root module so cmd/fj (the fj binary, analogue of
+// cmd/kubectl) builds as part of the server module. See staging/README.md.
+require (
+	forgejo.org/client-go v0.0.0
+	forgejo.org/fj v0.0.0
+)
+
+replace (
+	forgejo.org/client-go => ./staging/src/forgejo.org/client-go
+	forgejo.org/fj => ./staging/src/forgejo.org/fj
+)

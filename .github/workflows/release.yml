@@ -1,0 +1,214 @@
+name: release
+
+# Rezuscloud Forgejo distribution release.
+#
+# This repo IS the Forgejo fork. It builds and releases as one unit:
+#   - server image  : built from the repo root via Dockerfile / Dockerfile.rootless
+#   - fj CLI binary : built from ./cmd/fj (the fj analogue of cmd/kubectl)
+#   - Helm chart    : packaged from charts/forgejo (vendored upstream + Rezuscloud overlay)
+#
+# PR VALIDATION (build + codegen + integration) runs centrally in k8s-config's
+# fork-maintenance CronJob BEFORE the sync PR is pushed. The fork repo keeps
+# only tag-triggered release logic — no per-PR CI jobs here.
+
+on:
+  push:
+    tags: ["forgejo-v*"]
+  workflow_dispatch:
+    inputs:
+      distribution_file:
+        description: Release metadata file under distributions/
+        required: true
+        default: distributions/forgejo-16.0.0-rc.1.env
+
+jobs:
+  prepare:
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/forgejo-v')
+    runs-on: ubuntu-latest
+    outputs:
+      distribution_file: ${{ steps.meta.outputs.distribution_file }}
+      release_version: ${{ steps.meta.outputs.release_version }}
+      chart_version: ${{ steps.meta.outputs.chart_version }}
+      image_repository: ${{ steps.meta.outputs.image_repository }}
+      chart_repository: ${{ steps.meta.outputs.chart_repository }}
+      chart_archive: ${{ steps.meta.outputs.chart_archive }}
+      short_sha: ${{ steps.meta.outputs.short_sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0, fetch-tags: true }
+      - id: meta
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
+            file='${{ inputs.distribution_file }}'
+          else
+            version="${GITHUB_REF_NAME#forgejo-v}"
+            file="distributions/forgejo-${version}.env"
+          fi
+          test -f "$file"
+          set -a; source "$file"; set +a
+          short_sha="$(git rev-parse --short=12 HEAD)"
+          {
+            echo "distribution_file=$file"
+            echo "release_version=$FORGEJO_RELEASE_VERSION"
+            echo "chart_version=$FORGEJO_CHART_VERSION"
+            echo "image_repository=$FORGEJO_IMAGE_REPOSITORY"
+            echo "chart_repository=$FORGEJO_CHART_OCI_REPOSITORY"
+            echo "chart_archive=forgejo-${FORGEJO_CHART_VERSION}.tgz"
+            echo "short_sha=$short_sha"
+          } >> "$GITHUB_OUTPUT"
+
+  build-server-images:
+    needs: prepare
+    runs-on: ubuntu-latest
+    permissions: { contents: read, packages: write }
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0, fetch-tags: true }
+      - name: Write VERSION (Forgejo embeds its version from this)
+        run: printf '%s\n' '${{ needs.prepare.outputs.release_version }}' > VERSION
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build & push server image (rootful)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          build-args: |
+            RELEASE_VERSION=${{ needs.prepare.outputs.release_version }}
+          tags: |
+            ${{ needs.prepare.outputs.image_repository }}:${{ needs.prepare.outputs.release_version }}
+            ${{ needs.prepare.outputs.image_repository }}:${{ needs.prepare.outputs.release_version }}-${{ needs.prepare.outputs.short_sha }}
+          labels: |
+            org.opencontainers.image.title=forgejo (rezuscloud release)
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.version=${{ needs.prepare.outputs.release_version }}
+      - name: Build & push server image (rootless)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile.rootless
+          platforms: linux/amd64,linux/arm64
+          push: true
+          build-args: |
+            RELEASE_VERSION=${{ needs.prepare.outputs.release_version }}
+          tags: |
+            ${{ needs.prepare.outputs.image_repository }}:${{ needs.prepare.outputs.release_version }}-rootless
+            ${{ needs.prepare.outputs.image_repository }}:${{ needs.prepare.outputs.release_version }}-${{ needs.prepare.outputs.short_sha }}-rootless
+          labels: |
+            org.opencontainers.image.title=forgejo rootless (rezuscloud release)
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.version=${{ needs.prepare.outputs.release_version }}
+
+  build-cli:
+    needs: prepare
+    runs-on: ubuntu-latest
+    permissions: { contents: read }
+    strategy:
+      matrix:
+        include:
+          - { goos: linux,  goarch: amd64 }
+          - { goos: linux,  goarch: arm64 }
+          - { goos: darwin, goarch: amd64 }
+          - { goos: darwin, goarch: arm64 }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with: { go-version-file: go.mod }
+      - name: Build fj (versioned to the Forgejo release)
+        shell: bash
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          CGO_ENABLED: "0"
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          go build -mod=mod -trimpath -ldflags "-s -w -X 'forgejo.org/fj/pkg/cmd.cliVersion=${{ needs.prepare.outputs.release_version }}'" \
+            -o "dist/fj-${{ matrix.goos }}-${{ matrix.goarch }}" ./cmd/fj
+          tar -C dist -czf "dist/fj-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz" "fj-${{ matrix.goos }}-${{ matrix.goarch }}"
+      - name: Verify stamped version
+        if: matrix.goos == 'linux'
+        run: "./dist/fj-linux-${{ matrix.goarch }} version --client"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fj-cli-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: dist/fj-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz
+
+  build-repo-map:
+    needs: prepare
+    runs-on: ubuntu-latest
+    permissions: { contents: read }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with: { go-version-file: go.mod }
+      - name: Generate Repository Intelligence Graph (RIG)
+        uses: rezuscloud/llm-wiki/.github/actions/repo-map@792d3404060b4b201ef78ba4396fdc33cc6eb47f
+        with:
+          language: go
+          repo-path: .
+          output-file: repo-map.json
+          focus-package-prefixes: |
+            forgejo.org/cmd/fj
+            forgejo.org/client-go
+            forgejo.org/fj
+      - uses: actions/upload-artifact@v4
+        with:
+          name: repo-map
+          path: repo-map.json
+
+  publish-chart-and-release:
+    needs: [prepare, build-server-images, build-cli, build-repo-map]
+    runs-on: ubuntu-latest
+    permissions: { contents: write, packages: write }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-helm@v4
+        with: { version: "v3.16.0" }
+      - run: helm dependency build charts/forgejo
+      - name: Package chart
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          helm package charts/forgejo \
+            --version '${{ needs.prepare.outputs.chart_version }}' \
+            --app-version '${{ needs.prepare.outputs.release_version }}' \
+            --destination dist
+      - name: Push chart to GHCR (Helm OCI)
+        run: |
+          echo '${{ secrets.GITHUB_TOKEN }}' | helm registry login ghcr.io -u '${{ github.actor }}' --password-stdin
+          helm push dist/${{ needs.prepare.outputs.chart_archive }} '${{ needs.prepare.outputs.chart_repository }}'
+      - uses: actions/download-artifact@v4
+        with: { pattern: fj-cli-*, merge-multiple: true, path: dist-cli }
+      - uses: actions/download-artifact@v4
+        with: { name: repo-map, path: dist-rig }
+      - name: Create GitHub release
+        if: startsWith(github.ref, 'refs/tags/forgejo-v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/${{ needs.prepare.outputs.chart_archive }}
+            dist-cli/fj-*.tar.gz
+            dist-rig/repo-map.json
+          generate_release_notes: true
+          body: |
+            Rezuscloud Forgejo distribution release (this repo is the Forgejo fork).
+
+            All artifacts share the same version:
+            - server image: `${{ needs.prepare.outputs.image_repository }}:${{ needs.prepare.outputs.release_version }}` (+ `-rootless`)
+            - fj CLI (Client Version matches the release): `fj-{linux,darwin}-{amd64,arm64}.tar.gz`
+            - OCI Helm chart: `${{ needs.prepare.outputs.chart_repository }}/forgejo:${{ needs.prepare.outputs.chart_version }}` (appVersion = release version)
+            - Repository Intelligence Graph (RIG): `repo-map.json` (deterministic architecture graph for the wiki C4D2 workflow)
+
+            k8s-style monorepo layout — see `staging/README.md`.
