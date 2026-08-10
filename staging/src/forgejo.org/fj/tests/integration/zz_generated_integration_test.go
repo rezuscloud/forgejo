@@ -17,7 +17,7 @@ func TestGenerated_Activitypub(t *testing.T) {
 	skipIfNoInstance(t)
 	binary := buildFjBinary(t)
 	t.Run("activitypubInstanceActor", func(t *testing.T) {
-		args := []string{"api", "activitypub", "activitypub-instance-actor"}
+		args := []string{"api", "activitypub", "instance-actor"}
 		out, err := runFj(t, binary, args...)
 		if err != nil {
 			// GET: 404/403 means resource doesn't exist — still proves the command works
@@ -35,7 +35,7 @@ func TestGenerated_Activitypub(t *testing.T) {
 		}
 	})
 	t.Run("activitypubInstanceActorInbox", func(t *testing.T) {
-		args := []string{"api", "activitypub", "activitypub-instance-actor-inbox"}
+		args := []string{"api", "activitypub", "instance-actor-inbox"}
 		out, err := runFj(t, binary, args...)
 		if err != nil {
 			// Write commands: accept any HTTP error (404/403/409/422)
@@ -45,7 +45,7 @@ func TestGenerated_Activitypub(t *testing.T) {
 		}
 	})
 	t.Run("activitypubInstanceActorOutbox", func(t *testing.T) {
-		args := []string{"api", "activitypub", "activitypub-instance-actor-outbox"}
+		args := []string{"api", "activitypub", "instance-actor-outbox"}
 		out, err := runFj(t, binary, args...)
 		if err != nil {
 			// Write commands: accept any HTTP error (404/403/409/422)
@@ -55,7 +55,7 @@ func TestGenerated_Activitypub(t *testing.T) {
 		}
 	})
 	t.Run("activitypubPerson", func(t *testing.T) {
-		args := []string{"api", "activitypub", "activitypub-person",
+		args := []string{"api", "activitypub", "person",
 			"--user-id", "1",
 		}
 		out, err := runFj(t, binary, args...)
@@ -75,7 +75,7 @@ func TestGenerated_Activitypub(t *testing.T) {
 		}
 	})
 	t.Run("activitypubPersonActivity", func(t *testing.T) {
-		args := []string{"api", "activitypub", "activitypub-person-activity",
+		args := []string{"api", "activitypub", "person-activity",
 			"--user-id", "1",
 			"--activity-id", "1",
 		}
@@ -96,7 +96,7 @@ func TestGenerated_Activitypub(t *testing.T) {
 		}
 	})
 	t.Run("activitypubPersonActivityNote", func(t *testing.T) {
-		args := []string{"api", "activitypub", "activitypub-person-activity-note",
+		args := []string{"api", "activitypub", "person-activity-note",
 			"--user-id", "1",
 			"--activity-id", "1",
 		}
@@ -117,7 +117,7 @@ func TestGenerated_Activitypub(t *testing.T) {
 		}
 	})
 	t.Run("activitypubPersonFeed", func(t *testing.T) {
-		args := []string{"api", "activitypub", "activitypub-person-feed",
+		args := []string{"api", "activitypub", "person-feed",
 			"--user-id", "1",
 		}
 		out, err := runFj(t, binary, args...)
@@ -137,7 +137,7 @@ func TestGenerated_Activitypub(t *testing.T) {
 		}
 	})
 	t.Run("activitypubPersonInbox", func(t *testing.T) {
-		args := []string{"api", "activitypub", "activitypub-person-inbox",
+		args := []string{"api", "activitypub", "person-inbox",
 			"--user-id", "1",
 		}
 		out, err := runFj(t, binary, args...)
@@ -149,7 +149,7 @@ func TestGenerated_Activitypub(t *testing.T) {
 		}
 	})
 	t.Run("activitypubRepository", func(t *testing.T) {
-		args := []string{"api", "activitypub", "activitypub-repository",
+		args := []string{"api", "activitypub", "repository",
 			"--repository-id", "1",
 		}
 		out, err := runFj(t, binary, args...)
@@ -169,7 +169,7 @@ func TestGenerated_Activitypub(t *testing.T) {
 		}
 	})
 	t.Run("activitypubRepositoryInbox", func(t *testing.T) {
-		args := []string{"api", "activitypub", "activitypub-repository-inbox",
+		args := []string{"api", "activitypub", "repository-inbox",
 			"--repository-id", "1",
 		}
 		out, err := runFj(t, binary, args...)
@@ -181,7 +181,7 @@ func TestGenerated_Activitypub(t *testing.T) {
 		}
 	})
 	t.Run("activitypubRepositoryOutbox", func(t *testing.T) {
-		args := []string{"api", "activitypub", "activitypub-repository-outbox",
+		args := []string{"api", "activitypub", "repository-outbox",
 			"--repository-id", "1",
 		}
 		out, err := runFj(t, binary, args...)
@@ -199,7 +199,7 @@ func TestGenerated_Admin(t *testing.T) {
 	skipIfNoInstance(t)
 	binary := buildFjBinary(t)
 	t.Run("adminAddRuleToQuotaGroup", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-add-rule-to-quota-group",
+		args := []string{"api", "admin", "add-rule-to-quota-group",
 			"--quotagroup", "1",
 			"--quotarule", "1",
 		}
@@ -212,7 +212,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminAddUserToQuotaGroup", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-add-user-to-quota-group",
+		args := []string{"api", "admin", "add-user-to-quota-group",
 			"--quotagroup", "1",
 			"--username", testUser(),
 		}
@@ -225,7 +225,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminAdoptRepository", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-adopt-repository",
+		args := []string{"api", "admin", "adopt-repository",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -238,7 +238,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminCreateHook", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-create-hook"}
+		args := []string{"api", "admin", "create-hook"}
 		out, err := runFj(t, binary, args...)
 		if err != nil {
 			// Write commands: accept any HTTP error (404/403/409/422)
@@ -248,7 +248,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminCreateOrg", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-create-org",
+		args := []string{"api", "admin", "create-org",
 			"--username", testUser(),
 		}
 		out, err := runFj(t, binary, args...)
@@ -260,7 +260,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminCreatePublicKey", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-create-public-key",
+		args := []string{"api", "admin", "create-public-key",
 			"--username", testUser(),
 		}
 		out, err := runFj(t, binary, args...)
@@ -272,7 +272,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminCreateQuotaGroup", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-create-quota-group"}
+		args := []string{"api", "admin", "create-quota-group"}
 		out, err := runFj(t, binary, args...)
 		if err != nil {
 			// Write commands: accept any HTTP error (404/403/409/422)
@@ -282,7 +282,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminCreateQuotaRule", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-create-quota-rule"}
+		args := []string{"api", "admin", "create-quota-rule"}
 		out, err := runFj(t, binary, args...)
 		if err != nil {
 			// Write commands: accept any HTTP error (404/403/409/422)
@@ -292,7 +292,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminCreateRepo", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-create-repo",
+		args := []string{"api", "admin", "create-repo",
 			"--username", testUser(),
 		}
 		out, err := runFj(t, binary, args...)
@@ -304,7 +304,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminCreateUser", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-create-user"}
+		args := []string{"api", "admin", "create-user"}
 		out, err := runFj(t, binary, args...)
 		if err != nil {
 			// Write commands: accept any HTTP error (404/403/409/422)
@@ -314,7 +314,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminCreateUserAccessToken", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-create-user-access-token",
+		args := []string{"api", "admin", "create-user-access-token",
 			"--username", testUser(),
 		}
 		out, err := runFj(t, binary, args...)
@@ -326,7 +326,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminCronList", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-cron-list",
+		args := []string{"api", "admin", "cron-list",
 			"--page", "1",
 			"--limit", "1",
 		}
@@ -347,7 +347,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminCronRun", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-cron-run",
+		args := []string{"api", "admin", "cron-run",
 			"--task", "1",
 		}
 		out, err := runFj(t, binary, args...)
@@ -359,7 +359,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminDeleteHook", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-delete-hook",
+		args := []string{"api", "admin", "delete-hook",
 			"--id", "1",
 		}
 		out, err := runFj(t, binary, args...)
@@ -371,7 +371,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminDeleteQuotaGroup", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-delete-quota-group",
+		args := []string{"api", "admin", "delete-quota-group",
 			"--quotagroup", "1",
 		}
 		out, err := runFj(t, binary, args...)
@@ -383,7 +383,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminDeleteQuotaRule", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-delete-quota-rule",
+		args := []string{"api", "admin", "delete-quota-rule",
 			"--quotarule", "1",
 		}
 		out, err := runFj(t, binary, args...)
@@ -395,7 +395,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminDeleteUnadoptedRepository", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-delete-unadopted-repository",
+		args := []string{"api", "admin", "delete-unadopted-repository",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -408,7 +408,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminDeleteUser", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-delete-user",
+		args := []string{"api", "admin", "delete-user",
 			"--username", testUser(),
 			"--purge", "1",
 		}
@@ -421,7 +421,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminDeleteUserAccessToken", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-delete-user-access-token",
+		args := []string{"api", "admin", "delete-user-access-token",
 			"--username", testUser(),
 			"--token", "1",
 		}
@@ -434,7 +434,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminDeleteUserEmails", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-delete-user-emails",
+		args := []string{"api", "admin", "delete-user-emails",
 			"--username", testUser(),
 		}
 		out, err := runFj(t, binary, args...)
@@ -446,7 +446,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminDeleteUserPublicKey", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-delete-user-public-key",
+		args := []string{"api", "admin", "delete-user-public-key",
 			"--username", testUser(),
 			"--id", "1",
 		}
@@ -459,7 +459,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminEditHook", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-edit-hook",
+		args := []string{"api", "admin", "edit-hook",
 			"--id", "1",
 		}
 		out, err := runFj(t, binary, args...)
@@ -471,7 +471,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminEditQuotaRule", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-edit-quota-rule",
+		args := []string{"api", "admin", "edit-quota-rule",
 			"--quotarule", "1",
 		}
 		out, err := runFj(t, binary, args...)
@@ -483,7 +483,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminEditUser", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-edit-user",
+		args := []string{"api", "admin", "edit-user",
 			"--username", testUser(),
 		}
 		out, err := runFj(t, binary, args...)
@@ -495,7 +495,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminGetActionRunJobs", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-get-action-run-jobs",
+		args := []string{"api", "admin", "get-action-run-jobs",
 			"--labels", "1",
 		}
 		out, err := runFj(t, binary, args...)
@@ -515,7 +515,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminGetAllEmails", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-get-all-emails",
+		args := []string{"api", "admin", "get-all-emails",
 			"--page", "1",
 			"--limit", "1",
 		}
@@ -536,7 +536,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminGetAllOrgs", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-get-all-orgs",
+		args := []string{"api", "admin", "get-all-orgs",
 			"--page", "1",
 			"--limit", "1",
 		}
@@ -557,7 +557,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminGetHook", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-get-hook",
+		args := []string{"api", "admin", "get-hook",
 			"--id", "1",
 		}
 		out, err := runFj(t, binary, args...)
@@ -577,7 +577,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminGetQuotaGroup", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-get-quota-group",
+		args := []string{"api", "admin", "get-quota-group",
 			"--quotagroup", "1",
 		}
 		out, err := runFj(t, binary, args...)
@@ -597,7 +597,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminGetQuotaRule", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-get-quota-rule",
+		args := []string{"api", "admin", "get-quota-rule",
 			"--quotarule", "1",
 		}
 		out, err := runFj(t, binary, args...)
@@ -617,7 +617,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminGetRegistrationToken", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-get-registration-token"}
+		args := []string{"api", "admin", "get-registration-token"}
 		out, err := runFj(t, binary, args...)
 		if err != nil {
 			// GET: 404/403 means resource doesn't exist — still proves the command works
@@ -635,7 +635,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminGetRunnerRegistrationToken", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-get-runner-registration-token"}
+		args := []string{"api", "admin", "get-runner-registration-token"}
 		out, err := runFj(t, binary, args...)
 		if err != nil {
 			// GET: 404/403 means resource doesn't exist — still proves the command works
@@ -653,7 +653,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminGetUserQuota", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-get-user-quota",
+		args := []string{"api", "admin", "get-user-quota",
 			"--username", testUser(),
 		}
 		out, err := runFj(t, binary, args...)
@@ -673,7 +673,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminListHooks", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-list-hooks",
+		args := []string{"api", "admin", "list-hooks",
 			"--page", "1",
 			"--limit", "1",
 		}
@@ -694,7 +694,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminListQuotaGroups", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-list-quota-groups"}
+		args := []string{"api", "admin", "list-quota-groups"}
 		out, err := runFj(t, binary, args...)
 		if err != nil {
 			// GET: 404/403 means resource doesn't exist — still proves the command works
@@ -712,7 +712,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminListQuotaRules", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-list-quota-rules"}
+		args := []string{"api", "admin", "list-quota-rules"}
 		out, err := runFj(t, binary, args...)
 		if err != nil {
 			// GET: 404/403 means resource doesn't exist — still proves the command works
@@ -730,7 +730,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminListUserAccessTokens", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-list-user-access-tokens",
+		args := []string{"api", "admin", "list-user-access-tokens",
 			"--username", testUser(),
 			"--page", "1",
 			"--limit", "1",
@@ -752,7 +752,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminListUserEmails", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-list-user-emails",
+		args := []string{"api", "admin", "list-user-emails",
 			"--username", testUser(),
 		}
 		out, err := runFj(t, binary, args...)
@@ -772,7 +772,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminListUsersInQuotaGroup", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-list-users-in-quota-group",
+		args := []string{"api", "admin", "list-users-in-quota-group",
 			"--quotagroup", "1",
 		}
 		out, err := runFj(t, binary, args...)
@@ -792,7 +792,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminRemoveRuleFromQuotaGroup", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-remove-rule-from-quota-group",
+		args := []string{"api", "admin", "remove-rule-from-quota-group",
 			"--quotagroup", "1",
 			"--quotarule", "1",
 		}
@@ -805,7 +805,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminRemoveUserFromQuotaGroup", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-remove-user-from-quota-group",
+		args := []string{"api", "admin", "remove-user-from-quota-group",
 			"--quotagroup", "1",
 			"--username", testUser(),
 		}
@@ -818,7 +818,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminRenameUser", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-rename-user",
+		args := []string{"api", "admin", "rename-user",
 			"--username", testUser(),
 		}
 		out, err := runFj(t, binary, args...)
@@ -830,7 +830,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminSearchEmails", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-search-emails",
+		args := []string{"api", "admin", "search-emails",
 			"--q", "1",
 			"--page", "1",
 			"--limit", "1",
@@ -852,7 +852,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminSearchRunJobs", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-search-run-jobs",
+		args := []string{"api", "admin", "search-run-jobs",
 			"--labels", "1",
 		}
 		out, err := runFj(t, binary, args...)
@@ -872,7 +872,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminSearchUsers", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-search-users",
+		args := []string{"api", "admin", "search-users",
 			"--source-id", "1",
 			"--login-name", "1",
 			"--is-2fa-enabled", "1",
@@ -897,7 +897,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminSetUserQuotaGroups", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-set-user-quota-groups",
+		args := []string{"api", "admin", "set-user-quota-groups",
 			"--username", testUser(),
 		}
 		out, err := runFj(t, binary, args...)
@@ -909,7 +909,7 @@ func TestGenerated_Admin(t *testing.T) {
 		}
 	})
 	t.Run("adminUnadoptedList", func(t *testing.T) {
-		args := []string{"api", "admin", "admin-unadopted-list",
+		args := []string{"api", "admin", "unadopted-list",
 			"--page", "1",
 			"--limit", "1",
 			"--pattern", "1",
@@ -2734,7 +2734,7 @@ func TestGenerated_Notify(t *testing.T) {
 	skipIfNoInstance(t)
 	binary := buildFjBinary(t)
 	t.Run("notifyGetList", func(t *testing.T) {
-		args := []string{"api", "notify", "notify-get-list",
+		args := []string{"api", "notify", "get-list",
 			"--all", "1",
 			"--status-types", "1",
 			"--subject-type", "1",
@@ -2760,7 +2760,7 @@ func TestGenerated_Notify(t *testing.T) {
 		}
 	})
 	t.Run("notifyGetThread", func(t *testing.T) {
-		args := []string{"api", "notify", "notify-get-thread",
+		args := []string{"api", "notify", "get-thread",
 			"--id", "1",
 		}
 		out, err := runFj(t, binary, args...)
@@ -2780,7 +2780,7 @@ func TestGenerated_Notify(t *testing.T) {
 		}
 	})
 	t.Run("notifyNewAvailable", func(t *testing.T) {
-		args := []string{"api", "notify", "notify-new-available"}
+		args := []string{"api", "notify", "new-available"}
 		out, err := runFj(t, binary, args...)
 		if err != nil {
 			// GET: 404/403 means resource doesn't exist — still proves the command works
@@ -2798,7 +2798,7 @@ func TestGenerated_Notify(t *testing.T) {
 		}
 	})
 	t.Run("notifyReadList", func(t *testing.T) {
-		args := []string{"api", "notify", "notify-read-list",
+		args := []string{"api", "notify", "read-list",
 			"--last-read-at", "1",
 			"--all", "1",
 			"--status-types", "1",
@@ -2813,7 +2813,7 @@ func TestGenerated_Notify(t *testing.T) {
 		}
 	})
 	t.Run("notifyReadThread", func(t *testing.T) {
-		args := []string{"api", "notify", "notify-read-thread",
+		args := []string{"api", "notify", "read-thread",
 			"--id", "1",
 			"--to-status", "1",
 		}
@@ -2983,7 +2983,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgBlockUser", func(t *testing.T) {
-		args := []string{"api", "org", "org-block-user",
+		args := []string{"api", "org", "block-user",
 			"--org", testUser(),
 			"--username", testUser(),
 		}
@@ -2996,7 +2996,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgCheckQuota", func(t *testing.T) {
-		args := []string{"api", "org", "org-check-quota",
+		args := []string{"api", "org", "check-quota",
 			"--org", testUser(),
 			"--subject", "1",
 		}
@@ -3017,7 +3017,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgConcealMember", func(t *testing.T) {
-		args := []string{"api", "org", "org-conceal-member",
+		args := []string{"api", "org", "conceal-member",
 			"--org", testUser(),
 			"--username", testUser(),
 		}
@@ -3030,7 +3030,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgCreate", func(t *testing.T) {
-		args := []string{"api", "org", "org-create"}
+		args := []string{"api", "org", "create"}
 		out, err := runFj(t, binary, args...)
 		if err != nil {
 			// Write commands: accept any HTTP error (404/403/409/422)
@@ -3040,7 +3040,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgCreateHook", func(t *testing.T) {
-		args := []string{"api", "org", "org-create-hook",
+		args := []string{"api", "org", "create-hook",
 			"--org", testUser(),
 		}
 		out, err := runFj(t, binary, args...)
@@ -3052,7 +3052,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgCreateLabel", func(t *testing.T) {
-		args := []string{"api", "org", "org-create-label",
+		args := []string{"api", "org", "create-label",
 			"--org", testUser(),
 		}
 		out, err := runFj(t, binary, args...)
@@ -3064,7 +3064,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgCreateTeam", func(t *testing.T) {
-		args := []string{"api", "org", "org-create-team",
+		args := []string{"api", "org", "create-team",
 			"--org", testUser(),
 		}
 		out, err := runFj(t, binary, args...)
@@ -3076,7 +3076,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgDelete", func(t *testing.T) {
-		args := []string{"api", "org", "org-delete",
+		args := []string{"api", "org", "delete",
 			"--org", testUser(),
 		}
 		out, err := runFj(t, binary, args...)
@@ -3088,7 +3088,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgDeleteAvatar", func(t *testing.T) {
-		args := []string{"api", "org", "org-delete-avatar",
+		args := []string{"api", "org", "delete-avatar",
 			"--org", testUser(),
 		}
 		out, err := runFj(t, binary, args...)
@@ -3100,7 +3100,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgDeleteHook", func(t *testing.T) {
-		args := []string{"api", "org", "org-delete-hook",
+		args := []string{"api", "org", "delete-hook",
 			"--org", testUser(),
 			"--id", "1",
 		}
@@ -3113,7 +3113,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgDeleteLabel", func(t *testing.T) {
-		args := []string{"api", "org", "org-delete-label",
+		args := []string{"api", "org", "delete-label",
 			"--org", testUser(),
 			"--id", "1",
 		}
@@ -3126,7 +3126,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgDeleteMember", func(t *testing.T) {
-		args := []string{"api", "org", "org-delete-member",
+		args := []string{"api", "org", "delete-member",
 			"--org", testUser(),
 			"--username", testUser(),
 		}
@@ -3139,7 +3139,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgEdit", func(t *testing.T) {
-		args := []string{"api", "org", "org-edit",
+		args := []string{"api", "org", "edit",
 			"--org", testUser(),
 		}
 		out, err := runFj(t, binary, args...)
@@ -3151,7 +3151,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgEditHook", func(t *testing.T) {
-		args := []string{"api", "org", "org-edit-hook",
+		args := []string{"api", "org", "edit-hook",
 			"--org", testUser(),
 			"--id", "1",
 		}
@@ -3164,7 +3164,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgEditLabel", func(t *testing.T) {
-		args := []string{"api", "org", "org-edit-label",
+		args := []string{"api", "org", "edit-label",
 			"--org", testUser(),
 			"--id", "1",
 		}
@@ -3177,7 +3177,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgGet", func(t *testing.T) {
-		args := []string{"api", "org", "org-get",
+		args := []string{"api", "org", "get",
 			"--org", testUser(),
 		}
 		out, err := runFj(t, binary, args...)
@@ -3197,7 +3197,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgGetAll", func(t *testing.T) {
-		args := []string{"api", "org", "org-get-all",
+		args := []string{"api", "org", "get-all",
 			"--page", "1",
 			"--limit", "1",
 		}
@@ -3218,7 +3218,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgGetHook", func(t *testing.T) {
-		args := []string{"api", "org", "org-get-hook",
+		args := []string{"api", "org", "get-hook",
 			"--org", testUser(),
 			"--id", "1",
 		}
@@ -3239,7 +3239,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgGetLabel", func(t *testing.T) {
-		args := []string{"api", "org", "org-get-label",
+		args := []string{"api", "org", "get-label",
 			"--org", testUser(),
 			"--id", "1",
 		}
@@ -3260,7 +3260,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgGetQuota", func(t *testing.T) {
-		args := []string{"api", "org", "org-get-quota",
+		args := []string{"api", "org", "get-quota",
 			"--org", testUser(),
 		}
 		out, err := runFj(t, binary, args...)
@@ -3280,7 +3280,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgGetRunnerRegistrationToken", func(t *testing.T) {
-		args := []string{"api", "org", "org-get-runner-registration-token",
+		args := []string{"api", "org", "get-runner-registration-token",
 			"--org", testUser(),
 		}
 		out, err := runFj(t, binary, args...)
@@ -3300,7 +3300,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgIsMember", func(t *testing.T) {
-		args := []string{"api", "org", "org-is-member",
+		args := []string{"api", "org", "is-member",
 			"--org", testUser(),
 			"--username", testUser(),
 		}
@@ -3313,7 +3313,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgIsPublicMember", func(t *testing.T) {
-		args := []string{"api", "org", "org-is-public-member",
+		args := []string{"api", "org", "is-public-member",
 			"--org", testUser(),
 			"--username", testUser(),
 		}
@@ -3326,7 +3326,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgListActionsSecrets", func(t *testing.T) {
-		args := []string{"api", "org", "org-list-actions-secrets",
+		args := []string{"api", "org", "list-actions-secrets",
 			"--org", testUser(),
 			"--page", "1",
 			"--limit", "1",
@@ -3348,7 +3348,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgListActivityFeeds", func(t *testing.T) {
-		args := []string{"api", "org", "org-list-activity-feeds",
+		args := []string{"api", "org", "list-activity-feeds",
 			"--org", testUser(),
 			"--date", "1",
 			"--page", "1",
@@ -3371,7 +3371,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgListBlockedUsers", func(t *testing.T) {
-		args := []string{"api", "org", "org-list-blocked-users",
+		args := []string{"api", "org", "list-blocked-users",
 			"--org", testUser(),
 			"--page", "1",
 			"--limit", "1",
@@ -3393,7 +3393,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgListHooks", func(t *testing.T) {
-		args := []string{"api", "org", "org-list-hooks",
+		args := []string{"api", "org", "list-hooks",
 			"--org", testUser(),
 			"--page", "1",
 			"--limit", "1",
@@ -3415,7 +3415,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgListLabels", func(t *testing.T) {
-		args := []string{"api", "org", "org-list-labels",
+		args := []string{"api", "org", "list-labels",
 			"--org", testUser(),
 			"--sort", "1",
 			"--page", "1",
@@ -3438,7 +3438,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgListMembers", func(t *testing.T) {
-		args := []string{"api", "org", "org-list-members",
+		args := []string{"api", "org", "list-members",
 			"--org", testUser(),
 			"--page", "1",
 			"--limit", "1",
@@ -3460,7 +3460,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgListPublicMembers", func(t *testing.T) {
-		args := []string{"api", "org", "org-list-public-members",
+		args := []string{"api", "org", "list-public-members",
 			"--org", testUser(),
 			"--page", "1",
 			"--limit", "1",
@@ -3482,7 +3482,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgListQuotaArtifacts", func(t *testing.T) {
-		args := []string{"api", "org", "org-list-quota-artifacts",
+		args := []string{"api", "org", "list-quota-artifacts",
 			"--org", testUser(),
 			"--page", "1",
 			"--limit", "1",
@@ -3504,7 +3504,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgListQuotaAttachments", func(t *testing.T) {
-		args := []string{"api", "org", "org-list-quota-attachments",
+		args := []string{"api", "org", "list-quota-attachments",
 			"--org", testUser(),
 			"--page", "1",
 			"--limit", "1",
@@ -3526,7 +3526,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgListQuotaPackages", func(t *testing.T) {
-		args := []string{"api", "org", "org-list-quota-packages",
+		args := []string{"api", "org", "list-quota-packages",
 			"--org", testUser(),
 			"--page", "1",
 			"--limit", "1",
@@ -3548,7 +3548,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgListRepos", func(t *testing.T) {
-		args := []string{"api", "org", "org-list-repos",
+		args := []string{"api", "org", "list-repos",
 			"--org", testUser(),
 			"--page", "1",
 			"--limit", "1",
@@ -3570,7 +3570,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgListTeams", func(t *testing.T) {
-		args := []string{"api", "org", "org-list-teams",
+		args := []string{"api", "org", "list-teams",
 			"--org", testUser(),
 			"--page", "1",
 			"--limit", "1",
@@ -3592,7 +3592,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgPublicizeMember", func(t *testing.T) {
-		args := []string{"api", "org", "org-publicize-member",
+		args := []string{"api", "org", "publicize-member",
 			"--org", testUser(),
 			"--username", testUser(),
 		}
@@ -3605,7 +3605,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgSearchRunJobs", func(t *testing.T) {
-		args := []string{"api", "org", "org-search-run-jobs",
+		args := []string{"api", "org", "search-run-jobs",
 			"--org", testUser(),
 			"--labels", "1",
 		}
@@ -3626,7 +3626,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgUnblockUser", func(t *testing.T) {
-		args := []string{"api", "org", "org-unblock-user",
+		args := []string{"api", "org", "unblock-user",
 			"--org", testUser(),
 			"--username", testUser(),
 		}
@@ -3639,7 +3639,7 @@ func TestGenerated_Org(t *testing.T) {
 		}
 	})
 	t.Run("orgUpdateAvatar", func(t *testing.T) {
-		args := []string{"api", "org", "org-update-avatar",
+		args := []string{"api", "org", "update-avatar",
 			"--org", testUser(),
 		}
 		out, err := runFj(t, binary, args...)
@@ -5516,7 +5516,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoAddCollaborator", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-add-collaborator",
+		args := []string{"api", "repo", "add-collaborator",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--collaborator", "1",
@@ -5530,7 +5530,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoAddFlag", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-add-flag",
+		args := []string{"api", "repo", "add-flag",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--flag", "1",
@@ -5544,7 +5544,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoAddPushMirror", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-add-push-mirror",
+		args := []string{"api", "repo", "add-push-mirror",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -5557,7 +5557,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoAddTeam", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-add-team",
+		args := []string{"api", "repo", "add-team",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--team", "1",
@@ -5571,7 +5571,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoAddTopic", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-add-topic",
+		args := []string{"api", "repo", "add-topic",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--topic", "1",
@@ -5585,7 +5585,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoApplyDiffPatch", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-apply-diff-patch",
+		args := []string{"api", "repo", "apply-diff-patch",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -5598,7 +5598,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoCancelScheduledAutoMerge", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-cancel-scheduled-auto-merge",
+		args := []string{"api", "repo", "cancel-scheduled-auto-merge",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--index", "1",
@@ -5612,7 +5612,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoChangeFiles", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-change-files",
+		args := []string{"api", "repo", "change-files",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -5625,7 +5625,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoCheckCollaborator", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-check-collaborator",
+		args := []string{"api", "repo", "check-collaborator",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--collaborator", "1",
@@ -5639,7 +5639,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoCheckFlag", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-check-flag",
+		args := []string{"api", "repo", "check-flag",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--flag", "1",
@@ -5653,7 +5653,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoCheckTeam", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-check-team",
+		args := []string{"api", "repo", "check-team",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--team", "1",
@@ -5675,7 +5675,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoCompareDiff", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-compare-diff",
+		args := []string{"api", "repo", "compare-diff",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--basehead", "1",
@@ -5697,7 +5697,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoConvert", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-convert",
+		args := []string{"api", "repo", "convert",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -5710,7 +5710,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoCreateBranch", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-create-branch",
+		args := []string{"api", "repo", "create-branch",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -5723,7 +5723,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoCreateBranchProtection", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-create-branch-protection",
+		args := []string{"api", "repo", "create-branch-protection",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -5736,7 +5736,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoCreateFile", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-create-file",
+		args := []string{"api", "repo", "create-file",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--filepath", "1",
@@ -5750,7 +5750,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoCreateHook", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-create-hook",
+		args := []string{"api", "repo", "create-hook",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -5763,7 +5763,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoCreateKey", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-create-key",
+		args := []string{"api", "repo", "create-key",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -5776,7 +5776,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoCreatePullRequest", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-create-pull-request",
+		args := []string{"api", "repo", "create-pull-request",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -5789,7 +5789,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoCreatePullReview", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-create-pull-review",
+		args := []string{"api", "repo", "create-pull-review",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--index", "1",
@@ -5803,7 +5803,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoCreatePullReviewComment", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-create-pull-review-comment",
+		args := []string{"api", "repo", "create-pull-review-comment",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--index", "1",
@@ -5818,7 +5818,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoCreatePullReviewRequests", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-create-pull-review-requests",
+		args := []string{"api", "repo", "create-pull-review-requests",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--index", "1",
@@ -5832,7 +5832,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoCreateRelease", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-create-release",
+		args := []string{"api", "repo", "create-release",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -5845,7 +5845,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoCreateReleaseAttachment", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-create-release-attachment",
+		args := []string{"api", "repo", "create-release-attachment",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--id", "1",
@@ -5860,7 +5860,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoCreateStatus", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-create-status",
+		args := []string{"api", "repo", "create-status",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--sha", "1",
@@ -5874,7 +5874,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoCreateTag", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-create-tag",
+		args := []string{"api", "repo", "create-tag",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -5887,7 +5887,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoCreateTagProtection", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-create-tag-protection",
+		args := []string{"api", "repo", "create-tag-protection",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -5900,7 +5900,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoCreateWikiPage", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-create-wiki-page",
+		args := []string{"api", "repo", "create-wiki-page",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -5913,7 +5913,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoDelete", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-delete",
+		args := []string{"api", "repo", "delete",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -5926,7 +5926,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoDeleteAllFlags", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-delete-all-flags",
+		args := []string{"api", "repo", "delete-all-flags",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -5939,7 +5939,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoDeleteAvatar", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-delete-avatar",
+		args := []string{"api", "repo", "delete-avatar",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -5952,7 +5952,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoDeleteBranch", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-delete-branch",
+		args := []string{"api", "repo", "delete-branch",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--branch", "1",
@@ -5966,7 +5966,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoDeleteBranchProtection", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-delete-branch-protection",
+		args := []string{"api", "repo", "delete-branch-protection",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--name", "1",
@@ -5980,7 +5980,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoDeleteCollaborator", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-delete-collaborator",
+		args := []string{"api", "repo", "delete-collaborator",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--collaborator", "1",
@@ -5994,7 +5994,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoDeleteFile", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-delete-file",
+		args := []string{"api", "repo", "delete-file",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--filepath", "1",
@@ -6008,7 +6008,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoDeleteFlag", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-delete-flag",
+		args := []string{"api", "repo", "delete-flag",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--flag", "1",
@@ -6022,7 +6022,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoDeleteGitHook", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-delete-git-hook",
+		args := []string{"api", "repo", "delete-git-hook",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--id", "1",
@@ -6036,7 +6036,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoDeleteHook", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-delete-hook",
+		args := []string{"api", "repo", "delete-hook",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--id", "1",
@@ -6050,7 +6050,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoDeleteKey", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-delete-key",
+		args := []string{"api", "repo", "delete-key",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--id", "1",
@@ -6064,7 +6064,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoDeletePullReview", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-delete-pull-review",
+		args := []string{"api", "repo", "delete-pull-review",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--index", "1",
@@ -6079,7 +6079,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoDeletePullReviewComment", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-delete-pull-review-comment",
+		args := []string{"api", "repo", "delete-pull-review-comment",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--index", "1",
@@ -6095,7 +6095,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoDeletePullReviewRequests", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-delete-pull-review-requests",
+		args := []string{"api", "repo", "delete-pull-review-requests",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--index", "1",
@@ -6109,7 +6109,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoDeletePushMirror", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-delete-push-mirror",
+		args := []string{"api", "repo", "delete-push-mirror",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--name", "1",
@@ -6123,7 +6123,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoDeleteRelease", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-delete-release",
+		args := []string{"api", "repo", "delete-release",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--id", "1",
@@ -6137,7 +6137,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoDeleteReleaseAttachment", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-delete-release-attachment",
+		args := []string{"api", "repo", "delete-release-attachment",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--id", "1",
@@ -6152,7 +6152,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoDeleteReleaseByTag", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-delete-release-by-tag",
+		args := []string{"api", "repo", "delete-release-by-tag",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--tag", "1",
@@ -6166,7 +6166,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoDeleteTag", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-delete-tag",
+		args := []string{"api", "repo", "delete-tag",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--tag", "1",
@@ -6180,7 +6180,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoDeleteTagProtection", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-delete-tag-protection",
+		args := []string{"api", "repo", "delete-tag-protection",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--id", "1",
@@ -6194,7 +6194,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoDeleteTeam", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-delete-team",
+		args := []string{"api", "repo", "delete-team",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--team", "1",
@@ -6208,7 +6208,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoDeleteTopic", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-delete-topic",
+		args := []string{"api", "repo", "delete-topic",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--topic", "1",
@@ -6222,7 +6222,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoDeleteWikiPage", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-delete-wiki-page",
+		args := []string{"api", "repo", "delete-wiki-page",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--page-name", "1",
@@ -6236,7 +6236,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoDismissPullReview", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-dismiss-pull-review",
+		args := []string{"api", "repo", "dismiss-pull-review",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--index", "1",
@@ -6251,7 +6251,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoDownloadCommitDiffOrPatch", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-download-commit-diff-or-patch",
+		args := []string{"api", "repo", "download-commit-diff-or-patch",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--sha", "1",
@@ -6274,7 +6274,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoDownloadPullDiffOrPatch", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-download-pull-diff-or-patch",
+		args := []string{"api", "repo", "download-pull-diff-or-patch",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--index", "1",
@@ -6298,7 +6298,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoEdit", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-edit",
+		args := []string{"api", "repo", "edit",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -6311,7 +6311,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoEditBranchProtection", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-edit-branch-protection",
+		args := []string{"api", "repo", "edit-branch-protection",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--name", "1",
@@ -6325,7 +6325,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoEditGitHook", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-edit-git-hook",
+		args := []string{"api", "repo", "edit-git-hook",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--id", "1",
@@ -6339,7 +6339,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoEditHook", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-edit-hook",
+		args := []string{"api", "repo", "edit-hook",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--id", "1",
@@ -6353,7 +6353,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoEditPullRequest", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-edit-pull-request",
+		args := []string{"api", "repo", "edit-pull-request",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--index", "1",
@@ -6367,7 +6367,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoEditRelease", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-edit-release",
+		args := []string{"api", "repo", "edit-release",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--id", "1",
@@ -6381,7 +6381,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoEditReleaseAttachment", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-edit-release-attachment",
+		args := []string{"api", "repo", "edit-release-attachment",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--id", "1",
@@ -6396,7 +6396,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoEditTagProtection", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-edit-tag-protection",
+		args := []string{"api", "repo", "edit-tag-protection",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--id", "1",
@@ -6410,7 +6410,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoEditWikiPage", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-edit-wiki-page",
+		args := []string{"api", "repo", "edit-wiki-page",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--page-name", "1",
@@ -6424,7 +6424,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGet", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get",
+		args := []string{"api", "repo", "get",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -6445,7 +6445,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetActionJobLogs", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-action-job-logs",
+		args := []string{"api", "repo", "get-action-job-logs",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--job-id", "1",
@@ -6468,7 +6468,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetActionRunLogs", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-action-run-logs",
+		args := []string{"api", "repo", "get-action-run-logs",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--run-id", "1",
@@ -6490,7 +6490,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetAllCommits", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-all-commits",
+		args := []string{"api", "repo", "get-all-commits",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--sha", "1",
@@ -6519,7 +6519,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetArchive", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-archive",
+		args := []string{"api", "repo", "get-archive",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--archive", "1",
@@ -6533,7 +6533,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetAssignees", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-assignees",
+		args := []string{"api", "repo", "get-assignees",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -6554,7 +6554,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetBranch", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-branch",
+		args := []string{"api", "repo", "get-branch",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--branch", "1",
@@ -6576,7 +6576,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetBranchProtection", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-branch-protection",
+		args := []string{"api", "repo", "get-branch-protection",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--name", "1",
@@ -6598,7 +6598,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetCombinedStatusByRef", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-combined-status-by-ref",
+		args := []string{"api", "repo", "get-combined-status-by-ref",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--ref", "1",
@@ -6622,7 +6622,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetCommitPullRequest", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-commit-pull-request",
+		args := []string{"api", "repo", "get-commit-pull-request",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--sha", "1",
@@ -6644,7 +6644,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetContents", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-contents",
+		args := []string{"api", "repo", "get-contents",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--filepath", "1",
@@ -6667,7 +6667,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetContentsList", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-contents-list",
+		args := []string{"api", "repo", "get-contents-list",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--ref", "1",
@@ -6689,7 +6689,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetEditorConfig", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-editor-config",
+		args := []string{"api", "repo", "get-editor-config",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--filepath", "1",
@@ -6712,7 +6712,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetGitHook", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-git-hook",
+		args := []string{"api", "repo", "get-git-hook",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--id", "1",
@@ -6734,7 +6734,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetHook", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-hook",
+		args := []string{"api", "repo", "get-hook",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--id", "1",
@@ -6756,7 +6756,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetIssueConfig", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-issue-config",
+		args := []string{"api", "repo", "get-issue-config",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -6777,7 +6777,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetIssueTemplates", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-issue-templates",
+		args := []string{"api", "repo", "get-issue-templates",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -6798,7 +6798,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetKey", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-key",
+		args := []string{"api", "repo", "get-key",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--id", "1",
@@ -6820,7 +6820,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetLanguages", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-languages",
+		args := []string{"api", "repo", "get-languages",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -6841,7 +6841,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetLatestRelease", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-latest-release",
+		args := []string{"api", "repo", "get-latest-release",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -6862,7 +6862,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetNote", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-note",
+		args := []string{"api", "repo", "get-note",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--sha", "1",
@@ -6886,7 +6886,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetPullRequest", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-pull-request",
+		args := []string{"api", "repo", "get-pull-request",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--index", "1",
@@ -6908,7 +6908,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetPullRequestByBaseHead", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-pull-request-by-base-head",
+		args := []string{"api", "repo", "get-pull-request-by-base-head",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--base", "1",
@@ -6931,7 +6931,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetPullRequestCommits", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-pull-request-commits",
+		args := []string{"api", "repo", "get-pull-request-commits",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--index", "1",
@@ -6957,7 +6957,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetPullRequestFiles", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-pull-request-files",
+		args := []string{"api", "repo", "get-pull-request-files",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--index", "1",
@@ -6983,7 +6983,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetPullReview", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-pull-review",
+		args := []string{"api", "repo", "get-pull-review",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--index", "1",
@@ -7006,7 +7006,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetPullReviewComment", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-pull-review-comment",
+		args := []string{"api", "repo", "get-pull-review-comment",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--index", "1",
@@ -7030,7 +7030,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetPullReviewComments", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-pull-review-comments",
+		args := []string{"api", "repo", "get-pull-review-comments",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--index", "1",
@@ -7053,7 +7053,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetPushMirrorByRemoteName", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-push-mirror-by-remote-name",
+		args := []string{"api", "repo", "get-push-mirror-by-remote-name",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--name", "1",
@@ -7075,7 +7075,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetRawFile", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-raw-file",
+		args := []string{"api", "repo", "get-raw-file",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--filepath", "1",
@@ -7098,7 +7098,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetRawFileOrLFS", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-raw-file-or-l-f-s",
+		args := []string{"api", "repo", "get-raw-file-or-l-f-s",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--filepath", "1",
@@ -7121,7 +7121,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetRelease", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-release",
+		args := []string{"api", "repo", "get-release",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--id", "1",
@@ -7143,7 +7143,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetReleaseAttachment", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-release-attachment",
+		args := []string{"api", "repo", "get-release-attachment",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--id", "1",
@@ -7166,7 +7166,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetReleaseByTag", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-release-by-tag",
+		args := []string{"api", "repo", "get-release-by-tag",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--tag", "1",
@@ -7188,7 +7188,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetRepoPermissions", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-repo-permissions",
+		args := []string{"api", "repo", "get-repo-permissions",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--collaborator", "1",
@@ -7210,7 +7210,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetReviewers", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-reviewers",
+		args := []string{"api", "repo", "get-reviewers",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -7231,7 +7231,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetRunnerRegistrationToken", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-runner-registration-token",
+		args := []string{"api", "repo", "get-runner-registration-token",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -7252,7 +7252,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetSingleCommit", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-single-commit",
+		args := []string{"api", "repo", "get-single-commit",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--sha", "1",
@@ -7277,7 +7277,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetTag", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-tag",
+		args := []string{"api", "repo", "get-tag",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--tag", "1",
@@ -7299,7 +7299,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetTagProtection", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-tag-protection",
+		args := []string{"api", "repo", "get-tag-protection",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--id", "1",
@@ -7321,7 +7321,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetWikiPage", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-wiki-page",
+		args := []string{"api", "repo", "get-wiki-page",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--page-name", "1",
@@ -7343,7 +7343,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetWikiPageRevisions", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-wiki-page-revisions",
+		args := []string{"api", "repo", "get-wiki-page-revisions",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--page-name", "1",
@@ -7366,7 +7366,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoGetWikiPages", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-get-wiki-pages",
+		args := []string{"api", "repo", "get-wiki-pages",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--page", "1",
@@ -7389,7 +7389,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoListActionsSecrets", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-list-actions-secrets",
+		args := []string{"api", "repo", "list-actions-secrets",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--page", "1",
@@ -7412,7 +7412,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoListActivityFeeds", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-list-activity-feeds",
+		args := []string{"api", "repo", "list-activity-feeds",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--date", "1",
@@ -7436,7 +7436,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoListAllGitRefs", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-list-all-git-refs",
+		args := []string{"api", "repo", "list-all-git-refs",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -7457,7 +7457,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoListBranchProtection", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-list-branch-protection",
+		args := []string{"api", "repo", "list-branch-protection",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -7478,7 +7478,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoListBranches", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-list-branches",
+		args := []string{"api", "repo", "list-branches",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--page", "1",
@@ -7501,7 +7501,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoListCollaborators", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-list-collaborators",
+		args := []string{"api", "repo", "list-collaborators",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--page", "1",
@@ -7524,7 +7524,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoListFlags", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-list-flags",
+		args := []string{"api", "repo", "list-flags",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -7545,7 +7545,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoListGitHooks", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-list-git-hooks",
+		args := []string{"api", "repo", "list-git-hooks",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -7566,7 +7566,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoListGitRefs", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-list-git-refs",
+		args := []string{"api", "repo", "list-git-refs",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--ref", "1",
@@ -7588,7 +7588,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoListHooks", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-list-hooks",
+		args := []string{"api", "repo", "list-hooks",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--page", "1",
@@ -7611,7 +7611,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoListKeys", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-list-keys",
+		args := []string{"api", "repo", "list-keys",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--key-id", "1",
@@ -7636,7 +7636,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoListPinnedIssues", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-list-pinned-issues",
+		args := []string{"api", "repo", "list-pinned-issues",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -7657,7 +7657,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoListPinnedPullRequests", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-list-pinned-pull-requests",
+		args := []string{"api", "repo", "list-pinned-pull-requests",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -7678,7 +7678,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoListPullRequests", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-list-pull-requests",
+		args := []string{"api", "repo", "list-pull-requests",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--state", "1",
@@ -7708,7 +7708,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoListPullReviews", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-list-pull-reviews",
+		args := []string{"api", "repo", "list-pull-reviews",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--index", "1",
@@ -7732,7 +7732,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoListPushMirrors", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-list-push-mirrors",
+		args := []string{"api", "repo", "list-push-mirrors",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--page", "1",
@@ -7755,7 +7755,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoListReleaseAttachments", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-list-release-attachments",
+		args := []string{"api", "repo", "list-release-attachments",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--id", "1",
@@ -7777,7 +7777,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoListReleases", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-list-releases",
+		args := []string{"api", "repo", "list-releases",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--draft", "1",
@@ -7803,7 +7803,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoListStargazers", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-list-stargazers",
+		args := []string{"api", "repo", "list-stargazers",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--page", "1",
@@ -7826,7 +7826,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoListStatuses", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-list-statuses",
+		args := []string{"api", "repo", "list-statuses",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--sha", "1",
@@ -7852,7 +7852,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoListStatusesByRef", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-list-statuses-by-ref",
+		args := []string{"api", "repo", "list-statuses-by-ref",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--ref", "1",
@@ -7878,7 +7878,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoListSubscribers", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-list-subscribers",
+		args := []string{"api", "repo", "list-subscribers",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--page", "1",
@@ -7901,7 +7901,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoListTagProtection", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-list-tag-protection",
+		args := []string{"api", "repo", "list-tag-protection",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -7922,7 +7922,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoListTags", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-list-tags",
+		args := []string{"api", "repo", "list-tags",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--page", "1",
@@ -7945,7 +7945,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoListTeams", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-list-teams",
+		args := []string{"api", "repo", "list-teams",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -7966,7 +7966,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoListTopics", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-list-topics",
+		args := []string{"api", "repo", "list-topics",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--page", "1",
@@ -7989,7 +7989,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoMergePullRequest", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-merge-pull-request",
+		args := []string{"api", "repo", "merge-pull-request",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--index", "1",
@@ -8003,7 +8003,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoMigrate", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-migrate"}
+		args := []string{"api", "repo", "migrate"}
 		out, err := runFj(t, binary, args...)
 		if err != nil {
 			// Write commands: accept any HTTP error (404/403/409/422)
@@ -8013,7 +8013,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoMirrorSync", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-mirror-sync",
+		args := []string{"api", "repo", "mirror-sync",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -8026,7 +8026,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoNewPinAllowed", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-new-pin-allowed",
+		args := []string{"api", "repo", "new-pin-allowed",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -8047,7 +8047,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoPullRequestIsMerged", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-pull-request-is-merged",
+		args := []string{"api", "repo", "pull-request-is-merged",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--index", "1",
@@ -8061,7 +8061,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoPushMirrorSync", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-push-mirror-sync",
+		args := []string{"api", "repo", "push-mirror-sync",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -8074,7 +8074,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoRemoveNote", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-remove-note",
+		args := []string{"api", "repo", "remove-note",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--sha", "1",
@@ -8088,7 +8088,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoReplaceAllFlags", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-replace-all-flags",
+		args := []string{"api", "repo", "replace-all-flags",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -8101,7 +8101,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoSearch", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-search",
+		args := []string{"api", "repo", "search",
 			"--q", "1",
 			"--topic", "1",
 			"--include-desc", "1",
@@ -8137,7 +8137,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoSearchRunJobs", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-search-run-jobs",
+		args := []string{"api", "repo", "search-run-jobs",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--labels", "1",
@@ -8159,7 +8159,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoSetNote", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-set-note",
+		args := []string{"api", "repo", "set-note",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--sha", "1",
@@ -8173,7 +8173,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoSigningKey", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-signing-key",
+		args := []string{"api", "repo", "signing-key",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -8194,7 +8194,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoSubmitPullReview", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-submit-pull-review",
+		args := []string{"api", "repo", "submit-pull-review",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--index", "1",
@@ -8209,7 +8209,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoSyncForkBranch", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-sync-fork-branch",
+		args := []string{"api", "repo", "sync-fork-branch",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--branch", "1",
@@ -8223,7 +8223,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoSyncForkBranchInfo", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-sync-fork-branch-info",
+		args := []string{"api", "repo", "sync-fork-branch-info",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--branch", "1",
@@ -8245,7 +8245,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoSyncForkDefault", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-sync-fork-default",
+		args := []string{"api", "repo", "sync-fork-default",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -8258,7 +8258,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoSyncForkDefaultInfo", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-sync-fork-default-info",
+		args := []string{"api", "repo", "sync-fork-default-info",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -8279,7 +8279,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoTestHook", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-test-hook",
+		args := []string{"api", "repo", "test-hook",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--id", "1",
@@ -8294,7 +8294,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoTrackedTimes", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-tracked-times",
+		args := []string{"api", "repo", "tracked-times",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--user", "1",
@@ -8320,7 +8320,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoTransfer", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-transfer",
+		args := []string{"api", "repo", "transfer",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -8333,7 +8333,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoUnDismissPullReview", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-un-dismiss-pull-review",
+		args := []string{"api", "repo", "un-dismiss-pull-review",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--index", "1",
@@ -8348,7 +8348,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoUpdateAvatar", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-update-avatar",
+		args := []string{"api", "repo", "update-avatar",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -8361,7 +8361,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoUpdateBranch", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-update-branch",
+		args := []string{"api", "repo", "update-branch",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--branch", "1",
@@ -8375,7 +8375,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoUpdateFile", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-update-file",
+		args := []string{"api", "repo", "update-file",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--filepath", "1",
@@ -8389,7 +8389,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoUpdatePullRequest", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-update-pull-request",
+		args := []string{"api", "repo", "update-pull-request",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--index", "1",
@@ -8404,7 +8404,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoUpdateTopics", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-update-topics",
+		args := []string{"api", "repo", "update-topics",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -8417,7 +8417,7 @@ func TestGenerated_Repo(t *testing.T) {
 		}
 	})
 	t.Run("repoValidateIssueConfig", func(t *testing.T) {
-		args := []string{"api", "repo", "repo-validate-issue-config",
+		args := []string{"api", "repo", "validate-issue-config",
 			"--owner", testUser(),
 			"--repo", testRepo,
 		}
@@ -8598,7 +8598,7 @@ func TestGenerated_User(t *testing.T) {
 		}
 	})
 	t.Run("userCheckFollowing", func(t *testing.T) {
-		args := []string{"api", "user", "user-check-following",
+		args := []string{"api", "user", "check-following",
 			"--username", testUser(),
 			"--target", "1",
 		}
@@ -8611,7 +8611,7 @@ func TestGenerated_User(t *testing.T) {
 		}
 	})
 	t.Run("userCreateToken", func(t *testing.T) {
-		args := []string{"api", "user", "user-create-token",
+		args := []string{"api", "user", "create-token",
 			"--username", testUser(),
 		}
 		out, err := runFj(t, binary, args...)
@@ -8623,7 +8623,7 @@ func TestGenerated_User(t *testing.T) {
 		}
 	})
 	t.Run("userDeleteAccessToken", func(t *testing.T) {
-		args := []string{"api", "user", "user-delete-access-token",
+		args := []string{"api", "user", "delete-access-token",
 			"--username", testUser(),
 			"--token", "1",
 		}
@@ -8636,7 +8636,7 @@ func TestGenerated_User(t *testing.T) {
 		}
 	})
 	t.Run("userGet", func(t *testing.T) {
-		args := []string{"api", "user", "user-get",
+		args := []string{"api", "user", "get",
 			"--username", testUser(),
 		}
 		out, err := runFj(t, binary, args...)
@@ -8656,7 +8656,7 @@ func TestGenerated_User(t *testing.T) {
 		}
 	})
 	t.Run("userGetHeatmapData", func(t *testing.T) {
-		args := []string{"api", "user", "user-get-heatmap-data",
+		args := []string{"api", "user", "get-heatmap-data",
 			"--username", testUser(),
 		}
 		out, err := runFj(t, binary, args...)
@@ -8676,7 +8676,7 @@ func TestGenerated_User(t *testing.T) {
 		}
 	})
 	t.Run("userGetTokens", func(t *testing.T) {
-		args := []string{"api", "user", "user-get-tokens",
+		args := []string{"api", "user", "get-tokens",
 			"--username", testUser(),
 			"--page", "1",
 			"--limit", "1",
@@ -8698,7 +8698,7 @@ func TestGenerated_User(t *testing.T) {
 		}
 	})
 	t.Run("userListActivityFeeds", func(t *testing.T) {
-		args := []string{"api", "user", "user-list-activity-feeds",
+		args := []string{"api", "user", "list-activity-feeds",
 			"--username", testUser(),
 			"--only-performed-by", "1",
 			"--date", "1",
@@ -8722,7 +8722,7 @@ func TestGenerated_User(t *testing.T) {
 		}
 	})
 	t.Run("userListFollowers", func(t *testing.T) {
-		args := []string{"api", "user", "user-list-followers",
+		args := []string{"api", "user", "list-followers",
 			"--username", testUser(),
 			"--page", "1",
 			"--limit", "1",
@@ -8744,7 +8744,7 @@ func TestGenerated_User(t *testing.T) {
 		}
 	})
 	t.Run("userListFollowing", func(t *testing.T) {
-		args := []string{"api", "user", "user-list-following",
+		args := []string{"api", "user", "list-following",
 			"--username", testUser(),
 			"--page", "1",
 			"--limit", "1",
@@ -8766,7 +8766,7 @@ func TestGenerated_User(t *testing.T) {
 		}
 	})
 	t.Run("userListGPGKeys", func(t *testing.T) {
-		args := []string{"api", "user", "user-list-g-p-g-keys",
+		args := []string{"api", "user", "list-g-p-g-keys",
 			"--username", testUser(),
 			"--page", "1",
 			"--limit", "1",
@@ -8788,7 +8788,7 @@ func TestGenerated_User(t *testing.T) {
 		}
 	})
 	t.Run("userListKeys", func(t *testing.T) {
-		args := []string{"api", "user", "user-list-keys",
+		args := []string{"api", "user", "list-keys",
 			"--username", testUser(),
 			"--fingerprint", "1",
 			"--page", "1",
@@ -8811,7 +8811,7 @@ func TestGenerated_User(t *testing.T) {
 		}
 	})
 	t.Run("userListRepos", func(t *testing.T) {
-		args := []string{"api", "user", "user-list-repos",
+		args := []string{"api", "user", "list-repos",
 			"--username", testUser(),
 			"--page", "1",
 			"--limit", "1",
@@ -8833,7 +8833,7 @@ func TestGenerated_User(t *testing.T) {
 		}
 	})
 	t.Run("userListStarred", func(t *testing.T) {
-		args := []string{"api", "user", "user-list-starred",
+		args := []string{"api", "user", "list-starred",
 			"--username", testUser(),
 			"--page", "1",
 			"--limit", "1",
@@ -8855,7 +8855,7 @@ func TestGenerated_User(t *testing.T) {
 		}
 	})
 	t.Run("userListSubscriptions", func(t *testing.T) {
-		args := []string{"api", "user", "user-list-subscriptions",
+		args := []string{"api", "user", "list-subscriptions",
 			"--username", testUser(),
 			"--page", "1",
 			"--limit", "1",
@@ -8877,7 +8877,7 @@ func TestGenerated_User(t *testing.T) {
 		}
 	})
 	t.Run("userSearch", func(t *testing.T) {
-		args := []string{"api", "user", "user-search",
+		args := []string{"api", "user", "search",
 			"--q", "1",
 			"--uid", "1",
 			"--sort", "1",

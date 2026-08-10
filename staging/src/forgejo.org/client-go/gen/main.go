@@ -576,7 +576,7 @@ func serviceField(svc string) string {
 
 // genCLISubcommand generates one cobra.Command for a single SDK method.
 func genCLISubcommand(svc string, m MD, spec *SwaggerSpec) string {
-	cmdName := dashCase(m.OpID)
+	cmdName := cmdNameFor(svc, m.OpID)
 	methodName := pc(m.OpID)
 	svcFld := serviceField(svc)
 	varname := sanitizeVar(m.OpID) // unique var prefix per method
@@ -725,6 +725,19 @@ func dashCase(s string) string {
 	return b.String()
 }
 
+// cmdNameFor derives the CLI command name from a swagger operationId, stripping a
+// redundant leading service prefix. Forgejo's swagger operationIds are
+// inconsistent — some carry the service word (repoGetWikiPages, repoCreateBranch)
+// while others don't (issueCreateMilestone, acceptRepoTransfer). Without this,
+// 159 of 265 commands under `fj api repo` are redundantly prefixed `repo-…`, so a
+// user/agent typing `fj api repo get` / `wiki-pages` hits an unknown subcommand
+// (cobra then reports the next flag as "unknown flag") with empty stdout.
+// Stripping makes every command name guessable: get, create-branch,
+// get-wiki-pages, issue-create-milestone. Collision-free (verified at generation).
+func cmdNameFor(svc, opID string) string {
+	return strings.TrimPrefix(dashCase(opID), dashCase(svc)+"-")
+}
+
 // eqStr escapes a string for use as a Go string literal.
 func eqStr(s string) string {
 	if s == "" { return "" }
@@ -819,7 +832,7 @@ func genIntegrationTests(spec *SwaggerSpec) string {
 
 		for _, m := range methods {
 			totalMethods++
-			cmdName := dashCase(m.OpID)
+			cmdName := cmdNameFor(svc, m.OpID)
 			testName := m.OpID
 
 			// Build the flag arguments from path/query params (skip body params)

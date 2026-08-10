@@ -43,7 +43,7 @@ actions, etc.) instead.`,
 	{ // service: activitypub
 		svcCmd := &cobra.Command{Use: "activitypub", Short: "activitypub service (auto-generated)"}
 		{ // GET /activitypub/actor -> ActivityPub.ActivitypubInstanceActor
-		mc := &cobra.Command{Use: "activitypub-instance-actor", Short: "Returns the instance's Actor"}
+		mc := &cobra.Command{Use: "instance-actor", Short: "Returns the instance's Actor"}
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
@@ -56,7 +56,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /activitypub/actor/inbox -> ActivityPub.ActivitypubInstanceActorInbox
-		mc := &cobra.Command{Use: "activitypub-instance-actor-inbox", Short: "Send to the inbox"}
+		mc := &cobra.Command{Use: "instance-actor-inbox", Short: "Send to the inbox"}
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
@@ -67,7 +67,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /activitypub/actor/outbox -> ActivityPub.ActivitypubInstanceActorOutbox
-		mc := &cobra.Command{Use: "activitypub-instance-actor-outbox", Short: "Display the outbox (always empty)"}
+		mc := &cobra.Command{Use: "instance-actor-outbox", Short: "Display the outbox (always empty)"}
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
@@ -80,7 +80,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /activitypub/user-id/{user-id} -> ActivityPub.ActivitypubPerson
-		mc := &cobra.Command{Use: "activitypub-person", Short: "Returns the Person actor for a user"}
+		mc := &cobra.Command{Use: "person", Short: "Returns the Person actor for a user"}
 		var activitypubperson_userId int64
 		mc.Flags().Int64Var(&activitypubperson_userId, "user-id", 0, "user-id")
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
@@ -96,7 +96,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /activitypub/user-id/{user-id}/activities/{activity-id}/activity -> ActivityPub.ActivitypubPersonActivity
-		mc := &cobra.Command{Use: "activitypub-person-activity", Short: "Get a specific activity of the user"}
+		mc := &cobra.Command{Use: "person-activity", Short: "Get a specific activity of the user"}
 		var activitypubpersonactivity_userId int
 		mc.Flags().IntVar(&activitypubpersonactivity_userId, "user-id", 0, "user-id")
 		var activitypubpersonactivity_activityId int
@@ -115,7 +115,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /activitypub/user-id/{user-id}/activities/{activity-id} -> ActivityPub.ActivitypubPersonActivityNote
-		mc := &cobra.Command{Use: "activitypub-person-activity-note", Short: "Get a specific activity object of the user"}
+		mc := &cobra.Command{Use: "person-activity-note", Short: "Get a specific activity object of the user"}
 		var activitypubpersonactivitynote_userId int
 		mc.Flags().IntVar(&activitypubpersonactivitynote_userId, "user-id", 0, "user-id")
 		var activitypubpersonactivitynote_activityId int
@@ -134,7 +134,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /activitypub/user-id/{user-id}/outbox -> ActivityPub.ActivitypubPersonFeed
-		mc := &cobra.Command{Use: "activitypub-person-feed", Short: "List the user's recorded activity"}
+		mc := &cobra.Command{Use: "person-feed", Short: "List the user's recorded activity"}
 		var activitypubpersonfeed_userId int
 		mc.Flags().IntVar(&activitypubpersonfeed_userId, "user-id", 0, "user-id")
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
@@ -150,7 +150,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /activitypub/user-id/{user-id}/inbox -> ActivityPub.ActivitypubPersonInbox
-		mc := &cobra.Command{Use: "activitypub-person-inbox", Short: "Send to the inbox"}
+		mc := &cobra.Command{Use: "person-inbox", Short: "Send to the inbox"}
 		var activitypubpersoninbox_userId int64
 		mc.Flags().Int64Var(&activitypubpersoninbox_userId, "user-id", 0, "user-id")
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
@@ -164,7 +164,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /activitypub/repository-id/{repository-id} -> ActivityPub.ActivitypubRepository
-		mc := &cobra.Command{Use: "activitypub-repository", Short: "Returns the Repository actor for a repo"}
+		mc := &cobra.Command{Use: "repository", Short: "Returns the Repository actor for a repo"}
 		var activitypubrepository_repositoryId int64
 		mc.Flags().Int64Var(&activitypubrepository_repositoryId, "repository-id", 0, "repository-id")
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
@@ -180,7 +180,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /activitypub/repository-id/{repository-id}/inbox -> ActivityPub.ActivitypubRepositoryInbox
-		mc := &cobra.Command{Use: "activitypub-repository-inbox", Short: "Send to the inbox"}
+		mc := &cobra.Command{Use: "repository-inbox", Short: "Send to the inbox"}
 		var activitypubrepositoryinbox_repositoryId int64
 		mc.Flags().Int64Var(&activitypubrepositoryinbox_repositoryId, "repository-id", 0, "repository-id")
 		var activitypubrepositoryinbox_body string
@@ -198,7 +198,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /activitypub/repository-id/{repository-id}/outbox -> ActivityPub.ActivitypubRepositoryOutbox
-		mc := &cobra.Command{Use: "activitypub-repository-outbox", Short: "Display the outbox"}
+		mc := &cobra.Command{Use: "repository-outbox", Short: "Display the outbox"}
 		var activitypubrepositoryoutbox_repositoryId int64
 		mc.Flags().Int64Var(&activitypubrepositoryoutbox_repositoryId, "repository-id", 0, "repository-id")
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
@@ -218,7 +218,7 @@ actions, etc.) instead.`,
 	{ // service: admin
 		svcCmd := &cobra.Command{Use: "admin", Short: "admin service (auto-generated)"}
 		{ // PUT /admin/quota/groups/{quotagroup}/rules/{quotarule} -> Admin.AdminAddRuleToQuotaGroup
-		mc := &cobra.Command{Use: "admin-add-rule-to-quota-group", Short: "Adds a rule to a quota group"}
+		mc := &cobra.Command{Use: "add-rule-to-quota-group", Short: "Adds a rule to a quota group"}
 		var adminaddruletoquotagroup_quotagroup string
 		mc.Flags().StringVar(&adminaddruletoquotagroup_quotagroup, "quotagroup", "", "quotagroup")
 		var adminaddruletoquotagroup_quotarule string
@@ -235,7 +235,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // PUT /admin/quota/groups/{quotagroup}/users/{username} -> Admin.AdminAddUserToQuotaGroup
-		mc := &cobra.Command{Use: "admin-add-user-to-quota-group", Short: "Add a user to a quota group"}
+		mc := &cobra.Command{Use: "add-user-to-quota-group", Short: "Add a user to a quota group"}
 		var adminaddusertoquotagroup_quotagroup string
 		mc.Flags().StringVar(&adminaddusertoquotagroup_quotagroup, "quotagroup", "", "quotagroup")
 		var adminaddusertoquotagroup_username string
@@ -252,7 +252,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /admin/unadopted/{owner}/{repo} -> Admin.AdminAdoptRepository
-		mc := &cobra.Command{Use: "admin-adopt-repository", Short: "Adopt unadopted files as a repository"}
+		mc := &cobra.Command{Use: "adopt-repository", Short: "Adopt unadopted files as a repository"}
 		var adminadoptrepository_owner string
 		mc.Flags().StringVar(&adminadoptrepository_owner, "owner", "", "owner")
 		var adminadoptrepository_repo string
@@ -269,7 +269,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /admin/hooks -> Admin.AdminCreateHook
-		mc := &cobra.Command{Use: "admin-create-hook", Short: "Create a hook"}
+		mc := &cobra.Command{Use: "create-hook", Short: "Create a hook"}
 		var admincreatehook_body string
 		mc.Flags().StringVar(&admincreatehook_body, "body", "", "body")
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
@@ -286,7 +286,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /admin/users/{username}/orgs -> Admin.AdminCreateOrg
-		mc := &cobra.Command{Use: "admin-create-org", Short: "Create an organization"}
+		mc := &cobra.Command{Use: "create-org", Short: "Create an organization"}
 		var admincreateorg_username string
 		mc.Flags().StringVar(&admincreateorg_username, "username", "", "username")
 		var admincreateorg_organization string
@@ -306,7 +306,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /admin/users/{username}/keys -> Admin.AdminCreatePublicKey
-		mc := &cobra.Command{Use: "admin-create-public-key", Short: "Add an SSH public key to user's account"}
+		mc := &cobra.Command{Use: "create-public-key", Short: "Add an SSH public key to user's account"}
 		var admincreatepublickey_username string
 		mc.Flags().StringVar(&admincreatepublickey_username, "username", "", "username")
 		var admincreatepublickey_key string
@@ -326,7 +326,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /admin/quota/groups -> Admin.AdminCreateQuotaGroup
-		mc := &cobra.Command{Use: "admin-create-quota-group", Short: "Create a new quota group"}
+		mc := &cobra.Command{Use: "create-quota-group", Short: "Create a new quota group"}
 		var admincreatequotagroup_group string
 		mc.Flags().StringVar(&admincreatequotagroup_group, "group", "", "group")
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
@@ -343,7 +343,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /admin/quota/rules -> Admin.AdminCreateQuotaRule
-		mc := &cobra.Command{Use: "admin-create-quota-rule", Short: "Create a new quota rule"}
+		mc := &cobra.Command{Use: "create-quota-rule", Short: "Create a new quota rule"}
 		var admincreatequotarule_rule string
 		mc.Flags().StringVar(&admincreatequotarule_rule, "rule", "", "rule")
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
@@ -360,7 +360,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /admin/users/{username}/repos -> Admin.AdminCreateRepo
-		mc := &cobra.Command{Use: "admin-create-repo", Short: "Create a repository on behalf of a user"}
+		mc := &cobra.Command{Use: "create-repo", Short: "Create a repository on behalf of a user"}
 		var admincreaterepo_username string
 		mc.Flags().StringVar(&admincreaterepo_username, "username", "", "username")
 		var admincreaterepo_repository string
@@ -380,7 +380,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /admin/users -> Admin.AdminCreateUser
-		mc := &cobra.Command{Use: "admin-create-user", Short: "Create a user account"}
+		mc := &cobra.Command{Use: "create-user", Short: "Create a user account"}
 		var admincreateuser_body string
 		mc.Flags().StringVar(&admincreateuser_body, "body", "", "body")
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
@@ -397,7 +397,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /admin/users/{username}/tokens -> Admin.AdminCreateUserAccessToken
-		mc := &cobra.Command{Use: "admin-create-user-access-token", Short: "Create an access token for the specified user"}
+		mc := &cobra.Command{Use: "create-user-access-token", Short: "Create an access token for the specified user"}
 		var admincreateuseraccesstoken_username string
 		mc.Flags().StringVar(&admincreateuseraccesstoken_username, "username", "", "username")
 		var admincreateuseraccesstoken_body string
@@ -417,7 +417,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /admin/cron -> Admin.AdminCronList
-		mc := &cobra.Command{Use: "admin-cron-list", Short: "List cron tasks"}
+		mc := &cobra.Command{Use: "cron-list", Short: "List cron tasks"}
 		var admincronlist_page int
 		mc.Flags().IntVar(&admincronlist_page, "page", 0, "page")
 		var admincronlist_limit int
@@ -436,7 +436,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /admin/cron/{task} -> Admin.AdminCronRun
-		mc := &cobra.Command{Use: "admin-cron-run", Short: "Run cron task"}
+		mc := &cobra.Command{Use: "cron-run", Short: "Run cron task"}
 		var admincronrun_task string
 		mc.Flags().StringVar(&admincronrun_task, "task", "", "task")
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
@@ -450,7 +450,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /admin/hooks/{id} -> Admin.AdminDeleteHook
-		mc := &cobra.Command{Use: "admin-delete-hook", Short: "Delete a hook"}
+		mc := &cobra.Command{Use: "delete-hook", Short: "Delete a hook"}
 		var admindeletehook_id int64
 		mc.Flags().Int64Var(&admindeletehook_id, "id", 0, "id")
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
@@ -464,7 +464,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /admin/quota/groups/{quotagroup} -> Admin.AdminDeleteQuotaGroup
-		mc := &cobra.Command{Use: "admin-delete-quota-group", Short: "Delete a quota group"}
+		mc := &cobra.Command{Use: "delete-quota-group", Short: "Delete a quota group"}
 		var admindeletequotagroup_quotagroup string
 		mc.Flags().StringVar(&admindeletequotagroup_quotagroup, "quotagroup", "", "quotagroup")
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
@@ -478,7 +478,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /admin/quota/rules/{quotarule} -> Admin.AdminDeleteQuotaRule
-		mc := &cobra.Command{Use: "admin-delete-quota-rule", Short: "Deletes a quota rule"}
+		mc := &cobra.Command{Use: "delete-quota-rule", Short: "Deletes a quota rule"}
 		var admindeletequotarule_quotarule string
 		mc.Flags().StringVar(&admindeletequotarule_quotarule, "quotarule", "", "quotarule")
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
@@ -492,7 +492,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /admin/unadopted/{owner}/{repo} -> Admin.AdminDeleteUnadoptedRepository
-		mc := &cobra.Command{Use: "admin-delete-unadopted-repository", Short: "Delete unadopted files"}
+		mc := &cobra.Command{Use: "delete-unadopted-repository", Short: "Delete unadopted files"}
 		var admindeleteunadoptedrepository_owner string
 		mc.Flags().StringVar(&admindeleteunadoptedrepository_owner, "owner", "", "owner")
 		var admindeleteunadoptedrepository_repo string
@@ -509,7 +509,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /admin/users/{username} -> Admin.AdminDeleteUser
-		mc := &cobra.Command{Use: "admin-delete-user", Short: "Delete user account"}
+		mc := &cobra.Command{Use: "delete-user", Short: "Delete user account"}
 		var admindeleteuser_username string
 		mc.Flags().StringVar(&admindeleteuser_username, "username", "", "username")
 		var admindeleteuser_purge bool
@@ -525,7 +525,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /admin/users/{username}/tokens/{token} -> Admin.AdminDeleteUserAccessToken
-		mc := &cobra.Command{Use: "admin-delete-user-access-token", Short: "Delete an access token for the specified user"}
+		mc := &cobra.Command{Use: "delete-user-access-token", Short: "Delete an access token for the specified user"}
 		var admindeleteuseraccesstoken_username string
 		mc.Flags().StringVar(&admindeleteuseraccesstoken_username, "username", "", "username")
 		var admindeleteuseraccesstoken_token string
@@ -542,7 +542,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /admin/users/{username}/emails -> Admin.AdminDeleteUserEmails
-		mc := &cobra.Command{Use: "admin-delete-user-emails", Short: "Delete email addresses from a user's account"}
+		mc := &cobra.Command{Use: "delete-user-emails", Short: "Delete email addresses from a user's account"}
 		var admindeleteuseremails_username string
 		mc.Flags().StringVar(&admindeleteuseremails_username, "username", "", "username")
 		var admindeleteuseremails_body string
@@ -560,7 +560,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /admin/users/{username}/keys/{id} -> Admin.AdminDeleteUserPublicKey
-		mc := &cobra.Command{Use: "admin-delete-user-public-key", Short: "Remove a public key from user's account"}
+		mc := &cobra.Command{Use: "delete-user-public-key", Short: "Remove a public key from user's account"}
 		var admindeleteuserpublickey_username string
 		mc.Flags().StringVar(&admindeleteuserpublickey_username, "username", "", "username")
 		var admindeleteuserpublickey_id int64
@@ -577,7 +577,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // PATCH /admin/hooks/{id} -> Admin.AdminEditHook
-		mc := &cobra.Command{Use: "admin-edit-hook", Short: "Update a hook"}
+		mc := &cobra.Command{Use: "edit-hook", Short: "Update a hook"}
 		var adminedithook_id int64
 		mc.Flags().Int64Var(&adminedithook_id, "id", 0, "id")
 		var adminedithook_body string
@@ -597,7 +597,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // PATCH /admin/quota/rules/{quotarule} -> Admin.AdminEditQuotaRule
-		mc := &cobra.Command{Use: "admin-edit-quota-rule", Short: "Change an existing quota rule"}
+		mc := &cobra.Command{Use: "edit-quota-rule", Short: "Change an existing quota rule"}
 		var admineditquotarule_quotarule string
 		mc.Flags().StringVar(&admineditquotarule_quotarule, "quotarule", "", "quotarule")
 		var admineditquotarule_rule string
@@ -617,7 +617,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // PATCH /admin/users/{username} -> Admin.AdminEditUser
-		mc := &cobra.Command{Use: "admin-edit-user", Short: "Edit an existing user"}
+		mc := &cobra.Command{Use: "edit-user", Short: "Edit an existing user"}
 		var adminedituser_username string
 		mc.Flags().StringVar(&adminedituser_username, "username", "", "username")
 		var adminedituser_body string
@@ -637,7 +637,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /admin/actions/runners/jobs -> Admin.AdminGetActionRunJobs
-		mc := &cobra.Command{Use: "admin-get-action-run-jobs", Short: "Get action run jobs"}
+		mc := &cobra.Command{Use: "get-action-run-jobs", Short: "Get action run jobs"}
 		var admingetactionrunjobs_labels string
 		mc.Flags().StringVar(&admingetactionrunjobs_labels, "labels", "", "labels")
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
@@ -654,7 +654,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /admin/emails -> Admin.AdminGetAllEmails
-		mc := &cobra.Command{Use: "admin-get-all-emails", Short: "List all users' email addresses"}
+		mc := &cobra.Command{Use: "get-all-emails", Short: "List all users' email addresses"}
 		var admingetallemails_page int
 		mc.Flags().IntVar(&admingetallemails_page, "page", 0, "page")
 		var admingetallemails_limit int
@@ -673,7 +673,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /admin/orgs -> Admin.AdminGetAllOrgs
-		mc := &cobra.Command{Use: "admin-get-all-orgs", Short: "List all organizations"}
+		mc := &cobra.Command{Use: "get-all-orgs", Short: "List all organizations"}
 		var admingetallorgs_page int
 		mc.Flags().IntVar(&admingetallorgs_page, "page", 0, "page")
 		var admingetallorgs_limit int
@@ -692,7 +692,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /admin/hooks/{id} -> Admin.AdminGetHook
-		mc := &cobra.Command{Use: "admin-get-hook", Short: "Get a hook"}
+		mc := &cobra.Command{Use: "get-hook", Short: "Get a hook"}
 		var admingethook_id int64
 		mc.Flags().Int64Var(&admingethook_id, "id", 0, "id")
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
@@ -708,7 +708,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /admin/quota/groups/{quotagroup} -> Admin.AdminGetQuotaGroup
-		mc := &cobra.Command{Use: "admin-get-quota-group", Short: "Get information about the quota group"}
+		mc := &cobra.Command{Use: "get-quota-group", Short: "Get information about the quota group"}
 		var admingetquotagroup_quotagroup string
 		mc.Flags().StringVar(&admingetquotagroup_quotagroup, "quotagroup", "", "quotagroup")
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
@@ -724,7 +724,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /admin/quota/rules/{quotarule} -> Admin.AdminGetQuotaRule
-		mc := &cobra.Command{Use: "admin-get-quota-rule", Short: "Get information about a quota rule"}
+		mc := &cobra.Command{Use: "get-quota-rule", Short: "Get information about a quota rule"}
 		var admingetquotarule_quotarule string
 		mc.Flags().StringVar(&admingetquotarule_quotarule, "quotarule", "", "quotarule")
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
@@ -740,7 +740,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /admin/runners/registration-token -> Admin.AdminGetRegistrationToken
-		mc := &cobra.Command{Use: "admin-get-registration-token", Short: "Get a runner registration token for registering global runners"}
+		mc := &cobra.Command{Use: "get-registration-token", Short: "Get a runner registration token for registering global runners"}
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
@@ -753,7 +753,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /admin/actions/runners/registration-token -> Admin.AdminGetRunnerRegistrationToken
-		mc := &cobra.Command{Use: "admin-get-runner-registration-token", Short: "Get a runner registration token for registering global runners"}
+		mc := &cobra.Command{Use: "get-runner-registration-token", Short: "Get a runner registration token for registering global runners"}
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
@@ -766,7 +766,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /admin/users/{username}/quota -> Admin.AdminGetUserQuota
-		mc := &cobra.Command{Use: "admin-get-user-quota", Short: "Get the user's quota info"}
+		mc := &cobra.Command{Use: "get-user-quota", Short: "Get the user's quota info"}
 		var admingetuserquota_username string
 		mc.Flags().StringVar(&admingetuserquota_username, "username", "", "username")
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
@@ -782,7 +782,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /admin/hooks -> Admin.AdminListHooks
-		mc := &cobra.Command{Use: "admin-list-hooks", Short: "List global (system) webhooks"}
+		mc := &cobra.Command{Use: "list-hooks", Short: "List global (system) webhooks"}
 		var adminlisthooks_page int
 		mc.Flags().IntVar(&adminlisthooks_page, "page", 0, "page")
 		var adminlisthooks_limit int
@@ -801,7 +801,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /admin/quota/groups -> Admin.AdminListQuotaGroups
-		mc := &cobra.Command{Use: "admin-list-quota-groups", Short: "List the available quota groups"}
+		mc := &cobra.Command{Use: "list-quota-groups", Short: "List the available quota groups"}
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
@@ -814,7 +814,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /admin/quota/rules -> Admin.AdminListQuotaRules
-		mc := &cobra.Command{Use: "admin-list-quota-rules", Short: "List the available quota rules"}
+		mc := &cobra.Command{Use: "list-quota-rules", Short: "List the available quota rules"}
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
@@ -829,7 +829,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /admin/users/{username}/tokens -> Admin.AdminListUserAccessTokens
-		mc := &cobra.Command{Use: "admin-list-user-access-tokens", Short: "List the specified user's access tokens"}
+		mc := &cobra.Command{Use: "list-user-access-tokens", Short: "List the specified user's access tokens"}
 		var adminlistuseraccesstokens_username string
 		mc.Flags().StringVar(&adminlistuseraccesstokens_username, "username", "", "username")
 		var adminlistuseraccesstokens_page int
@@ -851,7 +851,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /admin/users/{username}/emails -> Admin.AdminListUserEmails
-		mc := &cobra.Command{Use: "admin-list-user-emails", Short: "List all email addresses for a user"}
+		mc := &cobra.Command{Use: "list-user-emails", Short: "List all email addresses for a user"}
 		var adminlistuseremails_username string
 		mc.Flags().StringVar(&adminlistuseremails_username, "username", "", "username")
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
@@ -869,7 +869,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /admin/quota/groups/{quotagroup}/users -> Admin.AdminListUsersInQuotaGroup
-		mc := &cobra.Command{Use: "admin-list-users-in-quota-group", Short: "List users in a quota group"}
+		mc := &cobra.Command{Use: "list-users-in-quota-group", Short: "List users in a quota group"}
 		var adminlistusersinquotagroup_quotagroup string
 		mc.Flags().StringVar(&adminlistusersinquotagroup_quotagroup, "quotagroup", "", "quotagroup")
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
@@ -887,7 +887,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /admin/quota/groups/{quotagroup}/rules/{quotarule} -> Admin.AdminRemoveRuleFromQuotaGroup
-		mc := &cobra.Command{Use: "admin-remove-rule-from-quota-group", Short: "Removes a rule from a quota group"}
+		mc := &cobra.Command{Use: "remove-rule-from-quota-group", Short: "Removes a rule from a quota group"}
 		var adminremoverulefromquotagroup_quotagroup string
 		mc.Flags().StringVar(&adminremoverulefromquotagroup_quotagroup, "quotagroup", "", "quotagroup")
 		var adminremoverulefromquotagroup_quotarule string
@@ -904,7 +904,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /admin/quota/groups/{quotagroup}/users/{username} -> Admin.AdminRemoveUserFromQuotaGroup
-		mc := &cobra.Command{Use: "admin-remove-user-from-quota-group", Short: "Remove a user from a quota group"}
+		mc := &cobra.Command{Use: "remove-user-from-quota-group", Short: "Remove a user from a quota group"}
 		var adminremoveuserfromquotagroup_quotagroup string
 		mc.Flags().StringVar(&adminremoveuserfromquotagroup_quotagroup, "quotagroup", "", "quotagroup")
 		var adminremoveuserfromquotagroup_username string
@@ -921,7 +921,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /admin/users/{username}/rename -> Admin.AdminRenameUser
-		mc := &cobra.Command{Use: "admin-rename-user", Short: "Rename a user"}
+		mc := &cobra.Command{Use: "rename-user", Short: "Rename a user"}
 		var adminrenameuser_username string
 		mc.Flags().StringVar(&adminrenameuser_username, "username", "", "username")
 		var adminrenameuser_body string
@@ -939,7 +939,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /admin/emails/search -> Admin.AdminSearchEmails
-		mc := &cobra.Command{Use: "admin-search-emails", Short: "Search users' email addresses"}
+		mc := &cobra.Command{Use: "search-emails", Short: "Search users' email addresses"}
 		var adminsearchemails_q string
 		mc.Flags().StringVar(&adminsearchemails_q, "q", "", "q")
 		var adminsearchemails_page int
@@ -960,7 +960,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /admin/runners/jobs -> Admin.AdminSearchRunJobs
-		mc := &cobra.Command{Use: "admin-search-run-jobs", Short: "Search action jobs according to filter conditions"}
+		mc := &cobra.Command{Use: "search-run-jobs", Short: "Search action jobs according to filter conditions"}
 		var adminsearchrunjobs_labels string
 		mc.Flags().StringVar(&adminsearchrunjobs_labels, "labels", "", "labels")
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
@@ -977,7 +977,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /admin/users -> Admin.AdminSearchUsers
-		mc := &cobra.Command{Use: "admin-search-users", Short: "Search users according filter conditions"}
+		mc := &cobra.Command{Use: "search-users", Short: "Search users according filter conditions"}
 		var adminsearchusers_sourceId int64
 		mc.Flags().Int64Var(&adminsearchusers_sourceId, "source-id", 0, "source-id")
 		var adminsearchusers_loginName string
@@ -1004,7 +1004,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /admin/users/{username}/quota/groups -> Admin.AdminSetUserQuotaGroups
-		mc := &cobra.Command{Use: "admin-set-user-quota-groups", Short: "Set the user's quota groups to a given list."}
+		mc := &cobra.Command{Use: "set-user-quota-groups", Short: "Set the user's quota groups to a given list."}
 		var adminsetuserquotagroups_username string
 		mc.Flags().StringVar(&adminsetuserquotagroups_username, "username", "", "username")
 		var adminsetuserquotagroups_groups string
@@ -1022,7 +1022,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /admin/unadopted -> Admin.AdminUnadoptedList
-		mc := &cobra.Command{Use: "admin-unadopted-list", Short: "List unadopted repositories"}
+		mc := &cobra.Command{Use: "unadopted-list", Short: "List unadopted repositories"}
 		var adminunadoptedlist_page int
 		mc.Flags().IntVar(&adminunadoptedlist_page, "page", 0, "page")
 		var adminunadoptedlist_limit int
@@ -2911,7 +2911,7 @@ actions, etc.) instead.`,
 	{ // service: notify
 		svcCmd := &cobra.Command{Use: "notify", Short: "notify service (auto-generated)"}
 		{ // GET /notifications -> Notify.NotifyGetList
-		mc := &cobra.Command{Use: "notify-get-list", Short: "List users's notification threads"}
+		mc := &cobra.Command{Use: "get-list", Short: "List users's notification threads"}
 		var notifygetlist_all bool
 		mc.Flags().BoolVar(&notifygetlist_all, "all", false, "all")
 		var notifygetlist_statusTypes string
@@ -2940,7 +2940,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /notifications/threads/{id} -> Notify.NotifyGetThread
-		mc := &cobra.Command{Use: "notify-get-thread", Short: "Get notification thread by ID"}
+		mc := &cobra.Command{Use: "get-thread", Short: "Get notification thread by ID"}
 		var notifygetthread_id int64
 		mc.Flags().Int64Var(&notifygetthread_id, "id", 0, "id")
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
@@ -2956,7 +2956,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /notifications/new -> Notify.NotifyNewAvailable
-		mc := &cobra.Command{Use: "notify-new-available", Short: "Check if unread notifications exist"}
+		mc := &cobra.Command{Use: "new-available", Short: "Check if unread notifications exist"}
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
@@ -2969,7 +2969,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // PUT /notifications -> Notify.NotifyReadList
-		mc := &cobra.Command{Use: "notify-read-list", Short: "Mark notification threads as read, pinned or unread"}
+		mc := &cobra.Command{Use: "read-list", Short: "Mark notification threads as read, pinned or unread"}
 		var notifyreadlist_lastReadAt string
 		mc.Flags().StringVar(&notifyreadlist_lastReadAt, "last-read-at", "", "last-read-at")
 		var notifyreadlist_all bool
@@ -2988,7 +2988,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // PATCH /notifications/threads/{id} -> Notify.NotifyReadThread
-		mc := &cobra.Command{Use: "notify-read-thread", Short: "Mark notification thread as read by ID"}
+		mc := &cobra.Command{Use: "read-thread", Short: "Mark notification thread as read by ID"}
 		var notifyreadthread_id int64
 		mc.Flags().Int64Var(&notifyreadthread_id, "id", 0, "id")
 		var notifyreadthread_toStatus string
@@ -3184,7 +3184,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // PUT /orgs/{org}/block/{username} -> Org.OrgBlockUser
-		mc := &cobra.Command{Use: "org-block-user", Short: "Blocks a user from the organization"}
+		mc := &cobra.Command{Use: "block-user", Short: "Blocks a user from the organization"}
 		var orgblockuser_org string
 		mc.Flags().StringVar(&orgblockuser_org, "org", "", "org")
 		var orgblockuser_username string
@@ -3201,7 +3201,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /orgs/{org}/quota/check -> Org.OrgCheckQuota
-		mc := &cobra.Command{Use: "org-check-quota", Short: "Check if the organization is over quota for a given subject"}
+		mc := &cobra.Command{Use: "check-quota", Short: "Check if the organization is over quota for a given subject"}
 		var orgcheckquota_org string
 		mc.Flags().StringVar(&orgcheckquota_org, "org", "", "org")
 		var orgcheckquota_subject string
@@ -3219,7 +3219,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /orgs/{org}/public_members/{username} -> Org.OrgConcealMember
-		mc := &cobra.Command{Use: "org-conceal-member", Short: "Conceal a user's membership"}
+		mc := &cobra.Command{Use: "conceal-member", Short: "Conceal a user's membership"}
 		var orgconcealmember_org string
 		mc.Flags().StringVar(&orgconcealmember_org, "org", "", "org")
 		var orgconcealmember_username string
@@ -3236,7 +3236,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /orgs -> Org.OrgCreate
-		mc := &cobra.Command{Use: "org-create", Short: "Create an organization"}
+		mc := &cobra.Command{Use: "create", Short: "Create an organization"}
 		var orgcreate_organization string
 		mc.Flags().StringVar(&orgcreate_organization, "organization", "", "organization")
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
@@ -3253,7 +3253,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /orgs/{org}/hooks -> Org.OrgCreateHook
-		mc := &cobra.Command{Use: "org-create-hook", Short: "Create a hook"}
+		mc := &cobra.Command{Use: "create-hook", Short: "Create a hook"}
 		var orgcreatehook_org string
 		mc.Flags().StringVar(&orgcreatehook_org, "org", "", "org")
 		var orgcreatehook_body string
@@ -3273,7 +3273,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /orgs/{org}/labels -> Org.OrgCreateLabel
-		mc := &cobra.Command{Use: "org-create-label", Short: "Create a label for an organization"}
+		mc := &cobra.Command{Use: "create-label", Short: "Create a label for an organization"}
 		var orgcreatelabel_org string
 		mc.Flags().StringVar(&orgcreatelabel_org, "org", "", "org")
 		var orgcreatelabel_body string
@@ -3293,7 +3293,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /orgs/{org}/teams -> Org.OrgCreateTeam
-		mc := &cobra.Command{Use: "org-create-team", Short: "Create a team"}
+		mc := &cobra.Command{Use: "create-team", Short: "Create a team"}
 		var orgcreateteam_org string
 		mc.Flags().StringVar(&orgcreateteam_org, "org", "", "org")
 		var orgcreateteam_body string
@@ -3313,7 +3313,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /orgs/{org} -> Org.OrgDelete
-		mc := &cobra.Command{Use: "org-delete", Short: "Delete an organization"}
+		mc := &cobra.Command{Use: "delete", Short: "Delete an organization"}
 		var orgdelete_org string
 		mc.Flags().StringVar(&orgdelete_org, "org", "", "org")
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
@@ -3327,7 +3327,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /orgs/{org}/avatar -> Org.OrgDeleteAvatar
-		mc := &cobra.Command{Use: "org-delete-avatar", Short: "Delete an organization's avatar. It will be replaced by a default one"}
+		mc := &cobra.Command{Use: "delete-avatar", Short: "Delete an organization's avatar. It will be replaced by a default one"}
 		var orgdeleteavatar_org string
 		mc.Flags().StringVar(&orgdeleteavatar_org, "org", "", "org")
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
@@ -3341,7 +3341,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /orgs/{org}/hooks/{id} -> Org.OrgDeleteHook
-		mc := &cobra.Command{Use: "org-delete-hook", Short: "Delete a hook"}
+		mc := &cobra.Command{Use: "delete-hook", Short: "Delete a hook"}
 		var orgdeletehook_org string
 		mc.Flags().StringVar(&orgdeletehook_org, "org", "", "org")
 		var orgdeletehook_id int64
@@ -3358,7 +3358,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /orgs/{org}/labels/{id} -> Org.OrgDeleteLabel
-		mc := &cobra.Command{Use: "org-delete-label", Short: "Delete a label"}
+		mc := &cobra.Command{Use: "delete-label", Short: "Delete a label"}
 		var orgdeletelabel_org string
 		mc.Flags().StringVar(&orgdeletelabel_org, "org", "", "org")
 		var orgdeletelabel_id int64
@@ -3375,7 +3375,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /orgs/{org}/members/{username} -> Org.OrgDeleteMember
-		mc := &cobra.Command{Use: "org-delete-member", Short: "Remove a member from an organization"}
+		mc := &cobra.Command{Use: "delete-member", Short: "Remove a member from an organization"}
 		var orgdeletemember_org string
 		mc.Flags().StringVar(&orgdeletemember_org, "org", "", "org")
 		var orgdeletemember_username string
@@ -3392,7 +3392,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // PATCH /orgs/{org} -> Org.OrgEdit
-		mc := &cobra.Command{Use: "org-edit", Short: "Edit an organization"}
+		mc := &cobra.Command{Use: "edit", Short: "Edit an organization"}
 		var orgedit_org string
 		mc.Flags().StringVar(&orgedit_org, "org", "", "org")
 		var orgedit_body string
@@ -3412,7 +3412,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // PATCH /orgs/{org}/hooks/{id} -> Org.OrgEditHook
-		mc := &cobra.Command{Use: "org-edit-hook", Short: "Update a hook"}
+		mc := &cobra.Command{Use: "edit-hook", Short: "Update a hook"}
 		var orgedithook_org string
 		mc.Flags().StringVar(&orgedithook_org, "org", "", "org")
 		var orgedithook_id int64
@@ -3435,7 +3435,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // PATCH /orgs/{org}/labels/{id} -> Org.OrgEditLabel
-		mc := &cobra.Command{Use: "org-edit-label", Short: "Update a label"}
+		mc := &cobra.Command{Use: "edit-label", Short: "Update a label"}
 		var orgeditlabel_org string
 		mc.Flags().StringVar(&orgeditlabel_org, "org", "", "org")
 		var orgeditlabel_id int64
@@ -3458,7 +3458,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /orgs/{org} -> Org.OrgGet
-		mc := &cobra.Command{Use: "org-get", Short: "Get an organization"}
+		mc := &cobra.Command{Use: "get", Short: "Get an organization"}
 		var orgget_org string
 		mc.Flags().StringVar(&orgget_org, "org", "", "org")
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
@@ -3474,7 +3474,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /orgs -> Org.OrgGetAll
-		mc := &cobra.Command{Use: "org-get-all", Short: "List all organizations"}
+		mc := &cobra.Command{Use: "get-all", Short: "List all organizations"}
 		var orggetall_page int
 		mc.Flags().IntVar(&orggetall_page, "page", 0, "page")
 		var orggetall_limit int
@@ -3493,7 +3493,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /orgs/{org}/hooks/{id} -> Org.OrgGetHook
-		mc := &cobra.Command{Use: "org-get-hook", Short: "Get a hook"}
+		mc := &cobra.Command{Use: "get-hook", Short: "Get a hook"}
 		var orggethook_org string
 		mc.Flags().StringVar(&orggethook_org, "org", "", "org")
 		var orggethook_id int64
@@ -3512,7 +3512,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /orgs/{org}/labels/{id} -> Org.OrgGetLabel
-		mc := &cobra.Command{Use: "org-get-label", Short: "Get a single label"}
+		mc := &cobra.Command{Use: "get-label", Short: "Get a single label"}
 		var orggetlabel_org string
 		mc.Flags().StringVar(&orggetlabel_org, "org", "", "org")
 		var orggetlabel_id int64
@@ -3531,7 +3531,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /orgs/{org}/quota -> Org.OrgGetQuota
-		mc := &cobra.Command{Use: "org-get-quota", Short: "Get quota information for an organization"}
+		mc := &cobra.Command{Use: "get-quota", Short: "Get quota information for an organization"}
 		var orggetquota_org string
 		mc.Flags().StringVar(&orggetquota_org, "org", "", "org")
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
@@ -3547,7 +3547,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /orgs/{org}/actions/runners/registration-token -> Org.OrgGetRunnerRegistrationToken
-		mc := &cobra.Command{Use: "org-get-runner-registration-token", Short: "Get the organization's runner registration token"}
+		mc := &cobra.Command{Use: "get-runner-registration-token", Short: "Get the organization's runner registration token"}
 		var orggetrunnerregistrationtoken_org string
 		mc.Flags().StringVar(&orggetrunnerregistrationtoken_org, "org", "", "org")
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
@@ -3563,7 +3563,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /orgs/{org}/members/{username} -> Org.OrgIsMember
-		mc := &cobra.Command{Use: "org-is-member", Short: "Check if a user is a member of an organization"}
+		mc := &cobra.Command{Use: "is-member", Short: "Check if a user is a member of an organization"}
 		var orgismember_org string
 		mc.Flags().StringVar(&orgismember_org, "org", "", "org")
 		var orgismember_username string
@@ -3580,7 +3580,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /orgs/{org}/public_members/{username} -> Org.OrgIsPublicMember
-		mc := &cobra.Command{Use: "org-is-public-member", Short: "Check if a user is a public member of an organization"}
+		mc := &cobra.Command{Use: "is-public-member", Short: "Check if a user is a public member of an organization"}
 		var orgispublicmember_org string
 		mc.Flags().StringVar(&orgispublicmember_org, "org", "", "org")
 		var orgispublicmember_username string
@@ -3597,7 +3597,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /orgs/{org}/actions/secrets -> Org.OrgListActionsSecrets
-		mc := &cobra.Command{Use: "org-list-actions-secrets", Short: "List actions secrets of an organization"}
+		mc := &cobra.Command{Use: "list-actions-secrets", Short: "List actions secrets of an organization"}
 		var orglistactionssecrets_org string
 		mc.Flags().StringVar(&orglistactionssecrets_org, "org", "", "org")
 		var orglistactionssecrets_page int
@@ -3619,7 +3619,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /orgs/{org}/activities/feeds -> Org.OrgListActivityFeeds
-		mc := &cobra.Command{Use: "org-list-activity-feeds", Short: "List an organization's activity feeds"}
+		mc := &cobra.Command{Use: "list-activity-feeds", Short: "List an organization's activity feeds"}
 		var orglistactivityfeeds_org string
 		mc.Flags().StringVar(&orglistactivityfeeds_org, "org", "", "org")
 		var orglistactivityfeeds_date string
@@ -3643,7 +3643,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /orgs/{org}/list_blocked -> Org.OrgListBlockedUsers
-		mc := &cobra.Command{Use: "org-list-blocked-users", Short: "List the organization's blocked users"}
+		mc := &cobra.Command{Use: "list-blocked-users", Short: "List the organization's blocked users"}
 		var orglistblockedusers_org string
 		mc.Flags().StringVar(&orglistblockedusers_org, "org", "", "org")
 		var orglistblockedusers_page int
@@ -3665,7 +3665,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /orgs/{org}/hooks -> Org.OrgListHooks
-		mc := &cobra.Command{Use: "org-list-hooks", Short: "List an organization's webhooks"}
+		mc := &cobra.Command{Use: "list-hooks", Short: "List an organization's webhooks"}
 		var orglisthooks_org string
 		mc.Flags().StringVar(&orglisthooks_org, "org", "", "org")
 		var orglisthooks_page int
@@ -3687,7 +3687,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /orgs/{org}/labels -> Org.OrgListLabels
-		mc := &cobra.Command{Use: "org-list-labels", Short: "List an organization's labels"}
+		mc := &cobra.Command{Use: "list-labels", Short: "List an organization's labels"}
 		var orglistlabels_org string
 		mc.Flags().StringVar(&orglistlabels_org, "org", "", "org")
 		var orglistlabels_sort string
@@ -3711,7 +3711,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /orgs/{org}/members -> Org.OrgListMembers
-		mc := &cobra.Command{Use: "org-list-members", Short: "List an organization's members"}
+		mc := &cobra.Command{Use: "list-members", Short: "List an organization's members"}
 		var orglistmembers_org string
 		mc.Flags().StringVar(&orglistmembers_org, "org", "", "org")
 		var orglistmembers_page int
@@ -3733,7 +3733,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /orgs/{org}/public_members -> Org.OrgListPublicMembers
-		mc := &cobra.Command{Use: "org-list-public-members", Short: "List an organization's public members"}
+		mc := &cobra.Command{Use: "list-public-members", Short: "List an organization's public members"}
 		var orglistpublicmembers_org string
 		mc.Flags().StringVar(&orglistpublicmembers_org, "org", "", "org")
 		var orglistpublicmembers_page int
@@ -3755,7 +3755,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /orgs/{org}/quota/artifacts -> Org.OrgListQuotaArtifacts
-		mc := &cobra.Command{Use: "org-list-quota-artifacts", Short: "List the artifacts affecting the organization's quota"}
+		mc := &cobra.Command{Use: "list-quota-artifacts", Short: "List the artifacts affecting the organization's quota"}
 		var orglistquotaartifacts_org string
 		mc.Flags().StringVar(&orglistquotaartifacts_org, "org", "", "org")
 		var orglistquotaartifacts_page int
@@ -3775,7 +3775,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /orgs/{org}/quota/attachments -> Org.OrgListQuotaAttachments
-		mc := &cobra.Command{Use: "org-list-quota-attachments", Short: "List the attachments affecting the organization's quota"}
+		mc := &cobra.Command{Use: "list-quota-attachments", Short: "List the attachments affecting the organization's quota"}
 		var orglistquotaattachments_org string
 		mc.Flags().StringVar(&orglistquotaattachments_org, "org", "", "org")
 		var orglistquotaattachments_page int
@@ -3795,7 +3795,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /orgs/{org}/quota/packages -> Org.OrgListQuotaPackages
-		mc := &cobra.Command{Use: "org-list-quota-packages", Short: "List the packages affecting the organization's quota"}
+		mc := &cobra.Command{Use: "list-quota-packages", Short: "List the packages affecting the organization's quota"}
 		var orglistquotapackages_org string
 		mc.Flags().StringVar(&orglistquotapackages_org, "org", "", "org")
 		var orglistquotapackages_page int
@@ -3815,7 +3815,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /orgs/{org}/repos -> Org.OrgListRepos
-		mc := &cobra.Command{Use: "org-list-repos", Short: "List an organization's repos"}
+		mc := &cobra.Command{Use: "list-repos", Short: "List an organization's repos"}
 		var orglistrepos_org string
 		mc.Flags().StringVar(&orglistrepos_org, "org", "", "org")
 		var orglistrepos_page int
@@ -3837,7 +3837,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /orgs/{org}/teams -> Org.OrgListTeams
-		mc := &cobra.Command{Use: "org-list-teams", Short: "List an organization's teams"}
+		mc := &cobra.Command{Use: "list-teams", Short: "List an organization's teams"}
 		var orglistteams_org string
 		mc.Flags().StringVar(&orglistteams_org, "org", "", "org")
 		var orglistteams_page int
@@ -3859,7 +3859,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // PUT /orgs/{org}/public_members/{username} -> Org.OrgPublicizeMember
-		mc := &cobra.Command{Use: "org-publicize-member", Short: "Publicize a user's membership"}
+		mc := &cobra.Command{Use: "publicize-member", Short: "Publicize a user's membership"}
 		var orgpublicizemember_org string
 		mc.Flags().StringVar(&orgpublicizemember_org, "org", "", "org")
 		var orgpublicizemember_username string
@@ -3876,7 +3876,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /orgs/{org}/actions/runners/jobs -> Org.OrgSearchRunJobs
-		mc := &cobra.Command{Use: "org-search-run-jobs", Short: "Search for organization's action jobs according filter conditions"}
+		mc := &cobra.Command{Use: "search-run-jobs", Short: "Search for organization's action jobs according filter conditions"}
 		var orgsearchrunjobs_org string
 		mc.Flags().StringVar(&orgsearchrunjobs_org, "org", "", "org")
 		var orgsearchrunjobs_labels string
@@ -3896,7 +3896,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // PUT /orgs/{org}/unblock/{username} -> Org.OrgUnblockUser
-		mc := &cobra.Command{Use: "org-unblock-user", Short: "Unblock a user from the organization"}
+		mc := &cobra.Command{Use: "unblock-user", Short: "Unblock a user from the organization"}
 		var orgunblockuser_org string
 		mc.Flags().StringVar(&orgunblockuser_org, "org", "", "org")
 		var orgunblockuser_username string
@@ -3913,7 +3913,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /orgs/{org}/avatar -> Org.OrgUpdateAvatar
-		mc := &cobra.Command{Use: "org-update-avatar", Short: "Update an organization's avatar"}
+		mc := &cobra.Command{Use: "update-avatar", Short: "Update an organization's avatar"}
 		var orgupdateavatar_org string
 		mc.Flags().StringVar(&orgupdateavatar_org, "org", "", "org")
 		var orgupdateavatar_body string
@@ -6480,7 +6480,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // PUT /repos/{owner}/{repo}/collaborators/{collaborator} -> Repo.RepoAddCollaborator
-		mc := &cobra.Command{Use: "repo-add-collaborator", Short: "Add a collaborator to a repository"}
+		mc := &cobra.Command{Use: "add-collaborator", Short: "Add a collaborator to a repository"}
 		var repoaddcollaborator_owner string
 		mc.Flags().StringVar(&repoaddcollaborator_owner, "owner", "", "owner")
 		var repoaddcollaborator_repo string
@@ -6504,7 +6504,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // PUT /repos/{owner}/{repo}/flags/{flag} -> Repo.RepoAddFlag
-		mc := &cobra.Command{Use: "repo-add-flag", Short: "Add a flag to a repository"}
+		mc := &cobra.Command{Use: "add-flag", Short: "Add a flag to a repository"}
 		var repoaddflag_owner string
 		mc.Flags().StringVar(&repoaddflag_owner, "owner", "", "owner")
 		var repoaddflag_repo string
@@ -6524,7 +6524,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /repos/{owner}/{repo}/push_mirrors -> Repo.RepoAddPushMirror
-		mc := &cobra.Command{Use: "repo-add-push-mirror", Short: "Set up a new push mirror in a repository"}
+		mc := &cobra.Command{Use: "add-push-mirror", Short: "Set up a new push mirror in a repository"}
 		var repoaddpushmirror_owner string
 		mc.Flags().StringVar(&repoaddpushmirror_owner, "owner", "", "owner")
 		var repoaddpushmirror_repo string
@@ -6547,7 +6547,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // PUT /repos/{owner}/{repo}/teams/{team} -> Repo.RepoAddTeam
-		mc := &cobra.Command{Use: "repo-add-team", Short: "Add a team to a repository"}
+		mc := &cobra.Command{Use: "add-team", Short: "Add a team to a repository"}
 		var repoaddteam_owner string
 		mc.Flags().StringVar(&repoaddteam_owner, "owner", "", "owner")
 		var repoaddteam_repo string
@@ -6567,7 +6567,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // PUT /repos/{owner}/{repo}/topics/{topic} -> Repo.RepoAddTopic
-		mc := &cobra.Command{Use: "repo-add-topic", Short: "Add a topic to a repository"}
+		mc := &cobra.Command{Use: "add-topic", Short: "Add a topic to a repository"}
 		var repoaddtopic_owner string
 		mc.Flags().StringVar(&repoaddtopic_owner, "owner", "", "owner")
 		var repoaddtopic_repo string
@@ -6587,7 +6587,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /repos/{owner}/{repo}/diffpatch -> Repo.RepoApplyDiffPatch
-		mc := &cobra.Command{Use: "repo-apply-diff-patch", Short: "Apply diff patch to repository"}
+		mc := &cobra.Command{Use: "apply-diff-patch", Short: "Apply diff patch to repository"}
 		var repoapplydiffpatch_owner string
 		mc.Flags().StringVar(&repoapplydiffpatch_owner, "owner", "", "owner")
 		var repoapplydiffpatch_repo string
@@ -6610,7 +6610,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /repos/{owner}/{repo}/pulls/{index}/merge -> Repo.RepoCancelScheduledAutoMerge
-		mc := &cobra.Command{Use: "repo-cancel-scheduled-auto-merge", Short: "Cancel the scheduled auto merge for the given pull request"}
+		mc := &cobra.Command{Use: "cancel-scheduled-auto-merge", Short: "Cancel the scheduled auto merge for the given pull request"}
 		var repocancelscheduledautomerge_owner string
 		mc.Flags().StringVar(&repocancelscheduledautomerge_owner, "owner", "", "owner")
 		var repocancelscheduledautomerge_repo string
@@ -6630,7 +6630,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /repos/{owner}/{repo}/contents -> Repo.RepoChangeFiles
-		mc := &cobra.Command{Use: "repo-change-files", Short: "Modify multiple files in a repository"}
+		mc := &cobra.Command{Use: "change-files", Short: "Modify multiple files in a repository"}
 		var repochangefiles_owner string
 		mc.Flags().StringVar(&repochangefiles_owner, "owner", "", "owner")
 		var repochangefiles_repo string
@@ -6653,7 +6653,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/collaborators/{collaborator} -> Repo.RepoCheckCollaborator
-		mc := &cobra.Command{Use: "repo-check-collaborator", Short: "Check if a user is a collaborator of a repository"}
+		mc := &cobra.Command{Use: "check-collaborator", Short: "Check if a user is a collaborator of a repository"}
 		var repocheckcollaborator_owner string
 		mc.Flags().StringVar(&repocheckcollaborator_owner, "owner", "", "owner")
 		var repocheckcollaborator_repo string
@@ -6673,7 +6673,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/flags/{flag} -> Repo.RepoCheckFlag
-		mc := &cobra.Command{Use: "repo-check-flag", Short: "Check if a repository has a given flag"}
+		mc := &cobra.Command{Use: "check-flag", Short: "Check if a repository has a given flag"}
 		var repocheckflag_owner string
 		mc.Flags().StringVar(&repocheckflag_owner, "owner", "", "owner")
 		var repocheckflag_repo string
@@ -6693,7 +6693,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/teams/{team} -> Repo.RepoCheckTeam
-		mc := &cobra.Command{Use: "repo-check-team", Short: "Check if a team is assigned to a repository"}
+		mc := &cobra.Command{Use: "check-team", Short: "Check if a team is assigned to a repository"}
 		var repocheckteam_owner string
 		mc.Flags().StringVar(&repocheckteam_owner, "owner", "", "owner")
 		var repocheckteam_repo string
@@ -6715,7 +6715,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/compare/{basehead} -> Repo.RepoCompareDiff
-		mc := &cobra.Command{Use: "repo-compare-diff", Short: "Get commit comparison information"}
+		mc := &cobra.Command{Use: "compare-diff", Short: "Get commit comparison information"}
 		var repocomparediff_owner string
 		mc.Flags().StringVar(&repocomparediff_owner, "owner", "", "owner")
 		var repocomparediff_repo string
@@ -6737,7 +6737,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /repos/{owner}/{repo}/convert -> Repo.RepoConvert
-		mc := &cobra.Command{Use: "repo-convert", Short: "Convert a mirror repo to a normal repo."}
+		mc := &cobra.Command{Use: "convert", Short: "Convert a mirror repo to a normal repo."}
 		var repoconvert_owner string
 		mc.Flags().StringVar(&repoconvert_owner, "owner", "", "owner")
 		var repoconvert_repo string
@@ -6756,7 +6756,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /repos/{owner}/{repo}/branches -> Repo.RepoCreateBranch
-		mc := &cobra.Command{Use: "repo-create-branch", Short: "Create a branch"}
+		mc := &cobra.Command{Use: "create-branch", Short: "Create a branch"}
 		var repocreatebranch_owner string
 		mc.Flags().StringVar(&repocreatebranch_owner, "owner", "", "owner")
 		var repocreatebranch_repo string
@@ -6779,7 +6779,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /repos/{owner}/{repo}/branch_protections -> Repo.RepoCreateBranchProtection
-		mc := &cobra.Command{Use: "repo-create-branch-protection", Short: "Create a branch protections for a repository"}
+		mc := &cobra.Command{Use: "create-branch-protection", Short: "Create a branch protections for a repository"}
 		var repocreatebranchprotection_owner string
 		mc.Flags().StringVar(&repocreatebranchprotection_owner, "owner", "", "owner")
 		var repocreatebranchprotection_repo string
@@ -6802,7 +6802,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /repos/{owner}/{repo}/contents/{filepath} -> Repo.RepoCreateFile
-		mc := &cobra.Command{Use: "repo-create-file", Short: "Create a file in a repository"}
+		mc := &cobra.Command{Use: "create-file", Short: "Create a file in a repository"}
 		var repocreatefile_owner string
 		mc.Flags().StringVar(&repocreatefile_owner, "owner", "", "owner")
 		var repocreatefile_repo string
@@ -6828,7 +6828,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /repos/{owner}/{repo}/hooks -> Repo.RepoCreateHook
-		mc := &cobra.Command{Use: "repo-create-hook", Short: "Create a hook"}
+		mc := &cobra.Command{Use: "create-hook", Short: "Create a hook"}
 		var repocreatehook_owner string
 		mc.Flags().StringVar(&repocreatehook_owner, "owner", "", "owner")
 		var repocreatehook_repo string
@@ -6851,7 +6851,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /repos/{owner}/{repo}/keys -> Repo.RepoCreateKey
-		mc := &cobra.Command{Use: "repo-create-key", Short: "Add a key to a repository"}
+		mc := &cobra.Command{Use: "create-key", Short: "Add a key to a repository"}
 		var repocreatekey_owner string
 		mc.Flags().StringVar(&repocreatekey_owner, "owner", "", "owner")
 		var repocreatekey_repo string
@@ -6874,7 +6874,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /repos/{owner}/{repo}/pulls -> Repo.RepoCreatePullRequest
-		mc := &cobra.Command{Use: "repo-create-pull-request", Short: "Create a pull request"}
+		mc := &cobra.Command{Use: "create-pull-request", Short: "Create a pull request"}
 		var repocreatepullrequest_owner string
 		mc.Flags().StringVar(&repocreatepullrequest_owner, "owner", "", "owner")
 		var repocreatepullrequest_repo string
@@ -6897,7 +6897,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /repos/{owner}/{repo}/pulls/{index}/reviews -> Repo.RepoCreatePullReview
-		mc := &cobra.Command{Use: "repo-create-pull-review", Short: "Create a review to an pull request"}
+		mc := &cobra.Command{Use: "create-pull-review", Short: "Create a review to an pull request"}
 		var repocreatepullreview_owner string
 		mc.Flags().StringVar(&repocreatepullreview_owner, "owner", "", "owner")
 		var repocreatepullreview_repo string
@@ -6923,7 +6923,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /repos/{owner}/{repo}/pulls/{index}/reviews/{id}/comments -> Repo.RepoCreatePullReviewComment
-		mc := &cobra.Command{Use: "repo-create-pull-review-comment", Short: "Add a new comment to a pull request review"}
+		mc := &cobra.Command{Use: "create-pull-review-comment", Short: "Add a new comment to a pull request review"}
 		var repocreatepullreviewcomment_owner string
 		mc.Flags().StringVar(&repocreatepullreviewcomment_owner, "owner", "", "owner")
 		var repocreatepullreviewcomment_repo string
@@ -6952,7 +6952,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /repos/{owner}/{repo}/pulls/{index}/requested_reviewers -> Repo.RepoCreatePullReviewRequests
-		mc := &cobra.Command{Use: "repo-create-pull-review-requests", Short: "Create review requests for a pull request"}
+		mc := &cobra.Command{Use: "create-pull-review-requests", Short: "Create review requests for a pull request"}
 		var repocreatepullreviewrequests_owner string
 		mc.Flags().StringVar(&repocreatepullreviewrequests_owner, "owner", "", "owner")
 		var repocreatepullreviewrequests_repo string
@@ -6980,7 +6980,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /repos/{owner}/{repo}/releases -> Repo.RepoCreateRelease
-		mc := &cobra.Command{Use: "repo-create-release", Short: "Create a release"}
+		mc := &cobra.Command{Use: "create-release", Short: "Create a release"}
 		var repocreaterelease_owner string
 		mc.Flags().StringVar(&repocreaterelease_owner, "owner", "", "owner")
 		var repocreaterelease_repo string
@@ -7003,7 +7003,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /repos/{owner}/{repo}/releases/{id}/assets -> Repo.RepoCreateReleaseAttachment
-		mc := &cobra.Command{Use: "repo-create-release-attachment", Short: "Create a release attachment"}
+		mc := &cobra.Command{Use: "create-release-attachment", Short: "Create a release attachment"}
 		var repocreatereleaseattachment_owner string
 		mc.Flags().StringVar(&repocreatereleaseattachment_owner, "owner", "", "owner")
 		var repocreatereleaseattachment_repo string
@@ -7027,7 +7027,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /repos/{owner}/{repo}/statuses/{sha} -> Repo.RepoCreateStatus
-		mc := &cobra.Command{Use: "repo-create-status", Short: "Create a commit status"}
+		mc := &cobra.Command{Use: "create-status", Short: "Create a commit status"}
 		var repocreatestatus_owner string
 		mc.Flags().StringVar(&repocreatestatus_owner, "owner", "", "owner")
 		var repocreatestatus_repo string
@@ -7053,7 +7053,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /repos/{owner}/{repo}/tags -> Repo.RepoCreateTag
-		mc := &cobra.Command{Use: "repo-create-tag", Short: "Create a new git tag in a repository"}
+		mc := &cobra.Command{Use: "create-tag", Short: "Create a new git tag in a repository"}
 		var repocreatetag_owner string
 		mc.Flags().StringVar(&repocreatetag_owner, "owner", "", "owner")
 		var repocreatetag_repo string
@@ -7076,7 +7076,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /repos/{owner}/{repo}/tag_protections -> Repo.RepoCreateTagProtection
-		mc := &cobra.Command{Use: "repo-create-tag-protection", Short: "Create a tag protections for a repository"}
+		mc := &cobra.Command{Use: "create-tag-protection", Short: "Create a tag protections for a repository"}
 		var repocreatetagprotection_owner string
 		mc.Flags().StringVar(&repocreatetagprotection_owner, "owner", "", "owner")
 		var repocreatetagprotection_repo string
@@ -7099,7 +7099,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /repos/{owner}/{repo}/wiki/new -> Repo.RepoCreateWikiPage
-		mc := &cobra.Command{Use: "repo-create-wiki-page", Short: "Create a wiki page"}
+		mc := &cobra.Command{Use: "create-wiki-page", Short: "Create a wiki page"}
 		var repocreatewikipage_owner string
 		mc.Flags().StringVar(&repocreatewikipage_owner, "owner", "", "owner")
 		var repocreatewikipage_repo string
@@ -7122,7 +7122,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /repos/{owner}/{repo} -> Repo.RepoDelete
-		mc := &cobra.Command{Use: "repo-delete", Short: "Delete a repository"}
+		mc := &cobra.Command{Use: "delete", Short: "Delete a repository"}
 		var repodelete_owner string
 		mc.Flags().StringVar(&repodelete_owner, "owner", "", "owner")
 		var repodelete_repo string
@@ -7139,7 +7139,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /repos/{owner}/{repo}/flags -> Repo.RepoDeleteAllFlags
-		mc := &cobra.Command{Use: "repo-delete-all-flags", Short: "Remove all flags from a repository"}
+		mc := &cobra.Command{Use: "delete-all-flags", Short: "Remove all flags from a repository"}
 		var repodeleteallflags_owner string
 		mc.Flags().StringVar(&repodeleteallflags_owner, "owner", "", "owner")
 		var repodeleteallflags_repo string
@@ -7156,7 +7156,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /repos/{owner}/{repo}/avatar -> Repo.RepoDeleteAvatar
-		mc := &cobra.Command{Use: "repo-delete-avatar", Short: "Delete a repository's avatar"}
+		mc := &cobra.Command{Use: "delete-avatar", Short: "Delete a repository's avatar"}
 		var repodeleteavatar_owner string
 		mc.Flags().StringVar(&repodeleteavatar_owner, "owner", "", "owner")
 		var repodeleteavatar_repo string
@@ -7173,7 +7173,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /repos/{owner}/{repo}/branches/{branch} -> Repo.RepoDeleteBranch
-		mc := &cobra.Command{Use: "repo-delete-branch", Short: "Delete a specific branch from a repository"}
+		mc := &cobra.Command{Use: "delete-branch", Short: "Delete a specific branch from a repository"}
 		var repodeletebranch_owner string
 		mc.Flags().StringVar(&repodeletebranch_owner, "owner", "", "owner")
 		var repodeletebranch_repo string
@@ -7193,7 +7193,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /repos/{owner}/{repo}/branch_protections/{name} -> Repo.RepoDeleteBranchProtection
-		mc := &cobra.Command{Use: "repo-delete-branch-protection", Short: "Delete a specific branch protection for the repository"}
+		mc := &cobra.Command{Use: "delete-branch-protection", Short: "Delete a specific branch protection for the repository"}
 		var repodeletebranchprotection_owner string
 		mc.Flags().StringVar(&repodeletebranchprotection_owner, "owner", "", "owner")
 		var repodeletebranchprotection_repo string
@@ -7213,7 +7213,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /repos/{owner}/{repo}/collaborators/{collaborator} -> Repo.RepoDeleteCollaborator
-		mc := &cobra.Command{Use: "repo-delete-collaborator", Short: "Delete a collaborator from a repository"}
+		mc := &cobra.Command{Use: "delete-collaborator", Short: "Delete a collaborator from a repository"}
 		var repodeletecollaborator_owner string
 		mc.Flags().StringVar(&repodeletecollaborator_owner, "owner", "", "owner")
 		var repodeletecollaborator_repo string
@@ -7233,7 +7233,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /repos/{owner}/{repo}/contents/{filepath} -> Repo.RepoDeleteFile
-		mc := &cobra.Command{Use: "repo-delete-file", Short: "Delete a file in a repository"}
+		mc := &cobra.Command{Use: "delete-file", Short: "Delete a file in a repository"}
 		var repodeletefile_owner string
 		mc.Flags().StringVar(&repodeletefile_owner, "owner", "", "owner")
 		var repodeletefile_repo string
@@ -7259,7 +7259,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /repos/{owner}/{repo}/flags/{flag} -> Repo.RepoDeleteFlag
-		mc := &cobra.Command{Use: "repo-delete-flag", Short: "Remove a flag from a repository"}
+		mc := &cobra.Command{Use: "delete-flag", Short: "Remove a flag from a repository"}
 		var repodeleteflag_owner string
 		mc.Flags().StringVar(&repodeleteflag_owner, "owner", "", "owner")
 		var repodeleteflag_repo string
@@ -7279,7 +7279,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /repos/{owner}/{repo}/hooks/git/{id} -> Repo.RepoDeleteGitHook
-		mc := &cobra.Command{Use: "repo-delete-git-hook", Short: "Delete a Git hook in a repository"}
+		mc := &cobra.Command{Use: "delete-git-hook", Short: "Delete a Git hook in a repository"}
 		var repodeletegithook_owner string
 		mc.Flags().StringVar(&repodeletegithook_owner, "owner", "", "owner")
 		var repodeletegithook_repo string
@@ -7299,7 +7299,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /repos/{owner}/{repo}/hooks/{id} -> Repo.RepoDeleteHook
-		mc := &cobra.Command{Use: "repo-delete-hook", Short: "Delete a hook in a repository"}
+		mc := &cobra.Command{Use: "delete-hook", Short: "Delete a hook in a repository"}
 		var repodeletehook_owner string
 		mc.Flags().StringVar(&repodeletehook_owner, "owner", "", "owner")
 		var repodeletehook_repo string
@@ -7319,7 +7319,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /repos/{owner}/{repo}/keys/{id} -> Repo.RepoDeleteKey
-		mc := &cobra.Command{Use: "repo-delete-key", Short: "Delete a key from a repository"}
+		mc := &cobra.Command{Use: "delete-key", Short: "Delete a key from a repository"}
 		var repodeletekey_owner string
 		mc.Flags().StringVar(&repodeletekey_owner, "owner", "", "owner")
 		var repodeletekey_repo string
@@ -7339,7 +7339,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /repos/{owner}/{repo}/pulls/{index}/reviews/{id} -> Repo.RepoDeletePullReview
-		mc := &cobra.Command{Use: "repo-delete-pull-review", Short: "Delete a specific review from a pull request"}
+		mc := &cobra.Command{Use: "delete-pull-review", Short: "Delete a specific review from a pull request"}
 		var repodeletepullreview_owner string
 		mc.Flags().StringVar(&repodeletepullreview_owner, "owner", "", "owner")
 		var repodeletepullreview_repo string
@@ -7362,7 +7362,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /repos/{owner}/{repo}/pulls/{index}/reviews/{id}/comments/{comment} -> Repo.RepoDeletePullReviewComment
-		mc := &cobra.Command{Use: "repo-delete-pull-review-comment", Short: "Delete a pull review comment"}
+		mc := &cobra.Command{Use: "delete-pull-review-comment", Short: "Delete a pull review comment"}
 		var repodeletepullreviewcomment_owner string
 		mc.Flags().StringVar(&repodeletepullreviewcomment_owner, "owner", "", "owner")
 		var repodeletepullreviewcomment_repo string
@@ -7388,7 +7388,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /repos/{owner}/{repo}/pulls/{index}/requested_reviewers -> Repo.RepoDeletePullReviewRequests
-		mc := &cobra.Command{Use: "repo-delete-pull-review-requests", Short: "Cancel review requests for a pull request"}
+		mc := &cobra.Command{Use: "delete-pull-review-requests", Short: "Cancel review requests for a pull request"}
 		var repodeletepullreviewrequests_owner string
 		mc.Flags().StringVar(&repodeletepullreviewrequests_owner, "owner", "", "owner")
 		var repodeletepullreviewrequests_repo string
@@ -7412,7 +7412,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /repos/{owner}/{repo}/push_mirrors/{name} -> Repo.RepoDeletePushMirror
-		mc := &cobra.Command{Use: "repo-delete-push-mirror", Short: "Remove a push mirror from a repository by remoteName"}
+		mc := &cobra.Command{Use: "delete-push-mirror", Short: "Remove a push mirror from a repository by remoteName"}
 		var repodeletepushmirror_owner string
 		mc.Flags().StringVar(&repodeletepushmirror_owner, "owner", "", "owner")
 		var repodeletepushmirror_repo string
@@ -7432,7 +7432,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /repos/{owner}/{repo}/releases/{id} -> Repo.RepoDeleteRelease
-		mc := &cobra.Command{Use: "repo-delete-release", Short: "Delete a release"}
+		mc := &cobra.Command{Use: "delete-release", Short: "Delete a release"}
 		var repodeleterelease_owner string
 		mc.Flags().StringVar(&repodeleterelease_owner, "owner", "", "owner")
 		var repodeleterelease_repo string
@@ -7452,7 +7452,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /repos/{owner}/{repo}/releases/{id}/assets/{attachment_id} -> Repo.RepoDeleteReleaseAttachment
-		mc := &cobra.Command{Use: "repo-delete-release-attachment", Short: "Delete a release attachment"}
+		mc := &cobra.Command{Use: "delete-release-attachment", Short: "Delete a release attachment"}
 		var repodeletereleaseattachment_owner string
 		mc.Flags().StringVar(&repodeletereleaseattachment_owner, "owner", "", "owner")
 		var repodeletereleaseattachment_repo string
@@ -7475,7 +7475,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /repos/{owner}/{repo}/releases/tags/{tag} -> Repo.RepoDeleteReleaseByTag
-		mc := &cobra.Command{Use: "repo-delete-release-by-tag", Short: "Delete a release by tag name"}
+		mc := &cobra.Command{Use: "delete-release-by-tag", Short: "Delete a release by tag name"}
 		var repodeletereleasebytag_owner string
 		mc.Flags().StringVar(&repodeletereleasebytag_owner, "owner", "", "owner")
 		var repodeletereleasebytag_repo string
@@ -7495,7 +7495,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /repos/{owner}/{repo}/tags/{tag} -> Repo.RepoDeleteTag
-		mc := &cobra.Command{Use: "repo-delete-tag", Short: "Delete a repository's tag by name"}
+		mc := &cobra.Command{Use: "delete-tag", Short: "Delete a repository's tag by name"}
 		var repodeletetag_owner string
 		mc.Flags().StringVar(&repodeletetag_owner, "owner", "", "owner")
 		var repodeletetag_repo string
@@ -7515,7 +7515,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /repos/{owner}/{repo}/tag_protections/{id} -> Repo.RepoDeleteTagProtection
-		mc := &cobra.Command{Use: "repo-delete-tag-protection", Short: "Delete a specific tag protection for the repository"}
+		mc := &cobra.Command{Use: "delete-tag-protection", Short: "Delete a specific tag protection for the repository"}
 		var repodeletetagprotection_owner string
 		mc.Flags().StringVar(&repodeletetagprotection_owner, "owner", "", "owner")
 		var repodeletetagprotection_repo string
@@ -7535,7 +7535,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /repos/{owner}/{repo}/teams/{team} -> Repo.RepoDeleteTeam
-		mc := &cobra.Command{Use: "repo-delete-team", Short: "Delete a team from a repository"}
+		mc := &cobra.Command{Use: "delete-team", Short: "Delete a team from a repository"}
 		var repodeleteteam_owner string
 		mc.Flags().StringVar(&repodeleteteam_owner, "owner", "", "owner")
 		var repodeleteteam_repo string
@@ -7555,7 +7555,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /repos/{owner}/{repo}/topics/{topic} -> Repo.RepoDeleteTopic
-		mc := &cobra.Command{Use: "repo-delete-topic", Short: "Delete a topic from a repository"}
+		mc := &cobra.Command{Use: "delete-topic", Short: "Delete a topic from a repository"}
 		var repodeletetopic_owner string
 		mc.Flags().StringVar(&repodeletetopic_owner, "owner", "", "owner")
 		var repodeletetopic_repo string
@@ -7575,7 +7575,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /repos/{owner}/{repo}/wiki/page/{pageName} -> Repo.RepoDeleteWikiPage
-		mc := &cobra.Command{Use: "repo-delete-wiki-page", Short: "Delete a wiki page"}
+		mc := &cobra.Command{Use: "delete-wiki-page", Short: "Delete a wiki page"}
 		var repodeletewikipage_owner string
 		mc.Flags().StringVar(&repodeletewikipage_owner, "owner", "", "owner")
 		var repodeletewikipage_repo string
@@ -7595,7 +7595,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /repos/{owner}/{repo}/pulls/{index}/reviews/{id}/dismissals -> Repo.RepoDismissPullReview
-		mc := &cobra.Command{Use: "repo-dismiss-pull-review", Short: "Dismiss a review for a pull request"}
+		mc := &cobra.Command{Use: "dismiss-pull-review", Short: "Dismiss a review for a pull request"}
 		var repodismisspullreview_owner string
 		mc.Flags().StringVar(&repodismisspullreview_owner, "owner", "", "owner")
 		var repodismisspullreview_repo string
@@ -7624,7 +7624,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/git/commits/{sha}.{diffType} -> Repo.RepoDownloadCommitDiffOrPatch
-		mc := &cobra.Command{Use: "repo-download-commit-diff-or-patch", Short: "Get a commit's diff or patch"}
+		mc := &cobra.Command{Use: "download-commit-diff-or-patch", Short: "Get a commit's diff or patch"}
 		var repodownloadcommitdifforpatch_owner string
 		mc.Flags().StringVar(&repodownloadcommitdifforpatch_owner, "owner", "", "owner")
 		var repodownloadcommitdifforpatch_repo string
@@ -7649,7 +7649,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/pulls/{index}.{diffType} -> Repo.RepoDownloadPullDiffOrPatch
-		mc := &cobra.Command{Use: "repo-download-pull-diff-or-patch", Short: "Get a pull request diff or patch"}
+		mc := &cobra.Command{Use: "download-pull-diff-or-patch", Short: "Get a pull request diff or patch"}
 		var repodownloadpulldifforpatch_owner string
 		mc.Flags().StringVar(&repodownloadpulldifforpatch_owner, "owner", "", "owner")
 		var repodownloadpulldifforpatch_repo string
@@ -7676,7 +7676,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // PATCH /repos/{owner}/{repo} -> Repo.RepoEdit
-		mc := &cobra.Command{Use: "repo-edit", Short: "Edit a repository's properties. Only fields that are set will be changed."}
+		mc := &cobra.Command{Use: "edit", Short: "Edit a repository's properties. Only fields that are set will be changed."}
 		var repoedit_owner string
 		mc.Flags().StringVar(&repoedit_owner, "owner", "", "owner")
 		var repoedit_repo string
@@ -7699,7 +7699,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // PATCH /repos/{owner}/{repo}/branch_protections/{name} -> Repo.RepoEditBranchProtection
-		mc := &cobra.Command{Use: "repo-edit-branch-protection", Short: "Edit a branch protections for a repository. Only fields that are set will be changed"}
+		mc := &cobra.Command{Use: "edit-branch-protection", Short: "Edit a branch protections for a repository. Only fields that are set will be changed"}
 		var repoeditbranchprotection_owner string
 		mc.Flags().StringVar(&repoeditbranchprotection_owner, "owner", "", "owner")
 		var repoeditbranchprotection_repo string
@@ -7725,7 +7725,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // PATCH /repos/{owner}/{repo}/hooks/git/{id} -> Repo.RepoEditGitHook
-		mc := &cobra.Command{Use: "repo-edit-git-hook", Short: "Edit a Git hook in a repository"}
+		mc := &cobra.Command{Use: "edit-git-hook", Short: "Edit a Git hook in a repository"}
 		var repoeditgithook_owner string
 		mc.Flags().StringVar(&repoeditgithook_owner, "owner", "", "owner")
 		var repoeditgithook_repo string
@@ -7751,7 +7751,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // PATCH /repos/{owner}/{repo}/hooks/{id} -> Repo.RepoEditHook
-		mc := &cobra.Command{Use: "repo-edit-hook", Short: "Edit a hook in a repository"}
+		mc := &cobra.Command{Use: "edit-hook", Short: "Edit a hook in a repository"}
 		var repoedithook_owner string
 		mc.Flags().StringVar(&repoedithook_owner, "owner", "", "owner")
 		var repoedithook_repo string
@@ -7777,7 +7777,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // PATCH /repos/{owner}/{repo}/pulls/{index} -> Repo.RepoEditPullRequest
-		mc := &cobra.Command{Use: "repo-edit-pull-request", Short: "Update a pull request. If using deadline only the date will be taken into account, and time of day ignored."}
+		mc := &cobra.Command{Use: "edit-pull-request", Short: "Update a pull request. If using deadline only the date will be taken into account, and time of day ignored."}
 		var repoeditpullrequest_owner string
 		mc.Flags().StringVar(&repoeditpullrequest_owner, "owner", "", "owner")
 		var repoeditpullrequest_repo string
@@ -7803,7 +7803,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // PATCH /repos/{owner}/{repo}/releases/{id} -> Repo.RepoEditRelease
-		mc := &cobra.Command{Use: "repo-edit-release", Short: "Update a release"}
+		mc := &cobra.Command{Use: "edit-release", Short: "Update a release"}
 		var repoeditrelease_owner string
 		mc.Flags().StringVar(&repoeditrelease_owner, "owner", "", "owner")
 		var repoeditrelease_repo string
@@ -7829,7 +7829,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // PATCH /repos/{owner}/{repo}/releases/{id}/assets/{attachment_id} -> Repo.RepoEditReleaseAttachment
-		mc := &cobra.Command{Use: "repo-edit-release-attachment", Short: "Edit a release attachment"}
+		mc := &cobra.Command{Use: "edit-release-attachment", Short: "Edit a release attachment"}
 		var repoeditreleaseattachment_owner string
 		mc.Flags().StringVar(&repoeditreleaseattachment_owner, "owner", "", "owner")
 		var repoeditreleaseattachment_repo string
@@ -7858,7 +7858,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // PATCH /repos/{owner}/{repo}/tag_protections/{id} -> Repo.RepoEditTagProtection
-		mc := &cobra.Command{Use: "repo-edit-tag-protection", Short: "Edit a tag protections for a repository. Only fields that are set will be changed"}
+		mc := &cobra.Command{Use: "edit-tag-protection", Short: "Edit a tag protections for a repository. Only fields that are set will be changed"}
 		var repoedittagprotection_owner string
 		mc.Flags().StringVar(&repoedittagprotection_owner, "owner", "", "owner")
 		var repoedittagprotection_repo string
@@ -7884,7 +7884,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // PATCH /repos/{owner}/{repo}/wiki/page/{pageName} -> Repo.RepoEditWikiPage
-		mc := &cobra.Command{Use: "repo-edit-wiki-page", Short: "Edit a wiki page"}
+		mc := &cobra.Command{Use: "edit-wiki-page", Short: "Edit a wiki page"}
 		var repoeditwikipage_owner string
 		mc.Flags().StringVar(&repoeditwikipage_owner, "owner", "", "owner")
 		var repoeditwikipage_repo string
@@ -7910,7 +7910,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo} -> Repo.RepoGet
-		mc := &cobra.Command{Use: "repo-get", Short: "Get a repository"}
+		mc := &cobra.Command{Use: "get", Short: "Get a repository"}
 		var repoget_owner string
 		mc.Flags().StringVar(&repoget_owner, "owner", "", "owner")
 		var repoget_repo string
@@ -7929,7 +7929,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/actions/jobs/{job_id}/logs -> Repo.RepoGetActionJobLogs
-		mc := &cobra.Command{Use: "repo-get-action-job-logs", Short: "Download the plaintext logs of an action job"}
+		mc := &cobra.Command{Use: "get-action-job-logs", Short: "Download the plaintext logs of an action job"}
 		var repogetactionjoblogs_owner string
 		mc.Flags().StringVar(&repogetactionjoblogs_owner, "owner", "", "owner")
 		var repogetactionjoblogs_repo string
@@ -7953,7 +7953,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/actions/runs/{run_id}/logs -> Repo.RepoGetActionRunLogs
-		mc := &cobra.Command{Use: "repo-get-action-run-logs", Short: "Download a ZIP of plaintext logs for every job in an action run"}
+		mc := &cobra.Command{Use: "get-action-run-logs", Short: "Download a ZIP of plaintext logs for every job in an action run"}
 		var repogetactionrunlogs_owner string
 		mc.Flags().StringVar(&repogetactionrunlogs_owner, "owner", "", "owner")
 		var repogetactionrunlogs_repo string
@@ -7975,7 +7975,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/commits -> Repo.RepoGetAllCommits
-		mc := &cobra.Command{Use: "repo-get-all-commits", Short: "Get a list of all commits from a repository"}
+		mc := &cobra.Command{Use: "get-all-commits", Short: "Get a list of all commits from a repository"}
 		var repogetallcommits_owner string
 		mc.Flags().StringVar(&repogetallcommits_owner, "owner", "", "owner")
 		var repogetallcommits_repo string
@@ -8012,7 +8012,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/archive/{archive} -> Repo.RepoGetArchive
-		mc := &cobra.Command{Use: "repo-get-archive", Short: "Get an archive of a repository"}
+		mc := &cobra.Command{Use: "get-archive", Short: "Get an archive of a repository"}
 		var repogetarchive_owner string
 		mc.Flags().StringVar(&repogetarchive_owner, "owner", "", "owner")
 		var repogetarchive_repo string
@@ -8032,7 +8032,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/assignees -> Repo.RepoGetAssignees
-		mc := &cobra.Command{Use: "repo-get-assignees", Short: "Return all users that have write access and can be assigned to issues"}
+		mc := &cobra.Command{Use: "get-assignees", Short: "Return all users that have write access and can be assigned to issues"}
 		var repogetassignees_owner string
 		mc.Flags().StringVar(&repogetassignees_owner, "owner", "", "owner")
 		var repogetassignees_repo string
@@ -8053,7 +8053,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/branches/{branch} -> Repo.RepoGetBranch
-		mc := &cobra.Command{Use: "repo-get-branch", Short: "Retrieve a specific branch from a repository, including its effective branch protection"}
+		mc := &cobra.Command{Use: "get-branch", Short: "Retrieve a specific branch from a repository, including its effective branch protection"}
 		var repogetbranch_owner string
 		mc.Flags().StringVar(&repogetbranch_owner, "owner", "", "owner")
 		var repogetbranch_repo string
@@ -8075,7 +8075,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/branch_protections/{name} -> Repo.RepoGetBranchProtection
-		mc := &cobra.Command{Use: "repo-get-branch-protection", Short: "Get a specific branch protection for the repository"}
+		mc := &cobra.Command{Use: "get-branch-protection", Short: "Get a specific branch protection for the repository"}
 		var repogetbranchprotection_owner string
 		mc.Flags().StringVar(&repogetbranchprotection_owner, "owner", "", "owner")
 		var repogetbranchprotection_repo string
@@ -8097,7 +8097,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/commits/{ref}/status -> Repo.RepoGetCombinedStatusByRef
-		mc := &cobra.Command{Use: "repo-get-combined-status-by-ref", Short: "Get a commit's combined status, by branch/tag/commit reference"}
+		mc := &cobra.Command{Use: "get-combined-status-by-ref", Short: "Get a commit's combined status, by branch/tag/commit reference"}
 		var repogetcombinedstatusbyref_owner string
 		mc.Flags().StringVar(&repogetcombinedstatusbyref_owner, "owner", "", "owner")
 		var repogetcombinedstatusbyref_repo string
@@ -8123,7 +8123,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/commits/{sha}/pull -> Repo.RepoGetCommitPullRequest
-		mc := &cobra.Command{Use: "repo-get-commit-pull-request", Short: "Get the pull request of the commit"}
+		mc := &cobra.Command{Use: "get-commit-pull-request", Short: "Get the pull request of the commit"}
 		var repogetcommitpullrequest_owner string
 		mc.Flags().StringVar(&repogetcommitpullrequest_owner, "owner", "", "owner")
 		var repogetcommitpullrequest_repo string
@@ -8145,7 +8145,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/contents/{filepath} -> Repo.RepoGetContents
-		mc := &cobra.Command{Use: "repo-get-contents", Short: "Gets the metadata and contents (if a file) of an entry in a repository, or a list of entries if a dir"}
+		mc := &cobra.Command{Use: "get-contents", Short: "Gets the metadata and contents (if a file) of an entry in a repository, or a list of entries if a dir"}
 		var repogetcontents_owner string
 		mc.Flags().StringVar(&repogetcontents_owner, "owner", "", "owner")
 		var repogetcontents_repo string
@@ -8169,7 +8169,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/contents -> Repo.RepoGetContentsList
-		mc := &cobra.Command{Use: "repo-get-contents-list", Short: "Gets the metadata of all the entries of the root dir"}
+		mc := &cobra.Command{Use: "get-contents-list", Short: "Gets the metadata of all the entries of the root dir"}
 		var repogetcontentslist_owner string
 		mc.Flags().StringVar(&repogetcontentslist_owner, "owner", "", "owner")
 		var repogetcontentslist_repo string
@@ -8192,7 +8192,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/editorconfig/{filepath} -> Repo.RepoGetEditorConfig
-		mc := &cobra.Command{Use: "repo-get-editor-config", Short: "Get the EditorConfig definitions of a file in a repository"}
+		mc := &cobra.Command{Use: "get-editor-config", Short: "Get the EditorConfig definitions of a file in a repository"}
 		var repogeteditorconfig_owner string
 		mc.Flags().StringVar(&repogeteditorconfig_owner, "owner", "", "owner")
 		var repogeteditorconfig_repo string
@@ -8216,7 +8216,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/hooks/git/{id} -> Repo.RepoGetGitHook
-		mc := &cobra.Command{Use: "repo-get-git-hook", Short: "Get a Git hook"}
+		mc := &cobra.Command{Use: "get-git-hook", Short: "Get a Git hook"}
 		var repogetgithook_owner string
 		mc.Flags().StringVar(&repogetgithook_owner, "owner", "", "owner")
 		var repogetgithook_repo string
@@ -8238,7 +8238,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/hooks/{id} -> Repo.RepoGetHook
-		mc := &cobra.Command{Use: "repo-get-hook", Short: "Get a hook"}
+		mc := &cobra.Command{Use: "get-hook", Short: "Get a hook"}
 		var repogethook_owner string
 		mc.Flags().StringVar(&repogethook_owner, "owner", "", "owner")
 		var repogethook_repo string
@@ -8260,7 +8260,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/issue_config -> Repo.RepoGetIssueConfig
-		mc := &cobra.Command{Use: "repo-get-issue-config", Short: "Returns the issue config for a repo"}
+		mc := &cobra.Command{Use: "get-issue-config", Short: "Returns the issue config for a repo"}
 		var repogetissueconfig_owner string
 		mc.Flags().StringVar(&repogetissueconfig_owner, "owner", "", "owner")
 		var repogetissueconfig_repo string
@@ -8279,7 +8279,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/issue_templates -> Repo.RepoGetIssueTemplates
-		mc := &cobra.Command{Use: "repo-get-issue-templates", Short: "Get available issue templates for a repository"}
+		mc := &cobra.Command{Use: "get-issue-templates", Short: "Get available issue templates for a repository"}
 		var repogetissuetemplates_owner string
 		mc.Flags().StringVar(&repogetissuetemplates_owner, "owner", "", "owner")
 		var repogetissuetemplates_repo string
@@ -8300,7 +8300,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/keys/{id} -> Repo.RepoGetKey
-		mc := &cobra.Command{Use: "repo-get-key", Short: "Get a repository's key by id"}
+		mc := &cobra.Command{Use: "get-key", Short: "Get a repository's key by id"}
 		var repogetkey_owner string
 		mc.Flags().StringVar(&repogetkey_owner, "owner", "", "owner")
 		var repogetkey_repo string
@@ -8322,7 +8322,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/languages -> Repo.RepoGetLanguages
-		mc := &cobra.Command{Use: "repo-get-languages", Short: "Get languages and number of bytes of code written"}
+		mc := &cobra.Command{Use: "get-languages", Short: "Get languages and number of bytes of code written"}
 		var repogetlanguages_owner string
 		mc.Flags().StringVar(&repogetlanguages_owner, "owner", "", "owner")
 		var repogetlanguages_repo string
@@ -8341,7 +8341,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/releases/latest -> Repo.RepoGetLatestRelease
-		mc := &cobra.Command{Use: "repo-get-latest-release", Short: "Gets the most recent non-prerelease, non-draft release of a repository, sorted by created_at"}
+		mc := &cobra.Command{Use: "get-latest-release", Short: "Gets the most recent non-prerelease, non-draft release of a repository, sorted by created_at"}
 		var repogetlatestrelease_owner string
 		mc.Flags().StringVar(&repogetlatestrelease_owner, "owner", "", "owner")
 		var repogetlatestrelease_repo string
@@ -8360,7 +8360,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/git/notes/{sha} -> Repo.RepoGetNote
-		mc := &cobra.Command{Use: "repo-get-note", Short: "Get a note corresponding to a single commit from a repository"}
+		mc := &cobra.Command{Use: "get-note", Short: "Get a note corresponding to a single commit from a repository"}
 		var repogetnote_owner string
 		mc.Flags().StringVar(&repogetnote_owner, "owner", "", "owner")
 		var repogetnote_repo string
@@ -8386,7 +8386,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/pulls/{index} -> Repo.RepoGetPullRequest
-		mc := &cobra.Command{Use: "repo-get-pull-request", Short: "Get a pull request"}
+		mc := &cobra.Command{Use: "get-pull-request", Short: "Get a pull request"}
 		var repogetpullrequest_owner string
 		mc.Flags().StringVar(&repogetpullrequest_owner, "owner", "", "owner")
 		var repogetpullrequest_repo string
@@ -8408,7 +8408,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/pulls/{base}/{head} -> Repo.RepoGetPullRequestByBaseHead
-		mc := &cobra.Command{Use: "repo-get-pull-request-by-base-head", Short: "Get a pull request by base and head"}
+		mc := &cobra.Command{Use: "get-pull-request-by-base-head", Short: "Get a pull request by base and head"}
 		var repogetpullrequestbybasehead_owner string
 		mc.Flags().StringVar(&repogetpullrequestbybasehead_owner, "owner", "", "owner")
 		var repogetpullrequestbybasehead_repo string
@@ -8433,7 +8433,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/pulls/{index}/commits -> Repo.RepoGetPullRequestCommits
-		mc := &cobra.Command{Use: "repo-get-pull-request-commits", Short: "Get commits for a pull request"}
+		mc := &cobra.Command{Use: "get-pull-request-commits", Short: "Get commits for a pull request"}
 		var repogetpullrequestcommits_owner string
 		mc.Flags().StringVar(&repogetpullrequestcommits_owner, "owner", "", "owner")
 		var repogetpullrequestcommits_repo string
@@ -8465,7 +8465,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/pulls/{index}/files -> Repo.RepoGetPullRequestFiles
-		mc := &cobra.Command{Use: "repo-get-pull-request-files", Short: "Get changed files for a pull request"}
+		mc := &cobra.Command{Use: "get-pull-request-files", Short: "Get changed files for a pull request"}
 		var repogetpullrequestfiles_owner string
 		mc.Flags().StringVar(&repogetpullrequestfiles_owner, "owner", "", "owner")
 		var repogetpullrequestfiles_repo string
@@ -8497,7 +8497,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/pulls/{index}/reviews/{id} -> Repo.RepoGetPullReview
-		mc := &cobra.Command{Use: "repo-get-pull-review", Short: "Get a specific review for a pull request"}
+		mc := &cobra.Command{Use: "get-pull-review", Short: "Get a specific review for a pull request"}
 		var repogetpullreview_owner string
 		mc.Flags().StringVar(&repogetpullreview_owner, "owner", "", "owner")
 		var repogetpullreview_repo string
@@ -8522,7 +8522,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/pulls/{index}/reviews/{id}/comments/{comment} -> Repo.RepoGetPullReviewComment
-		mc := &cobra.Command{Use: "repo-get-pull-review-comment", Short: "Get a pull review comment"}
+		mc := &cobra.Command{Use: "get-pull-review-comment", Short: "Get a pull review comment"}
 		var repogetpullreviewcomment_owner string
 		mc.Flags().StringVar(&repogetpullreviewcomment_owner, "owner", "", "owner")
 		var repogetpullreviewcomment_repo string
@@ -8550,7 +8550,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/pulls/{index}/reviews/{id}/comments -> Repo.RepoGetPullReviewComments
-		mc := &cobra.Command{Use: "repo-get-pull-review-comments", Short: "Get a specific review for a pull request"}
+		mc := &cobra.Command{Use: "get-pull-review-comments", Short: "Get a specific review for a pull request"}
 		var repogetpullreviewcomments_owner string
 		mc.Flags().StringVar(&repogetpullreviewcomments_owner, "owner", "", "owner")
 		var repogetpullreviewcomments_repo string
@@ -8577,7 +8577,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/push_mirrors/{name} -> Repo.RepoGetPushMirrorByRemoteName
-		mc := &cobra.Command{Use: "repo-get-push-mirror-by-remote-name", Short: "Get push mirror of the repository by remoteName"}
+		mc := &cobra.Command{Use: "get-push-mirror-by-remote-name", Short: "Get push mirror of the repository by remoteName"}
 		var repogetpushmirrorbyremotename_owner string
 		mc.Flags().StringVar(&repogetpushmirrorbyremotename_owner, "owner", "", "owner")
 		var repogetpushmirrorbyremotename_repo string
@@ -8599,7 +8599,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/raw/{filepath} -> Repo.RepoGetRawFile
-		mc := &cobra.Command{Use: "repo-get-raw-file", Short: "Get a file from a repository"}
+		mc := &cobra.Command{Use: "get-raw-file", Short: "Get a file from a repository"}
 		var repogetrawfile_owner string
 		mc.Flags().StringVar(&repogetrawfile_owner, "owner", "", "owner")
 		var repogetrawfile_repo string
@@ -8625,7 +8625,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/media/{filepath} -> Repo.RepoGetRawFileOrLFS
-		mc := &cobra.Command{Use: "repo-get-raw-file-or-l-f-s", Short: "Get a file or it's LFS object from a repository"}
+		mc := &cobra.Command{Use: "get-raw-file-or-l-f-s", Short: "Get a file or it's LFS object from a repository"}
 		var repogetrawfileorlfs_owner string
 		mc.Flags().StringVar(&repogetrawfileorlfs_owner, "owner", "", "owner")
 		var repogetrawfileorlfs_repo string
@@ -8651,7 +8651,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/releases/{id} -> Repo.RepoGetRelease
-		mc := &cobra.Command{Use: "repo-get-release", Short: "Get a release"}
+		mc := &cobra.Command{Use: "get-release", Short: "Get a release"}
 		var repogetrelease_owner string
 		mc.Flags().StringVar(&repogetrelease_owner, "owner", "", "owner")
 		var repogetrelease_repo string
@@ -8673,7 +8673,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/releases/{id}/assets/{attachment_id} -> Repo.RepoGetReleaseAttachment
-		mc := &cobra.Command{Use: "repo-get-release-attachment", Short: "Get a release attachment"}
+		mc := &cobra.Command{Use: "get-release-attachment", Short: "Get a release attachment"}
 		var repogetreleaseattachment_owner string
 		mc.Flags().StringVar(&repogetreleaseattachment_owner, "owner", "", "owner")
 		var repogetreleaseattachment_repo string
@@ -8698,7 +8698,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/releases/tags/{tag} -> Repo.RepoGetReleaseByTag
-		mc := &cobra.Command{Use: "repo-get-release-by-tag", Short: "Get a release by tag name"}
+		mc := &cobra.Command{Use: "get-release-by-tag", Short: "Get a release by tag name"}
 		var repogetreleasebytag_owner string
 		mc.Flags().StringVar(&repogetreleasebytag_owner, "owner", "", "owner")
 		var repogetreleasebytag_repo string
@@ -8720,7 +8720,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/collaborators/{collaborator}/permission -> Repo.RepoGetRepoPermissions
-		mc := &cobra.Command{Use: "repo-get-repo-permissions", Short: "Get repository permissions for a user"}
+		mc := &cobra.Command{Use: "get-repo-permissions", Short: "Get repository permissions for a user"}
 		var repogetrepopermissions_owner string
 		mc.Flags().StringVar(&repogetrepopermissions_owner, "owner", "", "owner")
 		var repogetrepopermissions_repo string
@@ -8742,7 +8742,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/reviewers -> Repo.RepoGetReviewers
-		mc := &cobra.Command{Use: "repo-get-reviewers", Short: "Return all users that can be requested to review in this repo"}
+		mc := &cobra.Command{Use: "get-reviewers", Short: "Return all users that can be requested to review in this repo"}
 		var repogetreviewers_owner string
 		mc.Flags().StringVar(&repogetreviewers_owner, "owner", "", "owner")
 		var repogetreviewers_repo string
@@ -8763,7 +8763,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/actions/runners/registration-token -> Repo.RepoGetRunnerRegistrationToken
-		mc := &cobra.Command{Use: "repo-get-runner-registration-token", Short: "Get a repository's runner registration token"}
+		mc := &cobra.Command{Use: "get-runner-registration-token", Short: "Get a repository's runner registration token"}
 		var repogetrunnerregistrationtoken_owner string
 		mc.Flags().StringVar(&repogetrunnerregistrationtoken_owner, "owner", "", "owner")
 		var repogetrunnerregistrationtoken_repo string
@@ -8782,7 +8782,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/git/commits/{sha} -> Repo.RepoGetSingleCommit
-		mc := &cobra.Command{Use: "repo-get-single-commit", Short: "Get a single commit from a repository"}
+		mc := &cobra.Command{Use: "get-single-commit", Short: "Get a single commit from a repository"}
 		var repogetsinglecommit_owner string
 		mc.Flags().StringVar(&repogetsinglecommit_owner, "owner", "", "owner")
 		var repogetsinglecommit_repo string
@@ -8810,7 +8810,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/tags/{tag} -> Repo.RepoGetTag
-		mc := &cobra.Command{Use: "repo-get-tag", Short: "Get the tag of a repository by tag name"}
+		mc := &cobra.Command{Use: "get-tag", Short: "Get the tag of a repository by tag name"}
 		var repogettag_owner string
 		mc.Flags().StringVar(&repogettag_owner, "owner", "", "owner")
 		var repogettag_repo string
@@ -8832,7 +8832,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/tag_protections/{id} -> Repo.RepoGetTagProtection
-		mc := &cobra.Command{Use: "repo-get-tag-protection", Short: "Get a specific tag protection for the repository"}
+		mc := &cobra.Command{Use: "get-tag-protection", Short: "Get a specific tag protection for the repository"}
 		var repogettagprotection_owner string
 		mc.Flags().StringVar(&repogettagprotection_owner, "owner", "", "owner")
 		var repogettagprotection_repo string
@@ -8854,7 +8854,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/wiki/page/{pageName} -> Repo.RepoGetWikiPage
-		mc := &cobra.Command{Use: "repo-get-wiki-page", Short: "Get a wiki page"}
+		mc := &cobra.Command{Use: "get-wiki-page", Short: "Get a wiki page"}
 		var repogetwikipage_owner string
 		mc.Flags().StringVar(&repogetwikipage_owner, "owner", "", "owner")
 		var repogetwikipage_repo string
@@ -8876,7 +8876,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/wiki/revisions/{pageName} -> Repo.RepoGetWikiPageRevisions
-		mc := &cobra.Command{Use: "repo-get-wiki-page-revisions", Short: "Get revisions of a wiki page"}
+		mc := &cobra.Command{Use: "get-wiki-page-revisions", Short: "Get revisions of a wiki page"}
 		var repogetwikipagerevisions_owner string
 		mc.Flags().StringVar(&repogetwikipagerevisions_owner, "owner", "", "owner")
 		var repogetwikipagerevisions_repo string
@@ -8900,7 +8900,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/wiki/pages -> Repo.RepoGetWikiPages
-		mc := &cobra.Command{Use: "repo-get-wiki-pages", Short: "Get all wiki pages"}
+		mc := &cobra.Command{Use: "get-wiki-pages", Short: "Get all wiki pages"}
 		var repogetwikipages_owner string
 		mc.Flags().StringVar(&repogetwikipages_owner, "owner", "", "owner")
 		var repogetwikipages_repo string
@@ -8925,7 +8925,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/actions/secrets -> Repo.RepoListActionsSecrets
-		mc := &cobra.Command{Use: "repo-list-actions-secrets", Short: "List an repo's actions secrets"}
+		mc := &cobra.Command{Use: "list-actions-secrets", Short: "List an repo's actions secrets"}
 		var repolistactionssecrets_owner string
 		mc.Flags().StringVar(&repolistactionssecrets_owner, "owner", "", "owner")
 		var repolistactionssecrets_repo string
@@ -8950,7 +8950,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/activities/feeds -> Repo.RepoListActivityFeeds
-		mc := &cobra.Command{Use: "repo-list-activity-feeds", Short: "List a repository's activity feeds"}
+		mc := &cobra.Command{Use: "list-activity-feeds", Short: "List a repository's activity feeds"}
 		var repolistactivityfeeds_owner string
 		mc.Flags().StringVar(&repolistactivityfeeds_owner, "owner", "", "owner")
 		var repolistactivityfeeds_repo string
@@ -8977,7 +8977,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/git/refs -> Repo.RepoListAllGitRefs
-		mc := &cobra.Command{Use: "repo-list-all-git-refs", Short: "Get specified ref or filtered repository's refs"}
+		mc := &cobra.Command{Use: "list-all-git-refs", Short: "Get specified ref or filtered repository's refs"}
 		var repolistallgitrefs_owner string
 		mc.Flags().StringVar(&repolistallgitrefs_owner, "owner", "", "owner")
 		var repolistallgitrefs_repo string
@@ -8998,7 +8998,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/branch_protections -> Repo.RepoListBranchProtection
-		mc := &cobra.Command{Use: "repo-list-branch-protection", Short: "List branch protections for a repository"}
+		mc := &cobra.Command{Use: "list-branch-protection", Short: "List branch protections for a repository"}
 		var repolistbranchprotection_owner string
 		mc.Flags().StringVar(&repolistbranchprotection_owner, "owner", "", "owner")
 		var repolistbranchprotection_repo string
@@ -9019,7 +9019,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/branches -> Repo.RepoListBranches
-		mc := &cobra.Command{Use: "repo-list-branches", Short: "List a repository's branches"}
+		mc := &cobra.Command{Use: "list-branches", Short: "List a repository's branches"}
 		var repolistbranches_owner string
 		mc.Flags().StringVar(&repolistbranches_owner, "owner", "", "owner")
 		var repolistbranches_repo string
@@ -9044,7 +9044,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/collaborators -> Repo.RepoListCollaborators
-		mc := &cobra.Command{Use: "repo-list-collaborators", Short: "List a repository's collaborators"}
+		mc := &cobra.Command{Use: "list-collaborators", Short: "List a repository's collaborators"}
 		var repolistcollaborators_owner string
 		mc.Flags().StringVar(&repolistcollaborators_owner, "owner", "", "owner")
 		var repolistcollaborators_repo string
@@ -9069,7 +9069,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/flags -> Repo.RepoListFlags
-		mc := &cobra.Command{Use: "repo-list-flags", Short: "List a repository's flags"}
+		mc := &cobra.Command{Use: "list-flags", Short: "List a repository's flags"}
 		var repolistflags_owner string
 		mc.Flags().StringVar(&repolistflags_owner, "owner", "", "owner")
 		var repolistflags_repo string
@@ -9090,7 +9090,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/hooks/git -> Repo.RepoListGitHooks
-		mc := &cobra.Command{Use: "repo-list-git-hooks", Short: "List the Git hooks in a repository"}
+		mc := &cobra.Command{Use: "list-git-hooks", Short: "List the Git hooks in a repository"}
 		var repolistgithooks_owner string
 		mc.Flags().StringVar(&repolistgithooks_owner, "owner", "", "owner")
 		var repolistgithooks_repo string
@@ -9111,7 +9111,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/git/refs/{ref} -> Repo.RepoListGitRefs
-		mc := &cobra.Command{Use: "repo-list-git-refs", Short: "Get specified ref or filtered repository's refs"}
+		mc := &cobra.Command{Use: "list-git-refs", Short: "Get specified ref or filtered repository's refs"}
 		var repolistgitrefs_owner string
 		mc.Flags().StringVar(&repolistgitrefs_owner, "owner", "", "owner")
 		var repolistgitrefs_repo string
@@ -9135,7 +9135,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/hooks -> Repo.RepoListHooks
-		mc := &cobra.Command{Use: "repo-list-hooks", Short: "List the hooks in a repository"}
+		mc := &cobra.Command{Use: "list-hooks", Short: "List the hooks in a repository"}
 		var repolisthooks_owner string
 		mc.Flags().StringVar(&repolisthooks_owner, "owner", "", "owner")
 		var repolisthooks_repo string
@@ -9160,7 +9160,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/keys -> Repo.RepoListKeys
-		mc := &cobra.Command{Use: "repo-list-keys", Short: "List a repository's keys"}
+		mc := &cobra.Command{Use: "list-keys", Short: "List a repository's keys"}
 		var repolistkeys_owner string
 		mc.Flags().StringVar(&repolistkeys_owner, "owner", "", "owner")
 		var repolistkeys_repo string
@@ -9189,7 +9189,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/issues/pinned -> Repo.RepoListPinnedIssues
-		mc := &cobra.Command{Use: "repo-list-pinned-issues", Short: "List a repo's pinned issues"}
+		mc := &cobra.Command{Use: "list-pinned-issues", Short: "List a repo's pinned issues"}
 		var repolistpinnedissues_owner string
 		mc.Flags().StringVar(&repolistpinnedissues_owner, "owner", "", "owner")
 		var repolistpinnedissues_repo string
@@ -9210,7 +9210,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/pulls/pinned -> Repo.RepoListPinnedPullRequests
-		mc := &cobra.Command{Use: "repo-list-pinned-pull-requests", Short: "List a repo's pinned pull requests"}
+		mc := &cobra.Command{Use: "list-pinned-pull-requests", Short: "List a repo's pinned pull requests"}
 		var repolistpinnedpullrequests_owner string
 		mc.Flags().StringVar(&repolistpinnedpullrequests_owner, "owner", "", "owner")
 		var repolistpinnedpullrequests_repo string
@@ -9231,7 +9231,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/pulls -> Repo.RepoListPullRequests
-		mc := &cobra.Command{Use: "repo-list-pull-requests", Short: "List a repo's pull requests. If a pull request is selected but fails to be retrieved for any reason, it will be a null value in the list of results."}
+		mc := &cobra.Command{Use: "list-pull-requests", Short: "List a repo's pull requests. If a pull request is selected but fails to be retrieved for any reason, it will be a null value in the list of results."}
 		var repolistpullrequests_owner string
 		mc.Flags().StringVar(&repolistpullrequests_owner, "owner", "", "owner")
 		var repolistpullrequests_repo string
@@ -9270,7 +9270,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/pulls/{index}/reviews -> Repo.RepoListPullReviews
-		mc := &cobra.Command{Use: "repo-list-pull-reviews", Short: "List all reviews for a pull request"}
+		mc := &cobra.Command{Use: "list-pull-reviews", Short: "List all reviews for a pull request"}
 		var repolistpullreviews_owner string
 		mc.Flags().StringVar(&repolistpullreviews_owner, "owner", "", "owner")
 		var repolistpullreviews_repo string
@@ -9298,7 +9298,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/push_mirrors -> Repo.RepoListPushMirrors
-		mc := &cobra.Command{Use: "repo-list-push-mirrors", Short: "Get all push mirrors of the repository"}
+		mc := &cobra.Command{Use: "list-push-mirrors", Short: "Get all push mirrors of the repository"}
 		var repolistpushmirrors_owner string
 		mc.Flags().StringVar(&repolistpushmirrors_owner, "owner", "", "owner")
 		var repolistpushmirrors_repo string
@@ -9323,7 +9323,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/releases/{id}/assets -> Repo.RepoListReleaseAttachments
-		mc := &cobra.Command{Use: "repo-list-release-attachments", Short: "List release's attachments"}
+		mc := &cobra.Command{Use: "list-release-attachments", Short: "List release's attachments"}
 		var repolistreleaseattachments_owner string
 		mc.Flags().StringVar(&repolistreleaseattachments_owner, "owner", "", "owner")
 		var repolistreleaseattachments_repo string
@@ -9347,7 +9347,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/releases -> Repo.RepoListReleases
-		mc := &cobra.Command{Use: "repo-list-releases", Short: "List a repo's releases"}
+		mc := &cobra.Command{Use: "list-releases", Short: "List a repo's releases"}
 		var repolistreleases_owner string
 		mc.Flags().StringVar(&repolistreleases_owner, "owner", "", "owner")
 		var repolistreleases_repo string
@@ -9378,7 +9378,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/stargazers -> Repo.RepoListStargazers
-		mc := &cobra.Command{Use: "repo-list-stargazers", Short: "List a repo's stargazers"}
+		mc := &cobra.Command{Use: "list-stargazers", Short: "List a repo's stargazers"}
 		var repoliststargazers_owner string
 		mc.Flags().StringVar(&repoliststargazers_owner, "owner", "", "owner")
 		var repoliststargazers_repo string
@@ -9403,7 +9403,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/statuses/{sha} -> Repo.RepoListStatuses
-		mc := &cobra.Command{Use: "repo-list-statuses", Short: "Get a commit's statuses"}
+		mc := &cobra.Command{Use: "list-statuses", Short: "Get a commit's statuses"}
 		var repoliststatuses_owner string
 		mc.Flags().StringVar(&repoliststatuses_owner, "owner", "", "owner")
 		var repoliststatuses_repo string
@@ -9435,7 +9435,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/commits/{ref}/statuses -> Repo.RepoListStatusesByRef
-		mc := &cobra.Command{Use: "repo-list-statuses-by-ref", Short: "Get a commit's statuses, by branch/tag/commit reference"}
+		mc := &cobra.Command{Use: "list-statuses-by-ref", Short: "Get a commit's statuses, by branch/tag/commit reference"}
 		var repoliststatusesbyref_owner string
 		mc.Flags().StringVar(&repoliststatusesbyref_owner, "owner", "", "owner")
 		var repoliststatusesbyref_repo string
@@ -9467,7 +9467,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/subscribers -> Repo.RepoListSubscribers
-		mc := &cobra.Command{Use: "repo-list-subscribers", Short: "List a repo's watchers"}
+		mc := &cobra.Command{Use: "list-subscribers", Short: "List a repo's watchers"}
 		var repolistsubscribers_owner string
 		mc.Flags().StringVar(&repolistsubscribers_owner, "owner", "", "owner")
 		var repolistsubscribers_repo string
@@ -9492,7 +9492,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/tag_protections -> Repo.RepoListTagProtection
-		mc := &cobra.Command{Use: "repo-list-tag-protection", Short: "List tag protections for a repository"}
+		mc := &cobra.Command{Use: "list-tag-protection", Short: "List tag protections for a repository"}
 		var repolisttagprotection_owner string
 		mc.Flags().StringVar(&repolisttagprotection_owner, "owner", "", "owner")
 		var repolisttagprotection_repo string
@@ -9513,7 +9513,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/tags -> Repo.RepoListTags
-		mc := &cobra.Command{Use: "repo-list-tags", Short: "List a repository's tags"}
+		mc := &cobra.Command{Use: "list-tags", Short: "List a repository's tags"}
 		var repolisttags_owner string
 		mc.Flags().StringVar(&repolisttags_owner, "owner", "", "owner")
 		var repolisttags_repo string
@@ -9538,7 +9538,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/teams -> Repo.RepoListTeams
-		mc := &cobra.Command{Use: "repo-list-teams", Short: "List a repository's teams"}
+		mc := &cobra.Command{Use: "list-teams", Short: "List a repository's teams"}
 		var repolistteams_owner string
 		mc.Flags().StringVar(&repolistteams_owner, "owner", "", "owner")
 		var repolistteams_repo string
@@ -9559,7 +9559,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/topics -> Repo.RepoListTopics
-		mc := &cobra.Command{Use: "repo-list-topics", Short: "Get list of topics that a repository has"}
+		mc := &cobra.Command{Use: "list-topics", Short: "Get list of topics that a repository has"}
 		var repolisttopics_owner string
 		mc.Flags().StringVar(&repolisttopics_owner, "owner", "", "owner")
 		var repolisttopics_repo string
@@ -9582,7 +9582,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /repos/{owner}/{repo}/pulls/{index}/merge -> Repo.RepoMergePullRequest
-		mc := &cobra.Command{Use: "repo-merge-pull-request", Short: "Merge a pull request"}
+		mc := &cobra.Command{Use: "merge-pull-request", Short: "Merge a pull request"}
 		var repomergepullrequest_owner string
 		mc.Flags().StringVar(&repomergepullrequest_owner, "owner", "", "owner")
 		var repomergepullrequest_repo string
@@ -9606,7 +9606,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /repos/migrate -> Repo.RepoMigrate
-		mc := &cobra.Command{Use: "repo-migrate", Short: "Migrate a remote git repository"}
+		mc := &cobra.Command{Use: "migrate", Short: "Migrate a remote git repository"}
 		var repomigrate_body string
 		mc.Flags().StringVar(&repomigrate_body, "body", "", "body")
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
@@ -9623,7 +9623,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /repos/{owner}/{repo}/mirror-sync -> Repo.RepoMirrorSync
-		mc := &cobra.Command{Use: "repo-mirror-sync", Short: "Sync a mirrored repository"}
+		mc := &cobra.Command{Use: "mirror-sync", Short: "Sync a mirrored repository"}
 		var repomirrorsync_owner string
 		mc.Flags().StringVar(&repomirrorsync_owner, "owner", "", "owner")
 		var repomirrorsync_repo string
@@ -9640,7 +9640,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/new_pin_allowed -> Repo.RepoNewPinAllowed
-		mc := &cobra.Command{Use: "repo-new-pin-allowed", Short: "Returns if new Issue Pins are allowed"}
+		mc := &cobra.Command{Use: "new-pin-allowed", Short: "Returns if new Issue Pins are allowed"}
 		var reponewpinallowed_owner string
 		mc.Flags().StringVar(&reponewpinallowed_owner, "owner", "", "owner")
 		var reponewpinallowed_repo string
@@ -9659,7 +9659,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/pulls/{index}/merge -> Repo.RepoPullRequestIsMerged
-		mc := &cobra.Command{Use: "repo-pull-request-is-merged", Short: "Check if a pull request has been merged"}
+		mc := &cobra.Command{Use: "pull-request-is-merged", Short: "Check if a pull request has been merged"}
 		var repopullrequestismerged_owner string
 		mc.Flags().StringVar(&repopullrequestismerged_owner, "owner", "", "owner")
 		var repopullrequestismerged_repo string
@@ -9679,7 +9679,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /repos/{owner}/{repo}/push_mirrors-sync -> Repo.RepoPushMirrorSync
-		mc := &cobra.Command{Use: "repo-push-mirror-sync", Short: "Sync all push mirrored repository"}
+		mc := &cobra.Command{Use: "push-mirror-sync", Short: "Sync all push mirrored repository"}
 		var repopushmirrorsync_owner string
 		mc.Flags().StringVar(&repopushmirrorsync_owner, "owner", "", "owner")
 		var repopushmirrorsync_repo string
@@ -9696,7 +9696,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /repos/{owner}/{repo}/git/notes/{sha} -> Repo.RepoRemoveNote
-		mc := &cobra.Command{Use: "repo-remove-note", Short: "Removes a note corresponding to a single commit from a repository"}
+		mc := &cobra.Command{Use: "remove-note", Short: "Removes a note corresponding to a single commit from a repository"}
 		var reporemovenote_owner string
 		mc.Flags().StringVar(&reporemovenote_owner, "owner", "", "owner")
 		var reporemovenote_repo string
@@ -9716,7 +9716,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // PUT /repos/{owner}/{repo}/flags -> Repo.RepoReplaceAllFlags
-		mc := &cobra.Command{Use: "repo-replace-all-flags", Short: "Replace all flags of a repository"}
+		mc := &cobra.Command{Use: "replace-all-flags", Short: "Replace all flags of a repository"}
 		var reporeplaceallflags_owner string
 		mc.Flags().StringVar(&reporeplaceallflags_owner, "owner", "", "owner")
 		var reporeplaceallflags_repo string
@@ -9737,7 +9737,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/search -> Repo.RepoSearch
-		mc := &cobra.Command{Use: "repo-search", Short: "Search for repositories"}
+		mc := &cobra.Command{Use: "search", Short: "Search for repositories"}
 		var reposearch_q string
 		mc.Flags().StringVar(&reposearch_q, "q", "", "q")
 		var reposearch_topic bool
@@ -9784,7 +9784,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/actions/runners/jobs -> Repo.RepoSearchRunJobs
-		mc := &cobra.Command{Use: "repo-search-run-jobs", Short: "Search for repository's action jobs according filter conditions"}
+		mc := &cobra.Command{Use: "search-run-jobs", Short: "Search for repository's action jobs according filter conditions"}
 		var reposearchrunjobs_owner string
 		mc.Flags().StringVar(&reposearchrunjobs_owner, "owner", "", "owner")
 		var reposearchrunjobs_repo string
@@ -9807,7 +9807,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /repos/{owner}/{repo}/git/notes/{sha} -> Repo.RepoSetNote
-		mc := &cobra.Command{Use: "repo-set-note", Short: "Set a note corresponding to a single commit from a repository"}
+		mc := &cobra.Command{Use: "set-note", Short: "Set a note corresponding to a single commit from a repository"}
 		var reposetnote_owner string
 		mc.Flags().StringVar(&reposetnote_owner, "owner", "", "owner")
 		var reposetnote_repo string
@@ -9833,7 +9833,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/signing-key.gpg -> Repo.RepoSigningKey
-		mc := &cobra.Command{Use: "repo-signing-key", Short: "Get signing-key.gpg for given repository"}
+		mc := &cobra.Command{Use: "signing-key", Short: "Get signing-key.gpg for given repository"}
 		var reposigningkey_owner string
 		mc.Flags().StringVar(&reposigningkey_owner, "owner", "", "owner")
 		var reposigningkey_repo string
@@ -9852,7 +9852,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /repos/{owner}/{repo}/pulls/{index}/reviews/{id} -> Repo.RepoSubmitPullReview
-		mc := &cobra.Command{Use: "repo-submit-pull-review", Short: "Submit a pending review to an pull request"}
+		mc := &cobra.Command{Use: "submit-pull-review", Short: "Submit a pending review to an pull request"}
 		var reposubmitpullreview_owner string
 		mc.Flags().StringVar(&reposubmitpullreview_owner, "owner", "", "owner")
 		var reposubmitpullreview_repo string
@@ -9881,7 +9881,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /repos/{owner}/{repo}/sync_fork/{branch} -> Repo.RepoSyncForkBranch
-		mc := &cobra.Command{Use: "repo-sync-fork-branch", Short: "Syncs a fork branch with the base branch"}
+		mc := &cobra.Command{Use: "sync-fork-branch", Short: "Syncs a fork branch with the base branch"}
 		var reposyncforkbranch_owner string
 		mc.Flags().StringVar(&reposyncforkbranch_owner, "owner", "", "owner")
 		var reposyncforkbranch_repo string
@@ -9901,7 +9901,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/sync_fork/{branch} -> Repo.RepoSyncForkBranchInfo
-		mc := &cobra.Command{Use: "repo-sync-fork-branch-info", Short: "Gets information about syncing a fork branch with the base branch"}
+		mc := &cobra.Command{Use: "sync-fork-branch-info", Short: "Gets information about syncing a fork branch with the base branch"}
 		var reposyncforkbranchinfo_owner string
 		mc.Flags().StringVar(&reposyncforkbranchinfo_owner, "owner", "", "owner")
 		var reposyncforkbranchinfo_repo string
@@ -9923,7 +9923,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /repos/{owner}/{repo}/sync_fork -> Repo.RepoSyncForkDefault
-		mc := &cobra.Command{Use: "repo-sync-fork-default", Short: "Syncs the default branch of a fork with the base branch"}
+		mc := &cobra.Command{Use: "sync-fork-default", Short: "Syncs the default branch of a fork with the base branch"}
 		var reposyncforkdefault_owner string
 		mc.Flags().StringVar(&reposyncforkdefault_owner, "owner", "", "owner")
 		var reposyncforkdefault_repo string
@@ -9940,7 +9940,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/sync_fork -> Repo.RepoSyncForkDefaultInfo
-		mc := &cobra.Command{Use: "repo-sync-fork-default-info", Short: "Gets information about syncing the fork default branch with the base branch"}
+		mc := &cobra.Command{Use: "sync-fork-default-info", Short: "Gets information about syncing the fork default branch with the base branch"}
 		var reposyncforkdefaultinfo_owner string
 		mc.Flags().StringVar(&reposyncforkdefaultinfo_owner, "owner", "", "owner")
 		var reposyncforkdefaultinfo_repo string
@@ -9959,7 +9959,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /repos/{owner}/{repo}/hooks/{id}/tests -> Repo.RepoTestHook
-		mc := &cobra.Command{Use: "repo-test-hook", Short: "Test a push webhook"}
+		mc := &cobra.Command{Use: "test-hook", Short: "Test a push webhook"}
 		var repotesthook_owner string
 		mc.Flags().StringVar(&repotesthook_owner, "owner", "", "owner")
 		var repotesthook_repo string
@@ -9981,7 +9981,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/times -> Repo.RepoTrackedTimes
-		mc := &cobra.Command{Use: "repo-tracked-times", Short: "List a repo's tracked times"}
+		mc := &cobra.Command{Use: "tracked-times", Short: "List a repo's tracked times"}
 		var repotrackedtimes_owner string
 		mc.Flags().StringVar(&repotrackedtimes_owner, "owner", "", "owner")
 		var repotrackedtimes_repo string
@@ -10012,7 +10012,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /repos/{owner}/{repo}/transfer -> Repo.RepoTransfer
-		mc := &cobra.Command{Use: "repo-transfer", Short: "Transfer a repo ownership"}
+		mc := &cobra.Command{Use: "transfer", Short: "Transfer a repo ownership"}
 		var repotransfer_owner string
 		mc.Flags().StringVar(&repotransfer_owner, "owner", "", "owner")
 		var repotransfer_repo string
@@ -10033,7 +10033,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /repos/{owner}/{repo}/pulls/{index}/reviews/{id}/undismissals -> Repo.RepoUnDismissPullReview
-		mc := &cobra.Command{Use: "repo-un-dismiss-pull-review", Short: "Cancel to dismiss a review for a pull request"}
+		mc := &cobra.Command{Use: "un-dismiss-pull-review", Short: "Cancel to dismiss a review for a pull request"}
 		var repoundismisspullreview_owner string
 		mc.Flags().StringVar(&repoundismisspullreview_owner, "owner", "", "owner")
 		var repoundismisspullreview_repo string
@@ -10058,7 +10058,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /repos/{owner}/{repo}/avatar -> Repo.RepoUpdateAvatar
-		mc := &cobra.Command{Use: "repo-update-avatar", Short: "Update a repository's avatar"}
+		mc := &cobra.Command{Use: "update-avatar", Short: "Update a repository's avatar"}
 		var repoupdateavatar_owner string
 		mc.Flags().StringVar(&repoupdateavatar_owner, "owner", "", "owner")
 		var repoupdateavatar_repo string
@@ -10079,7 +10079,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // PATCH /repos/{owner}/{repo}/branches/{branch} -> Repo.RepoUpdateBranch
-		mc := &cobra.Command{Use: "repo-update-branch", Short: "Update a branch"}
+		mc := &cobra.Command{Use: "update-branch", Short: "Update a branch"}
 		var repoupdatebranch_owner string
 		mc.Flags().StringVar(&repoupdatebranch_owner, "owner", "", "owner")
 		var repoupdatebranch_repo string
@@ -10103,7 +10103,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // PUT /repos/{owner}/{repo}/contents/{filepath} -> Repo.RepoUpdateFile
-		mc := &cobra.Command{Use: "repo-update-file", Short: "Update a file in a repository"}
+		mc := &cobra.Command{Use: "update-file", Short: "Update a file in a repository"}
 		var repoupdatefile_owner string
 		mc.Flags().StringVar(&repoupdatefile_owner, "owner", "", "owner")
 		var repoupdatefile_repo string
@@ -10129,7 +10129,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /repos/{owner}/{repo}/pulls/{index}/update -> Repo.RepoUpdatePullRequest
-		mc := &cobra.Command{Use: "repo-update-pull-request", Short: "Merge PR's baseBranch into headBranch"}
+		mc := &cobra.Command{Use: "update-pull-request", Short: "Merge PR's baseBranch into headBranch"}
 		var repoupdatepullrequest_owner string
 		mc.Flags().StringVar(&repoupdatepullrequest_owner, "owner", "", "owner")
 		var repoupdatepullrequest_repo string
@@ -10151,7 +10151,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // PUT /repos/{owner}/{repo}/topics -> Repo.RepoUpdateTopics
-		mc := &cobra.Command{Use: "repo-update-topics", Short: "Replace list of topics for a repository"}
+		mc := &cobra.Command{Use: "update-topics", Short: "Replace list of topics for a repository"}
 		var repoupdatetopics_owner string
 		mc.Flags().StringVar(&repoupdatetopics_owner, "owner", "", "owner")
 		var repoupdatetopics_repo string
@@ -10172,7 +10172,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /repos/{owner}/{repo}/issue_config/validate -> Repo.RepoValidateIssueConfig
-		mc := &cobra.Command{Use: "repo-validate-issue-config", Short: "Returns the validation information for a issue config"}
+		mc := &cobra.Command{Use: "validate-issue-config", Short: "Returns the validation information for a issue config"}
 		var repovalidateissueconfig_owner string
 		mc.Flags().StringVar(&repovalidateissueconfig_owner, "owner", "", "owner")
 		var repovalidateissueconfig_repo string
@@ -10383,7 +10383,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /users/{username}/following/{target} -> User.UserCheckFollowing
-		mc := &cobra.Command{Use: "user-check-following", Short: "Check if one user is following another user"}
+		mc := &cobra.Command{Use: "check-following", Short: "Check if one user is following another user"}
 		var usercheckfollowing_username string
 		mc.Flags().StringVar(&usercheckfollowing_username, "username", "", "username")
 		var usercheckfollowing_target string
@@ -10400,7 +10400,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // POST /users/{username}/tokens -> User.UserCreateToken
-		mc := &cobra.Command{Use: "user-create-token", Short: "Generate an access token for the specified user"}
+		mc := &cobra.Command{Use: "create-token", Short: "Generate an access token for the specified user"}
 		var usercreatetoken_username string
 		mc.Flags().StringVar(&usercreatetoken_username, "username", "", "username")
 		var usercreatetoken_body string
@@ -10420,7 +10420,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /users/{username}/tokens/{token} -> User.UserDeleteAccessToken
-		mc := &cobra.Command{Use: "user-delete-access-token", Short: "Delete an access token from the specified user's account"}
+		mc := &cobra.Command{Use: "delete-access-token", Short: "Delete an access token from the specified user's account"}
 		var userdeleteaccesstoken_username string
 		mc.Flags().StringVar(&userdeleteaccesstoken_username, "username", "", "username")
 		var userdeleteaccesstoken_token string
@@ -10437,7 +10437,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /users/{username} -> User.UserGet
-		mc := &cobra.Command{Use: "user-get", Short: "Get a user"}
+		mc := &cobra.Command{Use: "get", Short: "Get a user"}
 		var userget_username string
 		mc.Flags().StringVar(&userget_username, "username", "", "username")
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
@@ -10453,7 +10453,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /users/{username}/heatmap -> User.UserGetHeatmapData
-		mc := &cobra.Command{Use: "user-get-heatmap-data", Short: "Get a user's heatmap"}
+		mc := &cobra.Command{Use: "get-heatmap-data", Short: "Get a user's heatmap"}
 		var usergetheatmapdata_username string
 		mc.Flags().StringVar(&usergetheatmapdata_username, "username", "", "username")
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
@@ -10471,7 +10471,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /users/{username}/tokens -> User.UserGetTokens
-		mc := &cobra.Command{Use: "user-get-tokens", Short: "List the specified user's access tokens"}
+		mc := &cobra.Command{Use: "get-tokens", Short: "List the specified user's access tokens"}
 		var usergettokens_username string
 		mc.Flags().StringVar(&usergettokens_username, "username", "", "username")
 		var usergettokens_page int
@@ -10493,7 +10493,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /users/{username}/activities/feeds -> User.UserListActivityFeeds
-		mc := &cobra.Command{Use: "user-list-activity-feeds", Short: "List a user's activity feeds"}
+		mc := &cobra.Command{Use: "list-activity-feeds", Short: "List a user's activity feeds"}
 		var userlistactivityfeeds_username string
 		mc.Flags().StringVar(&userlistactivityfeeds_username, "username", "", "username")
 		var userlistactivityfeeds_onlyPerformedBy bool
@@ -10519,7 +10519,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /users/{username}/followers -> User.UserListFollowers
-		mc := &cobra.Command{Use: "user-list-followers", Short: "List the given user's followers"}
+		mc := &cobra.Command{Use: "list-followers", Short: "List the given user's followers"}
 		var userlistfollowers_username string
 		mc.Flags().StringVar(&userlistfollowers_username, "username", "", "username")
 		var userlistfollowers_page int
@@ -10541,7 +10541,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /users/{username}/following -> User.UserListFollowing
-		mc := &cobra.Command{Use: "user-list-following", Short: "List the users that the given user is following"}
+		mc := &cobra.Command{Use: "list-following", Short: "List the users that the given user is following"}
 		var userlistfollowing_username string
 		mc.Flags().StringVar(&userlistfollowing_username, "username", "", "username")
 		var userlistfollowing_page int
@@ -10563,7 +10563,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /users/{username}/gpg_keys -> User.UserListGPGKeys
-		mc := &cobra.Command{Use: "user-list-g-p-g-keys", Short: "List the given user's GPG keys"}
+		mc := &cobra.Command{Use: "list-g-p-g-keys", Short: "List the given user's GPG keys"}
 		var userlistgpgkeys_username string
 		mc.Flags().StringVar(&userlistgpgkeys_username, "username", "", "username")
 		var userlistgpgkeys_page int
@@ -10585,7 +10585,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /users/{username}/keys -> User.UserListKeys
-		mc := &cobra.Command{Use: "user-list-keys", Short: "List the given user's public keys"}
+		mc := &cobra.Command{Use: "list-keys", Short: "List the given user's public keys"}
 		var userlistkeys_username string
 		mc.Flags().StringVar(&userlistkeys_username, "username", "", "username")
 		var userlistkeys_fingerprint string
@@ -10609,7 +10609,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /users/{username}/repos -> User.UserListRepos
-		mc := &cobra.Command{Use: "user-list-repos", Short: "List the repos owned by the given user"}
+		mc := &cobra.Command{Use: "list-repos", Short: "List the repos owned by the given user"}
 		var userlistrepos_username string
 		mc.Flags().StringVar(&userlistrepos_username, "username", "", "username")
 		var userlistrepos_page int
@@ -10631,7 +10631,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /users/{username}/starred -> User.UserListStarred
-		mc := &cobra.Command{Use: "user-list-starred", Short: "The repos that the given user has starred"}
+		mc := &cobra.Command{Use: "list-starred", Short: "The repos that the given user has starred"}
 		var userliststarred_username string
 		mc.Flags().StringVar(&userliststarred_username, "username", "", "username")
 		var userliststarred_page int
@@ -10653,7 +10653,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /users/{username}/subscriptions -> User.UserListSubscriptions
-		mc := &cobra.Command{Use: "user-list-subscriptions", Short: "List the repositories watched by a user"}
+		mc := &cobra.Command{Use: "list-subscriptions", Short: "List the repositories watched by a user"}
 		var userlistsubscriptions_username string
 		mc.Flags().StringVar(&userlistsubscriptions_username, "username", "", "username")
 		var userlistsubscriptions_page int
@@ -10675,7 +10675,7 @@ actions, etc.) instead.`,
 		svcCmd.AddCommand(mc)
 		}
 		{ // GET /users/search -> User.UserSearch
-		mc := &cobra.Command{Use: "user-search", Short: "Search for users"}
+		mc := &cobra.Command{Use: "search", Short: "Search for users"}
 		var usersearch_q string
 		mc.Flags().StringVar(&usersearch_q, "q", "", "q")
 		var usersearch_uid int64
