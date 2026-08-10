@@ -84,8 +84,8 @@ func stateStr(s *forgejo.StateType) string {
 }
 
 // timeStr formats an optional timestamp for display ("" if absent/zero).
-func timeStr(t *time.Time) string {
-	if t == nil || t.IsZero() {
+func timeStr(t time.Time) string {
+	if t.IsZero() {
 		return ""
 	}
 	return t.Format(time.RFC3339)
