@@ -1,13 +1,13 @@
 name: upstream-mirror
 
-# Mirrors ALL upstream release branches (v*/forgejo) from Codeberg to this fork.
-# When Forgejo publishes a new major release (v17.0/forgejo, v18.0/forgejo, ...),
-# this Action automatically discovers and mirrors it — no reconfiguration needed.
+# Mirrors all Forgejo-era upstream release branches (v7.0+/forgejo) from Codeberg
+# to this fork. When Forgejo publishes a new major release (v17.0/forgejo,
+# v18.0/forgejo, ...), this Action automatically discovers and mirrors it —
+# no reconfiguration needed.
 #
 # Each branch that changes fires a push event → harmostes webhook → fork-sync.
 # The harmostes Workflow CR's branch filter determines which version is actively
-# synced into the release branch. Upgrading to a new major version = changing
-# that filter, not this Action.
+# synced. Upgrading to a new major version = changing that filter, not this Action.
 
 on:
   schedule:
@@ -27,42 +27,44 @@ jobs:
           fetch-depth: 1
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Mirror all upstream release branches
+      - name: Mirror Forgejo-era release branches (v7.0+)
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Fetch ALL release branches from Codeberg (v7.0/forgejo, v8.0/forgejo, ... v17.0/forgejo)
+          # Fetch ALL release branches from Codeberg
           git remote add upstream https://codeberg.org/forgejo/forgejo.git
           git fetch upstream '+refs/heads/v*/forgejo:refs/remotes/upstream/v*/forgejo'
 
           CHANGED=false
 
-          # Iterate every release branch upstream has
-          for ref in $(git for-each-ref --format='%(refname:short)' 'refs/remotes/upstream/v*/forgejo'); do
+          for ref in $(git for-each-ref --format='%(refname:short)' 'refs/remotes/upstream/v*/forgejo' | sort -V); do
             branch="${ref#upstream/}"
-            upstream_sha=$(git rev-parse "$ref")
-            current_sha=$(git ls-remote origin "refs/heads/$branch" | awk '{print $1}')
 
-            if [ -z "$current_sha" ]; then
-              current_sha="(new)"
-            fi
-
-            if [ "$upstream_sha" = "$current_sha" ]; then
-              echo "✓ $branch: up to date ($upstream_sha)"
+            # Skip Gitea-era branches (v1.x) — Forgejo starts at v7.0
+            major=$(echo "$branch" | sed 's/v\([0-9]*\)\..*/\1/')
+            if [ "$major" -lt 7 ]; then
               continue
             fi
 
-            echo "↻ $branch: $current_sha → $upstream_sha"
+            upstream_sha=$(git rev-parse "$ref")
+            current_sha=$(git ls-remote origin "refs/heads/$branch" | awk '{print $1}')
+            [ -z "$current_sha" ] && current_sha="(new)"
+
+            if [ "$upstream_sha" = "$current_sha" ]; then
+              echo "  ✓ $branch: up to date"
+              continue
+            fi
+
+            echo "  ↻ $branch: $current_sha → ${upstream_sha:0:12}"
             git push origin "$ref:refs/heads/$branch" --force
             CHANGED=true
           done
 
-          if [ "$CHANGED" = "false" ]; then
-            echo ""
-            echo "All release branches up to date — no push events fired"
-          else
-            echo ""
+          echo ""
+          if [ "$CHANGED" = "true" ]; then
             echo "Mirror updated — GitHub fired push webhooks for changed branches"
+          else
+            echo "All release branches up to date — no webhooks fired"
           fi
