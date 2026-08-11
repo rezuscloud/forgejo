@@ -24,22 +24,25 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Add Codeberg upstream and fetch the release branch
+          # Query the current mirror HEAD directly from the remote (no local fetch needed)
+          CURRENT=$(git ls-remote origin refs/heads/v16.0/forgejo | awk '{print $1}')
+          if [ -z "$CURRENT" ]; then
+            CURRENT="none"
+          fi
+
+          # Fetch the upstream release branch from Codeberg
           git remote add upstream https://codeberg.org/forgejo/forgejo.git
           git fetch upstream v16.0/forgejo
-
-          # Get current and upstream HEADs
-          CURRENT=$(git rev-parse origin/v16.0/forgejo 2>/dev/null || echo "none")
           UPSTREAM=$(git rev-parse upstream/v16.0/forgejo)
 
           echo "Current mirror HEAD: $CURRENT"
           echo "Upstream HEAD:       $UPSTREAM"
 
           if [ "$CURRENT" = "$UPSTREAM" ]; then
-            echo "Already up to date — no push needed"
+            echo "✓ Already up to date — no push, no webhook"
             exit 0
           fi
 
-          echo "Upstream has new commits — updating mirror branch"
+          echo "↻ Upstream has new commits — pushing to mirror branch"
           git push origin refs/remotes/upstream/v16.0/forgejo:refs/heads/v16.0/forgejo --force
-          echo "Mirror updated — GitHub will fire a push webhook"
+          echo "✓ Mirror updated — GitHub fires a push webhook"
