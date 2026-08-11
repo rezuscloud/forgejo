@@ -1,0 +1,45 @@
+name: upstream-mirror
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout fork
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Mirror upstream v16.0/forgejo branch
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Add Codeberg upstream and fetch the release branch
+          git remote add upstream https://codeberg.org/forgejo/forgejo.git
+          git fetch upstream v16.0/forgejo
+
+          # Get current and upstream HEADs
+          CURRENT=$(git rev-parse origin/v16.0/forgejo 2>/dev/null || echo "none")
+          UPSTREAM=$(git rev-parse upstream/v16.0/forgejo)
+
+          echo "Current mirror HEAD: $CURRENT"
+          echo "Upstream HEAD:       $UPSTREAM"
+
+          if [ "$CURRENT" = "$UPSTREAM" ]; then
+            echo "Already up to date — no push needed"
+            exit 0
+          fi
+
+          echo "Upstream has new commits — updating mirror branch"
+          git push origin refs/remotes/upstream/v16.0/forgejo:refs/heads/v16.0/forgejo --force
+          echo "Mirror updated — GitHub will fire a push webhook"
