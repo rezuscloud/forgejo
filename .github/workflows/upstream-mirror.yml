@@ -1,5 +1,14 @@
 name: upstream-mirror
 
+# Mirrors ALL upstream release branches (v*/forgejo) from Codeberg to this fork.
+# When Forgejo publishes a new major release (v17.0/forgejo, v18.0/forgejo, ...),
+# this Action automatically discovers and mirrors it — no reconfiguration needed.
+#
+# Each branch that changes fires a push event → harmostes webhook → fork-sync.
+# The harmostes Workflow CR's branch filter determines which version is actively
+# synced into the release branch. Upgrading to a new major version = changing
+# that filter, not this Action.
+
 on:
   schedule:
     - cron: '0 */6 * * *'
@@ -18,31 +27,42 @@ jobs:
           fetch-depth: 1
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Mirror upstream v16.0/forgejo branch
+      - name: Mirror all upstream release branches
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Query the current mirror HEAD directly from the remote (no local fetch needed)
-          CURRENT=$(git ls-remote origin refs/heads/v16.0/forgejo | awk '{print $1}')
-          if [ -z "$CURRENT" ]; then
-            CURRENT="none"
-          fi
-
-          # Fetch the upstream release branch from Codeberg
+          # Fetch ALL release branches from Codeberg (v7.0/forgejo, v8.0/forgejo, ... v17.0/forgejo)
           git remote add upstream https://codeberg.org/forgejo/forgejo.git
-          git fetch upstream v16.0/forgejo
-          UPSTREAM=$(git rev-parse upstream/v16.0/forgejo)
+          git fetch upstream '+refs/heads/v*/forgejo:refs/remotes/upstream/v*/forgejo'
 
-          echo "Current mirror HEAD: $CURRENT"
-          echo "Upstream HEAD:       $UPSTREAM"
+          CHANGED=false
 
-          if [ "$CURRENT" = "$UPSTREAM" ]; then
-            echo "✓ Already up to date — no push, no webhook"
-            exit 0
+          # Iterate every release branch upstream has
+          for ref in $(git for-each-ref --format='%(refname:short)' 'refs/remotes/upstream/v*/forgejo'); do
+            branch="${ref#upstream/}"
+            upstream_sha=$(git rev-parse "$ref")
+            current_sha=$(git ls-remote origin "refs/heads/$branch" | awk '{print $1}')
+
+            if [ -z "$current_sha" ]; then
+              current_sha="(new)"
+            fi
+
+            if [ "$upstream_sha" = "$current_sha" ]; then
+              echo "✓ $branch: up to date ($upstream_sha)"
+              continue
+            fi
+
+            echo "↻ $branch: $current_sha → $upstream_sha"
+            git push origin "$ref:refs/heads/$branch" --force
+            CHANGED=true
+          done
+
+          if [ "$CHANGED" = "false" ]; then
+            echo ""
+            echo "All release branches up to date — no push events fired"
+          else
+            echo ""
+            echo "Mirror updated — GitHub fired push webhooks for changed branches"
           fi
-
-          echo "↻ Upstream has new commits — pushing to mirror branch"
-          git push origin refs/remotes/upstream/v16.0/forgejo:refs/heads/v16.0/forgejo --force
-          echo "✓ Mirror updated — GitHub fires a push webhook"
