@@ -4,7 +4,7 @@ Historically this directory held hand-edited `forgejo-<version>.env` files that
 pinned `FORGEJO_RELEASE_VERSION` (e.g. `16.0.2-rezuscloud.3`) for the release
 workflow. **Those are gone.**
 
-The fork now follows the **Codeberg versioning model**:
+The fork follows **upstream-identity versioning**:
 
 - **Identity is the upstream version** — the binary reports `16.0.2`, nothing else.
 - Release tags `v16.0.2-rezus.N` are cut **by the fork-maintenance sync engine**

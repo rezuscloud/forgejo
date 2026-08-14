@@ -1,6 +1,6 @@
 name: release
 
-# Rezuscloud Forgejo distribution release — the Codeberg versioning model.
+# Rezuscloud Forgejo distribution release — upstream-identity versioning.
 #
 # This repo IS the Forgejo fork. It builds and releases as one unit:
 #   - server image  : built from the repo root via Dockerfile / Dockerfile.rootless
@@ -9,8 +9,8 @@ name: release
 #
 # VERSION IDENTITY (no hand-edited files, no hand-bumped counters):
 #   identity   = the upstream version the release is based on (16.0.2)
-#   provenance = +rezus.N semver build metadata (the +gitea- trick: ignored
-#                for precedence/identity)
+#   provenance = +rezus.N semver build metadata (ignored
+#                 for precedence/identity)
 #   docker tag = 16.0.2-rezus.N  (docker forbids '+' — hyphen-encoded)
 #   fingerprint= 16.0.2-rezus.N-<shortsha>
 #   chart      = 18.0.2-rezus.N  (upstream forgejo-helm convention: chart N+2 → app N)
