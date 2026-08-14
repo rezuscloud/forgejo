@@ -1,33 +1,44 @@
 name: release
 
-# Rezuscloud Forgejo distribution release.
+# Rezuscloud Forgejo distribution release — the Codeberg versioning model.
 #
 # This repo IS the Forgejo fork. It builds and releases as one unit:
 #   - server image  : built from the repo root via Dockerfile / Dockerfile.rootless
 #   - fj CLI binary : built from ./cmd/fj (the fj analogue of cmd/kubectl)
 #   - Helm chart    : packaged from charts/forgejo (vendored upstream + Rezuscloud overlay)
 #
-# PR VALIDATION (build + codegen + integration) runs centrally in k8s-config's
-# fork-maintenance CronJob BEFORE the sync PR is pushed. The fork repo keeps
+# VERSION IDENTITY (no hand-edited files, no hand-bumped counters):
+#   identity   = the upstream version the release is based on (16.0.2)
+#   provenance = +rezus.N semver build metadata (the +gitea- trick: ignored
+#                for precedence/identity)
+#   docker tag = 16.0.2-rezus.N  (docker forbids '+' — hyphen-encoded)
+#   fingerprint= 16.0.2-rezus.N-<shortsha>
+#   chart      = 18.0.2-rezus.N  (upstream forgejo-helm convention: chart N+2 → app N)
+# The tag itself (v16.0.2-rezus.N) is cut by the fork-maintenance sync engine
+# (auto-release) — a release TRIGGER, never an identity. Everything below is
+# derived from it. distributions/ holds no version metadata anymore.
+#
+# PR VALIDATION (build + codegen + integration) runs centrally in the
+# fork-maintenance workflow BEFORE the sync PR is merged. The fork repo keeps
 # only tag-triggered release logic — no per-PR CI jobs here.
 
 on:
   push:
-    tags: ["forgejo-v*"]
+    tags: ["v*-rezus.*"]
   workflow_dispatch:
     inputs:
-      distribution_file:
-        description: Release metadata file under distributions/
+      version:
+        description: 'Release tag to derive versions from (e.g. v16.0.2-rezus.4)'
         required: true
-        default: distributions/forgejo-16.0.2.env
+        default: v16.0.2-rezus.1
 
 jobs:
   prepare:
-    if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/forgejo-v')
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     outputs:
-      distribution_file: ${{ steps.meta.outputs.distribution_file }}
       release_version: ${{ steps.meta.outputs.release_version }}
+      version_file: ${{ steps.meta.outputs.version_file }}
       chart_version: ${{ steps.meta.outputs.chart_version }}
       image_repository: ${{ steps.meta.outputs.image_repository }}
       chart_repository: ${{ steps.meta.outputs.chart_repository }}
@@ -41,21 +52,28 @@ jobs:
         run: |
           set -euo pipefail
           if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
-            file='${{ inputs.distribution_file }}'
+            tag='${{ inputs.version }}'
           else
-            version="${GITHUB_REF_NAME#forgejo-v}"
-            file="distributions/forgejo-${version}.env"
+            tag="${GITHUB_REF_NAME}"
           fi
-          test -f "$file"
-          set -a; source "$file"; set +a
+          # v16.0.2-rezus.4 → identity 16.0.2, provenance rezus.4
+          [[ "$tag" =~ ^v([0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?)-rezus\.([0-9]+)$ ]] || {
+            echo "ERROR: tag '$tag' does not match v<upstream>-rezus.<N>" >&2; exit 1; }
+          identity="${BASH_REMATCH[1]}"
+          n="${BASH_REMATCH[3]}"
+          release_version="${identity}-rezus.${n}"     # docker-safe encoding
+          version_file="${identity}+rezus.${n}"         # VERSION (semver build metadata)
+          major="${identity%%.*}"
+          rest="${identity#*.}"
+          chart_version="$((major + 2)).${rest}-rezus.${n}"
           short_sha="$(git rev-parse --short=12 HEAD)"
           {
-            echo "distribution_file=$file"
-            echo "release_version=$FORGEJO_RELEASE_VERSION"
-            echo "chart_version=$FORGEJO_CHART_VERSION"
-            echo "image_repository=$FORGEJO_IMAGE_REPOSITORY"
-            echo "chart_repository=$FORGEJO_CHART_OCI_REPOSITORY"
-            echo "chart_archive=forgejo-${FORGEJO_CHART_VERSION}.tgz"
+            echo "release_version=$release_version"
+            echo "version_file=$version_file"
+            echo "chart_version=$chart_version"
+            echo "image_repository=ghcr.io/rezuscloud/forgejo"
+            echo "chart_repository=oci://ghcr.io/rezuscloud/charts"
+            echo "chart_archive=forgejo-${chart_version}.tgz"
             echo "short_sha=$short_sha"
           } >> "$GITHUB_OUTPUT"
 
@@ -66,8 +84,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: { fetch-depth: 0, fetch-tags: true }
-      - name: Write VERSION (Forgejo embeds its version from this)
-        run: printf '%s\n' '${{ needs.prepare.outputs.release_version }}' > VERSION
+      - name: Write VERSION (identity + provenance; Forgejo embeds its version from this)
+        run: printf '%s\n' '${{ needs.prepare.outputs.version_file }}' > VERSION
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
@@ -134,7 +152,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p dist
-          go build -mod=mod -trimpath -ldflags "-s -w -X 'forgejo.org/fj/pkg/cmd.cliVersion=${{ needs.prepare.outputs.release_version }}'" \
+          go build -mod=mod -trimpath -ldflags "-s -w -X 'forgejo.org/fj/pkg/cmd.cliVersion=${{ needs.prepare.outputs.version_file }}'" \
             -o "dist/fj-${{ matrix.goos }}-${{ matrix.goarch }}" ./cmd/fj
           tar -C dist -czf "dist/fj-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz" "fj-${{ matrix.goos }}-${{ matrix.goarch }}"
       - name: Verify stamped version
@@ -201,7 +219,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with: { name: repo-map, path: dist-rig }
       - name: Create GitHub release
-        if: startsWith(github.ref, 'refs/tags/forgejo-v')
+        if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
           files: |

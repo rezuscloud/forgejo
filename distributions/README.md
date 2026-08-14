@@ -1,29 +1,19 @@
-# Forgejo distributions
+# distributions/
 
-Each `.env` file here pins the metadata for one Forgejo distribution release
-built and published by `.github/workflows/forgejo-release.yml`.
+Historically this directory held hand-edited `forgejo-<version>.env` files that
+pinned `FORGEJO_RELEASE_VERSION` (e.g. `16.0.2-rezuscloud.3`) for the release
+workflow. **Those are gone.**
 
-```sh
-FORGEJO_SOURCE_REPOSITORY=rezuscloud/forgejo   # upstream-of-us fork
-FORGEJO_SOURCE_REF=forgejo                      # branch/ref to build from
-FORGEJO_RELEASE_VERSION=16.0.0-rc.1            # injected as RELEASE_VERSION + Chart.appVersion
-FORGEJO_CHART_VERSION=18.0.0-rc.1              # published chart version
-FORGEJO_IMAGE_REPOSITORY=ghcr.io/rezuscloud/forgejo-monorepo-forgejo
-FORGEJO_CHART_OCI_REPOSITORY=oci://ghcr.io/rezuscloud/forgejo-monorepo-charts
-```
+The fork now follows the **Codeberg versioning model**:
 
-## Channel model
+- **Identity is the upstream version** — the binary reports `16.0.2`, nothing else.
+- Release tags `v16.0.2-rezus.N` are cut **by the fork-maintenance sync engine**
+  (machine-computed counter), never by hand.
+- The release workflow (`.github/workflows/release.yml`) derives everything
+  from the tag: docker tag `16.0.2-rezus.N` (hyphen-encoded `+rezus.N`
+  semver build metadata), `VERSION=16.0.2+rezus.N`, chart `18.0.2-rezus.N`
+  (upstream forgejo-helm N+2 convention), fingerprint `<version>-<shortsha>`.
 
-- **RC channel** — filename `forgejo-<version>-rc<N>.env`, `FORGEJO_CHART_VERSION`
-  carries a SemVer prerelease suffix (`-rc.N`). Use for testing ahead of an
-  upstream Forgejo release (see `charts/forgejo/values-rc-testing.yaml`).
-- **Stable channel** — filename `forgejo-<version>.env` with no prerelease
-  suffix. Used once upstream Forgejo <version> is released and we promote the
-  custom build.
-
-To cut a new release: add a metadata file, push tag `forgejo-v<version>`, and the
-workflow publishes images + chart + **the matching `fj` CLI binary** + GitHub
-release asset. The Forgejo server image, the Helm chart appVersion, and the `fj`
-Client Version all advance together as one SemVer unit (the CLI is generated
-from this exact Forgejo swagger spec, so Client Version == Server Version for a
-paired release).
+There is nothing to edit here. If you need a release, tag per the sync
+engine's convention or run the release workflow with `workflow_dispatch`
+passing the tag string.
