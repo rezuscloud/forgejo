@@ -37,7 +37,9 @@ func FromKeys(ki *keys.KeyInfo, host string) (*api.Client, error) {
 	httpClient := &http.Client{
 		Transport: &TokenTransport{Token: login.Token},
 	}
-	return api.NewClient("https://"+host, httpClient)
+	// normalizeURL: hosts may carry a scheme (http://localhost:3000 in
+	// integration tests) — a hardcoded https:// prefix mangles them.
+	return api.NewClient(normalizeURL(host), httpClient)
 }
 
 // FromToken creates a forgejo SDK client with a plain token (no keys.json).

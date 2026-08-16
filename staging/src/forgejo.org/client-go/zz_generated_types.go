@@ -50,7 +50,7 @@ type APRemoteFollowOption struct {
 }
 
 type AccessToken struct {
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	Id int64 `json:"id,omitempty"`
 	Name string `json:"name,omitempty"`
 	Repositories []*RepositoryMeta `json:"repositories,omitempty"`
@@ -61,21 +61,21 @@ type AccessToken struct {
 
 type ActionArtifact struct {
 	ArchiveDownloadUrl string `json:"archive_download_url,omitempty"`
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	Expired bool `json:"expired,omitempty"`
-	ExpiresAt time.Time `json:"expires_at,omitempty"`
+	ExpiresAt *time.Time `json:"expires_at,omitempty"`
 	Id int64 `json:"id,omitempty"`
 	Name string `json:"name,omitempty"`
 	RunId int64 `json:"run_id,omitempty"`
 	SizeInBytes int64 `json:"size_in_bytes,omitempty"`
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 }
 
 type ActionRun struct {
 	ScheduleID int64 `json:"ScheduleID,omitempty"`
 	ApprovedBy int64 `json:"approved_by,omitempty"`
 	CommitSha string `json:"commit_sha,omitempty"`
-	Created time.Time `json:"created,omitempty"`
+	Created *time.Time `json:"created,omitempty"`
 	Duration *Duration `json:"duration,omitempty"`
 	Event string `json:"event,omitempty"`
 	EventPayload string `json:"event_payload,omitempty"`
@@ -87,13 +87,13 @@ type ActionRun struct {
 	NeedApproval bool `json:"need_approval,omitempty"`
 	Prettyref string `json:"prettyref,omitempty"`
 	Repository *Repository `json:"repository,omitempty"`
-	Started time.Time `json:"started,omitempty"`
+	Started *time.Time `json:"started,omitempty"`
 	Status string `json:"status,omitempty"`
-	Stopped time.Time `json:"stopped,omitempty"`
+	Stopped *time.Time `json:"stopped,omitempty"`
 	Title string `json:"title,omitempty"`
 	TriggerEvent string `json:"trigger_event,omitempty"`
 	TriggerUser *User `json:"trigger_user,omitempty"`
-	Updated time.Time `json:"updated,omitempty"`
+	Updated *time.Time `json:"updated,omitempty"`
 	WorkflowId string `json:"workflow_id,omitempty"`
 }
 
@@ -125,7 +125,7 @@ type ActionRunner struct {
 }
 
 type ActionTask struct {
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	DisplayTitle string `json:"display_title,omitempty"`
 	Event string `json:"event,omitempty"`
 	HeadBranch string `json:"head_branch,omitempty"`
@@ -133,9 +133,9 @@ type ActionTask struct {
 	Id int64 `json:"id,omitempty"`
 	Name string `json:"name,omitempty"`
 	RunNumber int64 `json:"run_number,omitempty"`
-	RunStartedAt time.Time `json:"run_started_at,omitempty"`
+	RunStartedAt *time.Time `json:"run_started_at,omitempty"`
 	Status string `json:"status,omitempty"`
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	Url string `json:"url,omitempty"`
 	WorkflowId string `json:"workflow_id,omitempty"`
 }
@@ -158,7 +158,7 @@ type Activity struct {
 	Comment *Comment `json:"comment,omitempty"`
 	CommentId int64 `json:"comment_id,omitempty"`
 	Content string `json:"content,omitempty"`
-	Created time.Time `json:"created,omitempty"`
+	Created *time.Time `json:"created,omitempty"`
 	Id int64 `json:"id,omitempty"`
 	IsPrivate bool `json:"is_private,omitempty"`
 	OpType string `json:"op_type,omitempty"`
@@ -177,7 +177,7 @@ type AddCollaboratorOption struct {
 }
 
 type AddTimeOption struct {
-	Created time.Time `json:"created,omitempty"`
+	Created *time.Time `json:"created,omitempty"`
 	Time int64 `json:"time,omitempty"`
 	UserName string `json:"user_name,omitempty"`
 }
@@ -201,7 +201,7 @@ type AnnotatedTagObject struct {
 
 type Attachment struct {
 	BrowserDownloadUrl string `json:"browser_download_url,omitempty"`
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	DownloadCount int64 `json:"download_count,omitempty"`
 	Id int64 `json:"id,omitempty"`
 	Name string `json:"name,omitempty"`
@@ -212,7 +212,7 @@ type Attachment struct {
 
 type BlockedUser struct {
 	BlockId int64 `json:"block_id,omitempty"`
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 }
 
 type Branch struct {
@@ -235,7 +235,7 @@ type BranchProtection struct {
 	BlockOnOutdatedBranch bool `json:"block_on_outdated_branch,omitempty"`
 	BlockOnRejectedReviews bool `json:"block_on_rejected_reviews,omitempty"`
 	BranchName string `json:"branch_name,omitempty"`
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	DismissStaleApprovals bool `json:"dismiss_stale_approvals,omitempty"`
 	EnableApprovalsWhitelist bool `json:"enable_approvals_whitelist,omitempty"`
 	EnableMergeWhitelist bool `json:"enable_merge_whitelist,omitempty"`
@@ -254,7 +254,7 @@ type BranchProtection struct {
 	RuleName string `json:"rule_name,omitempty"`
 	StatusCheckContexts []string `json:"status_check_contexts,omitempty"`
 	UnprotectedFilePatterns string `json:"unprotected_file_patterns,omitempty"`
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 }
 
 type ChangeFileOperation struct {
@@ -302,14 +302,14 @@ type CombinedStatus struct {
 type Comment struct {
 	Assets []*Attachment `json:"assets,omitempty"`
 	Body string `json:"body,omitempty"`
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	HtmlUrl string `json:"html_url,omitempty"`
 	Id int64 `json:"id,omitempty"`
 	IssueUrl string `json:"issue_url,omitempty"`
 	OriginalAuthor string `json:"original_author,omitempty"`
 	OriginalAuthorId int64 `json:"original_author_id,omitempty"`
 	PullRequestUrl string `json:"pull_request_url,omitempty"`
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	User *User `json:"user,omitempty"`
 }
 
@@ -317,7 +317,7 @@ type Commit struct {
 	Author *User `json:"author,omitempty"`
 	Commit *RepoCommit `json:"commit,omitempty"`
 	Committer *User `json:"committer,omitempty"`
-	Created time.Time `json:"created,omitempty"`
+	Created *time.Time `json:"created,omitempty"`
 	Files []*CommitAffectedFiles `json:"files,omitempty"`
 	HtmlUrl string `json:"html_url,omitempty"`
 	Parents []*CommitMeta `json:"parents,omitempty"`
@@ -332,12 +332,12 @@ type CommitAffectedFiles struct {
 }
 
 type CommitDateOptions struct {
-	Author time.Time `json:"author,omitempty"`
-	Committer time.Time `json:"committer,omitempty"`
+	Author *time.Time `json:"author,omitempty"`
+	Committer *time.Time `json:"committer,omitempty"`
 }
 
 type CommitMeta struct {
-	Created time.Time `json:"created,omitempty"`
+	Created *time.Time `json:"created,omitempty"`
 	Sha string `json:"sha,omitempty"`
 	Url string `json:"url,omitempty"`
 }
@@ -350,13 +350,13 @@ type CommitStats struct {
 
 type CommitStatus struct {
 	Context string `json:"context,omitempty"`
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	Creator *User `json:"creator,omitempty"`
 	Description string `json:"description,omitempty"`
 	Id int64 `json:"id,omitempty"`
 	Status *CommitStatusState `json:"status,omitempty"`
 	TargetUrl string `json:"target_url,omitempty"`
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	Url string `json:"url,omitempty"`
 }
 
@@ -382,7 +382,7 @@ type ContentsResponse struct {
 	GitUrl string `json:"git_url,omitempty"`
 	HtmlUrl string `json:"html_url,omitempty"`
 	LastCommitSha string `json:"last_commit_sha,omitempty"`
-	LastCommitWhen time.Time `json:"last_commit_when,omitempty"`
+	LastCommitWhen *time.Time `json:"last_commit_when,omitempty"`
 	Name string `json:"name,omitempty"`
 	Path string `json:"path,omitempty"`
 	Sha string `json:"sha,omitempty"`
@@ -472,7 +472,7 @@ type CreateHookOptionConfig interface{}
 
 type CreateIssueCommentOption struct {
 	Body string `json:"body,omitempty"`
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 }
 
 type CreateIssueOption struct {
@@ -480,7 +480,7 @@ type CreateIssueOption struct {
 	Assignees []string `json:"assignees,omitempty"`
 	Body string `json:"body,omitempty"`
 	Closed bool `json:"closed,omitempty"`
-	DueDate time.Time `json:"due_date,omitempty"`
+	DueDate *time.Time `json:"due_date,omitempty"`
 	Labels []int64 `json:"labels,omitempty"`
 	Milestone int64 `json:"milestone,omitempty"`
 	Ref string `json:"ref,omitempty"`
@@ -503,7 +503,7 @@ type CreateLabelOption struct {
 
 type CreateMilestoneOption struct {
 	Description string `json:"description,omitempty"`
-	DueOn time.Time `json:"due_on,omitempty"`
+	DueOn *time.Time `json:"due_on,omitempty"`
 	State string `json:"state,omitempty"`
 	Title string `json:"title,omitempty"`
 }
@@ -534,7 +534,7 @@ type CreatePullRequestOption struct {
 	Assignees []string `json:"assignees,omitempty"`
 	Base string `json:"base,omitempty"`
 	Body string `json:"body,omitempty"`
-	DueDate time.Time `json:"due_date,omitempty"`
+	DueDate *time.Time `json:"due_date,omitempty"`
 	Head string `json:"head,omitempty"`
 	Labels []int64 `json:"labels,omitempty"`
 	Milestone int64 `json:"milestone,omitempty"`
@@ -634,7 +634,7 @@ type CreateTeamOption struct {
 }
 
 type CreateUserOption struct {
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	Email string `json:"email,omitempty"`
 	FullName string `json:"full_name,omitempty"`
 	LoginName string `json:"login_name,omitempty"`
@@ -660,8 +660,8 @@ type CreateWikiPageOptions struct {
 type Cron struct {
 	ExecTimes int64 `json:"exec_times,omitempty"`
 	Name string `json:"name,omitempty"`
-	Next time.Time `json:"next,omitempty"`
-	Prev time.Time `json:"prev,omitempty"`
+	Next *time.Time `json:"next,omitempty"`
+	Prev *time.Time `json:"prev,omitempty"`
 	Schedule string `json:"schedule,omitempty"`
 }
 
@@ -682,11 +682,11 @@ type DeleteFileOptions struct {
 }
 
 type DeleteLabelsOption struct {
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 }
 
 type DeployKey struct {
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	Fingerprint string `json:"fingerprint,omitempty"`
 	Id int64 `json:"id,omitempty"`
 	Key string `json:"key,omitempty"`
@@ -765,20 +765,20 @@ type EditHookOption struct {
 
 type EditIssueCommentOption struct {
 	Body string `json:"body,omitempty"`
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 }
 
 type EditIssueOption struct {
 	Assignee string `json:"assignee,omitempty"`
 	Assignees []string `json:"assignees,omitempty"`
 	Body string `json:"body,omitempty"`
-	DueDate time.Time `json:"due_date,omitempty"`
+	DueDate *time.Time `json:"due_date,omitempty"`
 	Milestone int64 `json:"milestone,omitempty"`
 	Ref string `json:"ref,omitempty"`
 	State string `json:"state,omitempty"`
 	Title string `json:"title,omitempty"`
 	UnsetDueDate bool `json:"unset_due_date,omitempty"`
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 }
 
 type EditLabelOption struct {
@@ -791,7 +791,7 @@ type EditLabelOption struct {
 
 type EditMilestoneOption struct {
 	Description string `json:"description,omitempty"`
-	DueOn time.Time `json:"due_on,omitempty"`
+	DueOn *time.Time `json:"due_on,omitempty"`
 	State string `json:"state,omitempty"`
 	Title string `json:"title,omitempty"`
 }
@@ -812,7 +812,7 @@ type EditPullRequestOption struct {
 	Assignees []string `json:"assignees,omitempty"`
 	Base string `json:"base,omitempty"`
 	Body string `json:"body,omitempty"`
-	DueDate time.Time `json:"due_date,omitempty"`
+	DueDate *time.Time `json:"due_date,omitempty"`
 	Labels []int64 `json:"labels,omitempty"`
 	Milestone int64 `json:"milestone,omitempty"`
 	State string `json:"state,omitempty"`
@@ -937,7 +937,7 @@ type ExternalWiki struct {
 type FileCommitResponse struct {
 	Author *CommitUser `json:"author,omitempty"`
 	Committer *CommitUser `json:"committer,omitempty"`
-	Created time.Time `json:"created,omitempty"`
+	Created *time.Time `json:"created,omitempty"`
 	HtmlUrl string `json:"html_url,omitempty"`
 	Message string `json:"message,omitempty"`
 	Parents []*CommitMeta `json:"parents,omitempty"`
@@ -981,9 +981,9 @@ type GPGKey struct {
 	CanEncryptComms bool `json:"can_encrypt_comms,omitempty"`
 	CanEncryptStorage bool `json:"can_encrypt_storage,omitempty"`
 	CanSign bool `json:"can_sign,omitempty"`
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	Emails []*GPGKeyEmail `json:"emails,omitempty"`
-	ExpiresAt time.Time `json:"expires_at,omitempty"`
+	ExpiresAt *time.Time `json:"expires_at,omitempty"`
 	Id int64 `json:"id,omitempty"`
 	KeyId string `json:"key_id,omitempty"`
 	PrimaryKeyId string `json:"primary_key_id,omitempty"`
@@ -1091,12 +1091,12 @@ type Hook struct {
 	BranchFilter string `json:"branch_filter,omitempty"`
 	Config map[string]string `json:"config,omitempty"`
 	ContentType string `json:"content_type,omitempty"`
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	Events []string `json:"events,omitempty"`
 	Id int64 `json:"id,omitempty"`
 	Metadata interface{} `json:"metadata,omitempty"`
 	Type_ string `json:"type,omitempty"`
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	Url string `json:"url,omitempty"`
 }
 
@@ -1116,10 +1116,10 @@ type Issue struct {
 	Assignee *User `json:"assignee,omitempty"`
 	Assignees []*User `json:"assignees,omitempty"`
 	Body string `json:"body,omitempty"`
-	ClosedAt time.Time `json:"closed_at,omitempty"`
+	ClosedAt *time.Time `json:"closed_at,omitempty"`
 	Comments int64 `json:"comments,omitempty"`
-	CreatedAt time.Time `json:"created_at,omitempty"`
-	DueDate time.Time `json:"due_date,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	DueDate *time.Time `json:"due_date,omitempty"`
 	HtmlUrl string `json:"html_url,omitempty"`
 	Id int64 `json:"id,omitempty"`
 	IsLocked bool `json:"is_locked,omitempty"`
@@ -1134,7 +1134,7 @@ type Issue struct {
 	Repository *RepositoryMeta `json:"repository,omitempty"`
 	State *StateType `json:"state,omitempty"`
 	Title string `json:"title,omitempty"`
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	Url string `json:"url,omitempty"`
 	User *User `json:"user,omitempty"`
 }
@@ -1156,7 +1156,7 @@ type IssueConfigValidation struct {
 }
 
 type IssueDeadline struct {
-	DueDate time.Time `json:"due_date,omitempty"`
+	DueDate *time.Time `json:"due_date,omitempty"`
 }
 
 type IssueFormField struct {
@@ -1173,7 +1173,7 @@ type IssueFormFieldVisible string
 
 type IssueLabelsOption struct {
 	Labels []interface{} `json:"labels,omitempty"`
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 }
 
 type IssueMeta struct {
@@ -1282,16 +1282,16 @@ type MigrateRepoOptions struct {
 }
 
 type Milestone struct {
-	ClosedAt time.Time `json:"closed_at,omitempty"`
+	ClosedAt *time.Time `json:"closed_at,omitempty"`
 	ClosedIssues int64 `json:"closed_issues,omitempty"`
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	Description string `json:"description,omitempty"`
-	DueOn time.Time `json:"due_on,omitempty"`
+	DueOn *time.Time `json:"due_on,omitempty"`
 	Id int64 `json:"id,omitempty"`
 	OpenIssues int64 `json:"open_issues,omitempty"`
 	State *StateType `json:"state,omitempty"`
 	Title string `json:"title,omitempty"`
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 }
 
 type NewIssuePinsAllowed struct {
@@ -1362,7 +1362,7 @@ type NotificationThread struct {
 	Repository *Repository `json:"repository,omitempty"`
 	Subject *NotificationSubject `json:"subject,omitempty"`
 	Unread bool `json:"unread,omitempty"`
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	Url string `json:"url,omitempty"`
 }
 
@@ -1372,7 +1372,7 @@ type OAuth2Application struct {
 	ClientId string `json:"client_id,omitempty"`
 	ClientSecret string `json:"client_secret,omitempty"`
 	ConfidentialClient bool `json:"confidential_client,omitempty"`
-	Created time.Time `json:"created,omitempty"`
+	Created *time.Time `json:"created,omitempty"`
 	Id int64 `json:"id,omitempty"`
 	Name string `json:"name,omitempty"`
 	RedirectUris []string `json:"redirect_uris,omitempty"`
@@ -1380,7 +1380,7 @@ type OAuth2Application struct {
 
 type Organization struct {
 	AvatarUrl string `json:"avatar_url,omitempty"`
-	Created time.Time `json:"created,omitempty"`
+	Created *time.Time `json:"created,omitempty"`
 	Description string `json:"description,omitempty"`
 	Email string `json:"email,omitempty"`
 	FullName string `json:"full_name,omitempty"`
@@ -1410,7 +1410,7 @@ type PRBranchInfo struct {
 }
 
 type Package struct {
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	Creator *User `json:"creator,omitempty"`
 	HtmlUrl string `json:"html_url,omitempty"`
 	Id int64 `json:"id,omitempty"`
@@ -1439,7 +1439,7 @@ type PayloadCommit struct {
 	Message string `json:"message,omitempty"`
 	Modified []string `json:"modified,omitempty"`
 	Removed []string `json:"removed,omitempty"`
-	Timestamp time.Time `json:"timestamp,omitempty"`
+	Timestamp *time.Time `json:"timestamp,omitempty"`
 	Url string `json:"url,omitempty"`
 	Verification *PayloadCommitVerification `json:"verification,omitempty"`
 }
@@ -1465,14 +1465,14 @@ type Permission struct {
 }
 
 type PublicKey struct {
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	Fingerprint string `json:"fingerprint,omitempty"`
 	Id int64 `json:"id,omitempty"`
 	Key string `json:"key,omitempty"`
 	KeyType string `json:"key_type,omitempty"`
 	ReadOnly bool `json:"read_only,omitempty"`
 	Title string `json:"title,omitempty"`
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	Url string `json:"url,omitempty"`
 	User *User `json:"user,omitempty"`
 	Verified bool `json:"verified,omitempty"`
@@ -1486,13 +1486,13 @@ type PullRequest struct {
 	Base *PRBranchInfo `json:"base,omitempty"`
 	Body string `json:"body,omitempty"`
 	ChangedFiles int64 `json:"changed_files,omitempty"`
-	ClosedAt time.Time `json:"closed_at,omitempty"`
+	ClosedAt *time.Time `json:"closed_at,omitempty"`
 	Comments int64 `json:"comments,omitempty"`
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	Deletions int64 `json:"deletions,omitempty"`
 	DiffUrl string `json:"diff_url,omitempty"`
 	Draft bool `json:"draft,omitempty"`
-	DueDate time.Time `json:"due_date,omitempty"`
+	DueDate *time.Time `json:"due_date,omitempty"`
 	Flow int64 `json:"flow,omitempty"`
 	Head *PRBranchInfo `json:"head,omitempty"`
 	HtmlUrl string `json:"html_url,omitempty"`
@@ -1503,7 +1503,7 @@ type PullRequest struct {
 	MergeCommitSha string `json:"merge_commit_sha,omitempty"`
 	Mergeable bool `json:"mergeable,omitempty"`
 	Merged bool `json:"merged,omitempty"`
-	MergedAt time.Time `json:"merged_at,omitempty"`
+	MergedAt *time.Time `json:"merged_at,omitempty"`
 	MergedBy *User `json:"merged_by,omitempty"`
 	Milestone *Milestone `json:"milestone,omitempty"`
 	Number int64 `json:"number,omitempty"`
@@ -1514,7 +1514,7 @@ type PullRequest struct {
 	ReviewComments int64 `json:"review_comments,omitempty"`
 	State *StateType `json:"state,omitempty"`
 	Title string `json:"title,omitempty"`
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	Url string `json:"url,omitempty"`
 	User *User `json:"user,omitempty"`
 }
@@ -1523,7 +1523,7 @@ type PullRequestMeta struct {
 	Draft bool `json:"draft,omitempty"`
 	HtmlUrl string `json:"html_url,omitempty"`
 	Merged bool `json:"merged,omitempty"`
-	MergedAt time.Time `json:"merged_at,omitempty"`
+	MergedAt *time.Time `json:"merged_at,omitempty"`
 }
 
 type PullReview struct {
@@ -1537,16 +1537,16 @@ type PullReview struct {
 	PullRequestUrl string `json:"pull_request_url,omitempty"`
 	Stale bool `json:"stale,omitempty"`
 	State *ReviewStateType `json:"state,omitempty"`
-	SubmittedAt time.Time `json:"submitted_at,omitempty"`
+	SubmittedAt *time.Time `json:"submitted_at,omitempty"`
 	Team *Team `json:"team,omitempty"`
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	User *User `json:"user,omitempty"`
 }
 
 type PullReviewComment struct {
 	Body string `json:"body,omitempty"`
 	CommitId string `json:"commit_id,omitempty"`
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	DiffHunk string `json:"diff_hunk,omitempty"`
 	ExtraLinesCount int64 `json:"extra_lines_count,omitempty"`
 	HtmlUrl string `json:"html_url,omitempty"`
@@ -1558,7 +1558,7 @@ type PullReviewComment struct {
 	PullRequestReviewId int64 `json:"pull_request_review_id,omitempty"`
 	PullRequestUrl string `json:"pull_request_url,omitempty"`
 	Resolver *User `json:"resolver,omitempty"`
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	User *User `json:"user,omitempty"`
 }
 
@@ -1569,10 +1569,10 @@ type PullReviewRequestOptions struct {
 
 type PushMirror struct {
 	BranchFilter string `json:"branch_filter,omitempty"`
-	Created time.Time `json:"created,omitempty"`
+	Created *time.Time `json:"created,omitempty"`
 	Interval string `json:"interval,omitempty"`
 	LastError string `json:"last_error,omitempty"`
-	LastUpdate time.Time `json:"last_update,omitempty"`
+	LastUpdate *time.Time `json:"last_update,omitempty"`
 	PublicKey string `json:"public_key,omitempty"`
 	RemoteAddress string `json:"remote_address,omitempty"`
 	RemoteName string `json:"remote_name,omitempty"`
@@ -1661,7 +1661,7 @@ type QuotaUsedSizeRepos struct {
 
 type Reaction struct {
 	Content string `json:"content,omitempty"`
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	User *User `json:"user,omitempty"`
 }
 
@@ -1692,14 +1692,14 @@ type Release struct {
 	Assets []*Attachment `json:"assets,omitempty"`
 	Author *User `json:"author,omitempty"`
 	Body string `json:"body,omitempty"`
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	Draft bool `json:"draft,omitempty"`
 	HideArchiveLinks bool `json:"hide_archive_links,omitempty"`
 	HtmlUrl string `json:"html_url,omitempty"`
 	Id int64 `json:"id,omitempty"`
 	Name string `json:"name,omitempty"`
 	Prerelease bool `json:"prerelease,omitempty"`
-	PublishedAt time.Time `json:"published_at,omitempty"`
+	PublishedAt *time.Time `json:"published_at,omitempty"`
 	TagName string `json:"tag_name,omitempty"`
 	TarballUrl string `json:"tarball_url,omitempty"`
 	TargetCommitish string `json:"target_commitish,omitempty"`
@@ -1758,10 +1758,10 @@ type Repository struct {
 	AllowRebaseUpdate bool `json:"allow_rebase_update,omitempty"`
 	AllowSquashMerge bool `json:"allow_squash_merge,omitempty"`
 	Archived bool `json:"archived,omitempty"`
-	ArchivedAt time.Time `json:"archived_at,omitempty"`
+	ArchivedAt *time.Time `json:"archived_at,omitempty"`
 	AvatarUrl string `json:"avatar_url,omitempty"`
 	CloneUrl string `json:"clone_url,omitempty"`
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	DefaultAllowMaintainerEdit bool `json:"default_allow_maintainer_edit,omitempty"`
 	DefaultBranch string `json:"default_branch,omitempty"`
 	DefaultDeleteBranchAfterMerge bool `json:"default_delete_branch_after_merge,omitempty"`
@@ -1793,7 +1793,7 @@ type Repository struct {
 	Link string `json:"link,omitempty"`
 	Mirror bool `json:"mirror,omitempty"`
 	MirrorInterval string `json:"mirror_interval,omitempty"`
-	MirrorUpdated time.Time `json:"mirror_updated,omitempty"`
+	MirrorUpdated *time.Time `json:"mirror_updated,omitempty"`
 	Name string `json:"name,omitempty"`
 	ObjectFormatName string `json:"object_format_name,omitempty"`
 	OpenIssuesCount int64 `json:"open_issues_count,omitempty"`
@@ -1810,7 +1810,7 @@ type Repository struct {
 	StarsCount int64 `json:"stars_count,omitempty"`
 	Template bool `json:"template,omitempty"`
 	Topics []string `json:"topics,omitempty"`
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	Url string `json:"url,omitempty"`
 	WatchersCount int64 `json:"watchers_count,omitempty"`
 	Website string `json:"website,omitempty"`
@@ -1834,7 +1834,7 @@ type SearchResults struct {
 }
 
 type Secret struct {
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	Name string `json:"name,omitempty"`
 }
 
@@ -1849,7 +1849,7 @@ type SetUserQuotaGroupsOptions struct {
 type StateType string
 
 type StopWatch struct {
-	Created time.Time `json:"created,omitempty"`
+	Created *time.Time `json:"created,omitempty"`
 	Duration string `json:"duration,omitempty"`
 	IssueIndex int64 `json:"issue_index,omitempty"`
 	IssueTitle string `json:"issue_title,omitempty"`
@@ -1886,10 +1886,10 @@ type TagArchiveDownloadCount struct {
 }
 
 type TagProtection struct {
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	Id int64 `json:"id,omitempty"`
 	NamePattern string `json:"name_pattern,omitempty"`
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	WhitelistTeams []string `json:"whitelist_teams,omitempty"`
 	WhitelistUsernames []string `json:"whitelist_usernames,omitempty"`
 }
@@ -1912,7 +1912,7 @@ type TimelineComment struct {
 	Assignee *User `json:"assignee,omitempty"`
 	AssigneeTeam *Team `json:"assignee_team,omitempty"`
 	Body string `json:"body,omitempty"`
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	DependentIssue *Issue `json:"dependent_issue,omitempty"`
 	HtmlUrl string `json:"html_url,omitempty"`
 	Id int64 `json:"id,omitempty"`
@@ -1936,7 +1936,7 @@ type TimelineComment struct {
 	ReviewId int64 `json:"review_id,omitempty"`
 	TrackedTime *TrackedTime `json:"tracked_time,omitempty"`
 	Type_ string `json:"type,omitempty"`
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	User *User `json:"user,omitempty"`
 }
 
@@ -1945,15 +1945,15 @@ type TopicName struct {
 }
 
 type TopicResponse struct {
-	Created time.Time `json:"created,omitempty"`
+	Created *time.Time `json:"created,omitempty"`
 	Id int64 `json:"id,omitempty"`
 	RepoCount int64 `json:"repo_count,omitempty"`
 	TopicName string `json:"topic_name,omitempty"`
-	Updated time.Time `json:"updated,omitempty"`
+	Updated *time.Time `json:"updated,omitempty"`
 }
 
 type TrackedTime struct {
-	Created time.Time `json:"created,omitempty"`
+	Created *time.Time `json:"created,omitempty"`
 	Id int64 `json:"id,omitempty"`
 	Issue *Issue `json:"issue,omitempty"`
 	IssueId int64 `json:"issue_id,omitempty"`
@@ -2001,7 +2001,7 @@ type UpdateVariableOption struct {
 type User struct {
 	Active bool `json:"active,omitempty"`
 	AvatarUrl string `json:"avatar_url,omitempty"`
-	Created time.Time `json:"created,omitempty"`
+	Created *time.Time `json:"created,omitempty"`
 	Description string `json:"description,omitempty"`
 	Email string `json:"email,omitempty"`
 	FollowersCount int64 `json:"followers_count,omitempty"`
@@ -2011,7 +2011,7 @@ type User struct {
 	Id int64 `json:"id,omitempty"`
 	IsAdmin bool `json:"is_admin,omitempty"`
 	Language string `json:"language,omitempty"`
-	LastLogin time.Time `json:"last_login,omitempty"`
+	LastLogin *time.Time `json:"last_login,omitempty"`
 	Location string `json:"location,omitempty"`
 	Login string `json:"login,omitempty"`
 	LoginName string `json:"login_name,omitempty"`
@@ -2065,7 +2065,7 @@ type VerifyGPGKeyOption struct {
 }
 
 type WatchInfo struct {
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 	Ignored bool `json:"ignored,omitempty"`
 	Reason interface{} `json:"reason,omitempty"`
 	RepositoryUrl string `json:"repository_url,omitempty"`
