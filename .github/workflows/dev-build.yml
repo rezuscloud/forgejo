@@ -117,5 +117,9 @@ jobs:
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
             org.opencontainers.image.revision=${{ github.sha }}
             org.opencontainers.image.version=${{ steps.meta.outputs.version }}
-          cache-from: type=gha,scope=dev-${{ github.ref_name }}
-          cache-to: type=gha,scope=dev-${{ github.ref_name }},mode=max
+          # NO gha build cache: cross-platform cache pollution executes
+          # amd64-cached go-generate tools under the emulated arm64 stage
+          # ("fork/exec ... exec format error" — release.yml builds cache-less
+          # for the same reason).
+          cache-from: ''
+          cache-to: 
