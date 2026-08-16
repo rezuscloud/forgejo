@@ -1,0 +1,114 @@
+name: dev-build
+
+# Continuous dev channels — branch-per-major continuous deployment.
+# https://github.com/tibrezus/harmostes/issues/201
+#
+#   dev      : every push to the release branch rezus/forgejo-16 builds
+#              16.0.2-dev-<sha8> (immutable) + dev-16 / dev (mutable).
+#              Prod (git.rezus.cloud) tracks dev-16 via Flux ImagePolicy —
+#              digest-pinned, always our head, rollback = any prior sha tag.
+#   dev-next : every push to rezus/forgejo-next (upstream main + our delta,
+#              continuously merged by the harmostes forgejo-next workflow)
+#              builds next-<sha8> (immutable) + next (mutable) for the
+#              forgejo-dev-next canary instance — cross-major pre-flight.
+#
+# This channel NEVER cuts git tags or GitHub releases: stable artifacts remain
+# exclusively tag-triggered (release.yml, v*-rezus.N). Version identity follows
+# the same upstream-identity rule (ls-remote pure vX.Y.Z per release-line
+# prefix); dev-next derives from git describe (upstream main has no release
+# tags yet — major+1 dev identity, Codeberg-style).
+#
+# amd64-only for speed (cluster nodes are amd64); stable release builds remain
+# multi-arch.
+
+on:
+  push:
+    branches: [rezus/forgejo-16, rezus/forgejo-next]
+  workflow_dispatch: {}
+
+concurrency:
+  group: dev-build-${{ github.ref_name }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  dev-image:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
+      tags: ${{ steps.meta.outputs.tags }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0, fetch-tags: true }
+
+      - name: Derive channel identity
+        id: meta
+        env:
+          BRANCH: ${{ github.ref_name }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          SHORT_SHA="${SHA:0:8}"
+          if [ "$BRANCH" = "rezus/forgejo-16" ]; then
+            # Same derivation as the tag phase / release.yml: highest pure
+            # vX.Y.Z on the release-line prefix, from the upstream host.
+            TAG_PREFIX="v16.0"
+            VER=$(git ls-remote --tags https://codeberg.org/forgejo/forgejo.git "refs/tags/${TAG_PREFIX}.*" \
+              | awk -F/ '{print $NF}' | grep -E "^${TAG_PREFIX//./\\.}\.[0-9]+$" | sort -V | tail -1)
+            [ -z "$VER" ] && { echo "ERROR: no upstream ${TAG_PREFIX}.* release tag"; exit 1; }
+            VERSION="${VER#v}+dev.${SHORT_SHA}"
+            IMMUTABLE="${VER#v}-dev-${SHORT_SHA}"
+            MUTABLES="dev-16 dev"
+          else
+            # dev-next: identity from topology (describe) — upstream main has
+            # no release tags yet; report major+1 dev.
+            DESCRIBE=$(git describe --tags 2>/dev/null || echo "v16.0.2-0-g${SHORT_SHA}")
+            LAST_VER=$(echo "$DESCRIBE" | sed -E 's/^v([0-9]+)\..*$/\1/')
+            NEXT_MAJOR=$((LAST_VER + 1))
+            COUNT=$(echo "$DESCRIBE" | sed -E 's/.*-([0-9]+)-g[0-9a-f]+$/\1/')
+            VERSION="${NEXT_MAJOR}.0.0-dev.${COUNT}.g${SHORT_SHA}"
+            IMMUTABLE="next-${SHORT_SHA}"
+            MUTABLES="next"
+          fi
+          REPO="ghcr.io/rezuscloud/forgejo"
+          TAGS="${REPO}:${IMMUTABLE}"
+          for m in $MUTABLES; do TAGS="${TAGS}
+${REPO}:${m}"; done
+          {
+            echo "version=${VERSION}"
+            echo "tags<<EOF"
+            echo "$TAGS"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Write VERSION (upstream identity + dev provenance)
+        run: printf '%s\n' "${{ steps.meta.outputs.version }}" > VERSION
+
+      # -16 → rootful Dockerfile (prod parity); -next → rootless (canary).
+      - name: Build & push dev image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ github.ref_name == 'rezus/forgejo-16' && './Dockerfile' || './Dockerfile.rootless' }}
+          platforms: linux/amd64
+          push: true
+          build-args: |
+            RELEASE_VERSION=${{ steps.meta.outputs.version }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: |
+            org.opencontainers.image.title=forgejo (rezuscloud dev channel)
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.version=${{ steps.meta.outputs.version }}
+          cache-from: type=gha,scope=dev-${{ github.ref_name }}
+          cache-to: type=gha,scope=dev-${{ github.ref_name }},mode=max
