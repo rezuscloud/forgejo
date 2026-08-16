@@ -99,13 +99,15 @@ jobs:
       - name: Write VERSION (upstream identity + dev provenance)
         run: printf '%s\n' "${{ steps.meta.outputs.version }}" > VERSION
 
-      # -16 → rootful Dockerfile (prod parity); -next → rootless (canary).
+      # -16 → rootful Dockerfile, MULTI-ARCH (prod lives on the arm64
+      # control-plane by design — juicefs-valkey co-location); -next →
+      # rootless amd64 (canary is placed on an amd64 worker).
       - name: Build & push dev image
         uses: docker/build-push-action@v6
         with:
           context: .
           file: ${{ github.ref_name == 'rezus/forgejo-16' && './Dockerfile' || './Dockerfile.rootless' }}
-          platforms: linux/amd64
+          platforms: ${{ github.ref_name == 'rezus/forgejo-16' && 'linux/amd64,linux/arm64' || 'linux/amd64' }}
           push: true
           build-args: |
             RELEASE_VERSION=${{ steps.meta.outputs.version }}
