@@ -74,7 +74,13 @@ jobs:
             MUTABLES="next"
           fi
           REPO="ghcr.io/rezuscloud/forgejo"
-          TAGS="${REPO}:${IMMUTABLE}"
+          # ORDER tag: zero-padded run number → fixed-width lexical order
+          # equals numeric order; Flux ImagePolicy(alphabetical, tagFilter
+          # ^16\.0\.2-dev\.\d{6}$ / ^next\.\d{6}$) picks the latest build
+          # deterministically. Immutable sha tag stays for addressability.
+          PADDED=$(printf '%06d' "${GITHUB_RUN_NUMBER}")
+          if [ "$BRANCH" = "rezus/forgejo-16" ]; then ORDER="${VER#v}-dev.${PADDED}"; else ORDER="next.${PADDED}"; fi
+          TAGS="${REPO}:${IMMUTABLE} ${REPO}:${ORDER}"
           for m in $MUTABLES; do TAGS="${TAGS} ${REPO}:${m}"; done
           {
             echo "version=${VERSION}"
