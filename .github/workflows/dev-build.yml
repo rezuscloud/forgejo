@@ -75,12 +75,11 @@ jobs:
           fi
           REPO="ghcr.io/rezuscloud/forgejo"
           TAGS="${REPO}:${IMMUTABLE}"
-          for m in $MUTABLES; do TAGS="${TAGS}
-${REPO}:${m}"; done
+          for m in $MUTABLES; do TAGS="${TAGS} ${REPO}:${m}"; done
           {
             echo "version=${VERSION}"
             echo "tags<<EOF"
-            echo "$TAGS"
+            for t in $TAGS; do echo "$t"; done
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
