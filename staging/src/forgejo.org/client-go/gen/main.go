@@ -47,12 +47,13 @@ type Param struct {
 	Schema *Schema `json:"schema"`
 }
 type Schema struct {
-	Type   string            `json:"type"`
-	Format string            `json:"format"`
-	Ref    string            `json:"$ref"`
-	Items  *Schema           `json:"items"`
-	Props  map[string]Schema `json:"properties"`
-	Addl   *Schema           `json:"additionalProperties"`
+	Type     string            `json:"type"`
+	Format   string            `json:"format"`
+	Ref      string            `json:"$ref"`
+	Items    *Schema           `json:"items"`
+	Props    map[string]Schema `json:"properties"`
+	Addl     *Schema           `json:"additionalProperties"`
+	Required []string          `json:"required"`
 }
 
 func main() {
@@ -120,7 +121,16 @@ func genTypes(spec *SwaggerSpec) string {
 				if len(cn) > 0 && !isAlpha(rune(cn[0])) { cn = "X" + strings.TrimLeft(cn, "@#$%^&*") }
 				f := pc(cn)
 				if kw(f) { f += "_" }
-				b.WriteString(fmt.Sprintf("\t%s %s `json:\"%s,omitempty\"`\n", f, gt(&ps, spec), pn))
+				// Optional date-time fields MUST be pointers: encoding/json never
+				// omits a zero time.Time (structs are never "empty"), so a value
+				// type serialises "0001-01-01T00:00:00Z" and the server's date
+				// guard rejects it (seen live: forgejo 16.0.2 issue comments,
+				// 403 unallowed update date). Required stays a value type.
+				t := gt(&ps, spec)
+				isRequired := false
+				for _, r := range s.Required { if r == pn { isRequired = true; break } }
+				if t == "time.Time" && !isRequired { t = "*time.Time" }
+				b.WriteString(fmt.Sprintf("\t%s %s `json:\"%s,omitempty\"`\n", f, t, pn))
 			}
 			b.WriteString("}\n\n")
 		case s.Type == "string":

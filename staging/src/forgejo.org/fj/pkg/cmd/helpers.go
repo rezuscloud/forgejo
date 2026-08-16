@@ -84,11 +84,21 @@ func stateStr(s *forgejo.StateType) string {
 }
 
 // timeStr formats an optional timestamp for display ("" if absent/zero).
-func timeStr(t time.Time) string {
-	if t.IsZero() {
-		return ""
+// Accepts the generated SDK's optional *time.Time fields directly.
+func timeStr(t any) string {
+	switch v := t.(type) {
+	case time.Time:
+		if v.IsZero() {
+			return ""
+		}
+		return v.Format(time.RFC3339)
+	case *time.Time:
+		if v == nil || v.IsZero() {
+			return ""
+		}
+		return v.Format(time.RFC3339)
 	}
-	return t.Format(time.RFC3339)
+	return ""
 }
 
 // commitStateStr safely stringifies a *CommitStatusState, treating nil or
