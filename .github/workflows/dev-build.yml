@@ -1,29 +1,18 @@
 name: dev-build
 
-# Continuous dev channels — branch-per-major continuous deployment.
+# Dev channel — continuous deployment of the release branch.
 # https://github.com/tibrezus/harmostes/issues/201
 #
-#   dev      : every push to the release branch rezus/forgejo-16 builds
-#              16.0.2-dev-<sha8> (immutable) + dev-16 / dev (mutable).
-#              Prod (git.rezus.cloud) tracks dev-16 via Flux ImagePolicy —
-#              digest-pinned, always our head, rollback = any prior sha tag.
-#   dev-next : every push to rezus/forgejo-next (upstream main + our delta,
-#              continuously merged by the harmostes forgejo-next workflow)
-#              builds next-<sha8> (immutable) + next (mutable) for the
-#              forgejo-dev-next canary instance — cross-major pre-flight.
-#
-# This channel NEVER cuts git tags or GitHub releases: stable artifacts remain
-# exclusively tag-triggered (release.yml, v*-rezus.N). Version identity follows
-# the same upstream-identity rule (ls-remote pure vX.Y.Z per release-line
-# prefix); dev-next derives from git describe (upstream main has no release
-# tags yet — major+1 dev identity, Codeberg-style).
-#
-# amd64-only for speed (cluster nodes are amd64); stable release builds remain
-# multi-arch.
+# Fires on pushes to rezus/forgejo-16 (sync.yml merges + PR merges).
+# Builds 16.0.2-dev.NNNNNN (immutable, zero-padded run number: lexical ==
+# numeric; the Flux ImagePolicy orders on it) + 16.0.2-dev-<sha8>
+# (addressable) + dev-16 / dev (mutable). Prod rolls on this channel.
+# Multi-arch: prod runs on the arm64 OCI control-plane by design.
+# NEVER cuts tags; stable artifacts stay tag-triggered (release.yml).
 
 on:
   push:
-    branches: [rezus/forgejo-16, rezus/forgejo-next]
+    branches: [rezus/forgejo-16]
   workflow_dispatch: {}
 
 concurrency:
@@ -52,34 +41,22 @@ jobs:
         run: |
           set -euo pipefail
           SHORT_SHA="${SHA:0:8}"
-          if [ "$BRANCH" = "rezus/forgejo-16" ]; then
-            # Same derivation as the tag phase / release.yml: highest pure
-            # vX.Y.Z on the release-line prefix, from the upstream host.
-            TAG_PREFIX="v16.0"
-            VER=$(git ls-remote --tags https://codeberg.org/forgejo/forgejo.git "refs/tags/${TAG_PREFIX}.*" \
-              | awk -F/ '{print $NF}' | grep -E "^${TAG_PREFIX//./\\.}\.[0-9]+$" | sort -V | tail -1)
-            [ -z "$VER" ] && { echo "ERROR: no upstream ${TAG_PREFIX}.* release tag"; exit 1; }
-            VERSION="${VER#v}+dev.${SHORT_SHA}"
-            IMMUTABLE="${VER#v}-dev-${SHORT_SHA}"
-            MUTABLES="dev-16 dev"
-          else
-            # dev-next: identity from topology (describe) — upstream main has
-            # no release tags yet; report major+1 dev.
-            DESCRIBE=$(git describe --tags 2>/dev/null || echo "v16.0.2-0-g${SHORT_SHA}")
-            LAST_VER=$(echo "$DESCRIBE" | sed -E 's/^v([0-9]+)\..*$/\1/')
-            NEXT_MAJOR=$((LAST_VER + 1))
-            COUNT=$(echo "$DESCRIBE" | sed -E 's/.*-([0-9]+)-g[0-9a-f]+$/\1/')
-            VERSION="${NEXT_MAJOR}.0.0-dev.${COUNT}.g${SHORT_SHA}"
-            IMMUTABLE="next-${SHORT_SHA}"
-            MUTABLES="next"
-          fi
-          REPO="ghcr.io/rezuscloud/forgejo"
+          # Single mapping row = the release line; identity = highest pure
+          # vX.Y.Z on the release-line prefix, from the upstream host.
+          TAG_PREFIX="v${BRANCH#rezus/forgejo-}.0"
+          VER=$(git ls-remote --tags https://codeberg.org/forgejo/forgejo.git "refs/tags/${TAG_PREFIX}.*" \
+            | awk -F/ '{print $NF}' | grep -E "^${TAG_PREFIX//./\\.}\\.[0-9]+$" | sort -V | tail -1)
+          [ -z "$VER" ] && { echo "ERROR: no upstream ${TAG_PREFIX}.* release tag"; exit 1; }
+          VERSION="${VER#v}+dev.${SHORT_SHA}"
+          IMMUTABLE="${VER#v}-dev-${SHORT_SHA}"
+          MUTABLES="dev-${TAG_PREFIX#v} dev"
+          
           # ORDER tag: zero-padded run number → fixed-width lexical order
           # equals numeric order; Flux ImagePolicy(alphabetical, tagFilter
-          # ^16\.0\.2-dev\.\d{6}$ / ^next\.\d{6}$) picks the latest build
+          # ^<ver>-dev\.\d{6}$) picks the latest build
           # deterministically. Immutable sha tag stays for addressability.
           PADDED=$(printf '%06d' "${GITHUB_RUN_NUMBER}")
-          if [ "$BRANCH" = "rezus/forgejo-16" ]; then ORDER="${VER#v}-dev.${PADDED}"; else ORDER="next.${PADDED}"; fi
+          ORDER="${VER#v}-dev.${PADDED}"
           TAGS="${REPO}:${IMMUTABLE} ${REPO}:${ORDER}"
           for m in $MUTABLES; do TAGS="${TAGS} ${REPO}:${m}"; done
           {
@@ -107,8 +84,8 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ${{ github.ref_name == 'rezus/forgejo-16' && './Dockerfile' || './Dockerfile.rootless' }}
-          platforms: ${{ github.ref_name == 'rezus/forgejo-16' && 'linux/amd64,linux/arm64' || 'linux/amd64' }}
+          file: ./Dockerfile
+          platforms: linux/amd64,linux/arm64
           push: true
           build-args: |
             RELEASE_VERSION=${{ steps.meta.outputs.version }}
