@@ -1,0 +1,130 @@
+name: sync
+
+# Fork maintenance — THE GENERIC WORKFLOW, stated once:
+#
+#   A mapping table. Each row maps an upstream ref to one of ours:
+#
+#     theirs                ours
+#     v16.0/forgejo    →    rezus/forgejo-16
+#
+#   Invariant per row: ours ⊇ theirs (all their work + all ours, history
+#   intact). This workflow restores the invariant when their side moves.
+#
+# Row semantics (same for every row, every fork using this pattern):
+#   - already ⊆          → no-op (the common case)
+#   - merge clean        → validate (SDK regen + builds + clean tree);
+#                          green = push. The green run IS the review.
+#   - merge conflicts    → conclude WITH markers on conflict/<theirs>,
+#                          open ONE PR (needs-conflict-resolution) —
+#                          human/agent resolves there, merging restores ⊇
+#   - validation red     → nothing pushed; red run is the signal; retried
+#   next run (idempotent)
+#
+# Versions (release rule, evaluated per row with tags: derive):
+#   identity flows from THEM (v16.0.2); only an ordinal from US
+#   (-rezus.N). Stable tags are cut deliberately (workflow_dispatch tag
+#   input or by hand) — a daily sync never mints a version.
+#   Dev images for prod ride dev-build.yml (fires on the push below).
+#
+# Operations are row operations: add a row on a major upgrade, delete one
+# on retirement. Nothing else in this file is fork-specific except ROWS.
+
+on:
+  schedule:
+    - cron: '0 3 * * *'   # daily
+  workflow_dispatch: {}
+
+concurrency:
+  group: sync
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  UPSTREAM: https://codeberg.org/forgejo/forgejo.git
+  # ── the mapping table ─────────────────────────────────────────────────
+  # one row per line: <theirs> <ours>
+  ROWS: |
+    v16.0/forgejo rezus/forgejo-16
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0                # full history: merge-base never lies
+          token: ${{ secrets.SYNC_TOKEN }}   # PAT: pushes must trigger dev-build
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Walk the mapping table
+        env:
+          GH_TOKEN: ${{ secrets.SYNC_TOKEN }}
+        run: |
+          set -euo pipefail
+          git config user.name  "rezus-bot"
+          git config user.email "rezus-bot@users.noreply.github.com"
+          git remote add upstream "$UPSTREAM"
+
+          SYNC_DATE=$(date +%F)
+          CONFLICTED=0
+
+          while read -r THEIRS OURS; do
+            [ -z "$THEIRS" ] && continue
+            echo ""
+            echo "══ row: $THEIRS → $OURS ══"
+
+            git fetch -q upstream "$THEIRS"
+            git fetch -q origin "$OURS"
+
+            # Invariant already holds?
+            if git merge-base --is-ancestor "upstream/$THEIRS" "origin/$OURS"; then
+              echo "  ⊇ holds — no-op"
+              continue
+            fi
+
+            BASE=$(git rev-parse "origin/$OURS")
+            git checkout -q -B "sync-work" "origin/$OURS"
+
+            if git merge --no-ff --no-edit \
+                 -m "RZ/sync: $THEIRS → $OURS ($SYNC_DATE)" \
+                 "upstream/$THEIRS"; then
+              echo "  merged clean — validating"
+              if bash .github/fork/sync-validate.sh "$BASE"; then
+                # Regen output (SDK/tidy) rides on top of the merge commit.
+                if ! git diff --quiet || ! git diff --cached --quiet; then
+                  git add -A
+                  git commit -q -m "RZ/sync: post-merge regen (SDK/tidy) for $THEIRS"
+                fi
+                git push origin "HEAD:$OURS"
+                echo "  pushed — invariant restored (dev-build fires)"
+              else
+                echo "::error::validation failed for $THEIRS → $OURS; nothing pushed"
+                exit 1
+              fi
+            else
+              echo "  conflicts — concluding with markers for resolution"
+              CONFLICTED=1
+              git add -A 2>/dev/null || true
+              git commit --no-edit --quiet 2>/dev/null || true
+              CONFLICT_BRANCH="conflict/$(echo "$THEIRS" | tr '/' '-')-$SYNC_DATE"
+              git push --force-with-lease origin "HEAD:$CONFLICT_BRANCH"
+              gh pr create \
+                --base "$OURS" --head "$CONFLICT_BRANCH" \
+                --title "sync: $THEIRS → $OURS needs conflict resolution ($SYNC_DATE)" \
+                --body "Upstream moved into files our delta touches. Resolve the 3-way regions on this branch (the rezus intent lives in our side of each marker); merging this PR restores \`ours ⊇ theirs\`." \
+                --label needs-conflict-resolution \
+                2>/dev/null || echo "  (PR may already exist)"
+            fi
+          done <<< "$ROWS"
+
+          [ "$CONFLICTED" -eq 0 ] || {
+            echo "::notice::one or more rows await conflict resolution (PRs above)"
+            exit 0
+          }
