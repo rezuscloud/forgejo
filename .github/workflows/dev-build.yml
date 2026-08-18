@@ -50,7 +50,9 @@ jobs:
           [ -z "$VER" ] && { echo "ERROR: no upstream ${TAG_PREFIX}.* release tag"; exit 1; }
           VERSION="${VER#v}+dev.${SHORT_SHA}"
           IMMUTABLE="${VER#v}-dev-${SHORT_SHA}"
-          MUTABLES="dev-${TAG_PREFIX#v} dev"
+          MAJOR="${BRANCH#rezus/forgejo-}"      # rezus/forgejo-16 → 16
+          MUTABLES="dev-${MAJOR} dev"
+          REPO="ghcr.io/rezuscloud/forgejo"
           
           # ORDER tag: zero-padded run number → fixed-width lexical order
           # equals numeric order; Flux ImagePolicy(alphabetical, tagFilter
