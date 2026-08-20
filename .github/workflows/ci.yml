@@ -5,9 +5,11 @@ name: ci
 # free to exercise BOTH read and write commands (create issue/PR/release/tag,
 # comment, merge, delete, ...) with zero risk to any real server.
 #
-# The container is vanilla upstream Forgejo at the same release line the fork
-# tracks (v16.0.2); the fork's server code is byte-identical upstream, so this
+# The container is vanilla upstream Forgejo at the current upstream patch of the
+# release line the fork tracks; the fork's server code is byte-identical upstream, so this
 # validates the fj CLI + client-go SDK against the real Forgejo API surface.
+# NOTE: 16.0.2's container tag was dropped by upstream's registry on 2026-08-20
+# (issue #84) — use the newest patch tag of the tracked line that resolves.
 
 on:
   push:
@@ -32,7 +34,7 @@ jobs:
           docker run -d --name forgejo -p 3000:3000 \
             -e FORGEJO__security__INSTALL_LOCK=true \
             -e FORGEJO__server__LOCAL_ROOT_URL=http://localhost:3000/ \
-            codeberg.org/forgejo/forgejo:16.0.2
+            codeberg.org/forgejo/forgejo:16.0.3
           echo "::group::Waiting for Forgejo to become healthy"
           for i in $(seq 1 90); do
             if curl -sf http://localhost:3000/api/v1/version >/dev/null 2>&1; then
