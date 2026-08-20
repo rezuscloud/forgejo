@@ -16,8 +16,8 @@ func (s *NotifyService) NotifyGetList(ctx context.Context, all bool, statusTypes
 	u := s.client.base.JoinPath(fmt.Sprintf("/notifications"))
 	qry := u.Query()
 	if all != false { qry.Set("all", fmt.Sprintf("%v", all)) }
-	if statusTypes != nil { qry.Set("status-types", fmt.Sprintf("%v", statusTypes)) }
-	if subjectType != nil { qry.Set("subject-type", fmt.Sprintf("%v", subjectType)) }
+	if statusTypes != nil { for _, v := range statusTypes { qry.Add("status-types", fmt.Sprintf("%v", v)) } }
+	if subjectType != nil { for _, v := range subjectType { qry.Add("subject-type", fmt.Sprintf("%v", v)) } }
 	if since != (time.Time{}) { qry.Set("since", fmt.Sprintf("%v", since)) }
 	if before != (time.Time{}) { qry.Set("before", fmt.Sprintf("%v", before)) }
 	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
@@ -80,7 +80,7 @@ func (s *NotifyService) NotifyReadList(ctx context.Context, lastReadAt time.Time
 	qry := u.Query()
 	if lastReadAt != (time.Time{}) { qry.Set("last_read_at", fmt.Sprintf("%v", lastReadAt)) }
 	if all != false { qry.Set("all", fmt.Sprintf("%v", all)) }
-	if statusTypes != nil { qry.Set("status-types", fmt.Sprintf("%v", statusTypes)) }
+	if statusTypes != nil { for _, v := range statusTypes { qry.Add("status-types", fmt.Sprintf("%v", v)) } }
 	if toStatus != "" { qry.Set("to-status", fmt.Sprintf("%v", toStatus)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, u.String(), nil)

@@ -343,6 +343,16 @@ func TestCLICommands(t *testing.T) {
 		if _, err := runFj(t, binary, "actions", "runs", "-r", ownerRepo); err != nil {
 			t.Fatal(err)
 		}
+		// filters pass through to list-action-runs (#74) — exit-0 is the
+		// contract on an empty repo ("no runs"), flags must at least bind.
+		if _, err := runFj(t, binary, "actions", "runs", "-r", ownerRepo, "--limit", "3", "--page", "1"); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := runFj(t, binary, "actions", "runs", "-r", ownerRepo,
+			"--status", "success,failure", "--event", "push", "--head-sha", "0af1a3633115fe49317c0289ecb45b18ba3cf0ee",
+			"--ref", "main", "--workflow-id", "1", "--run-number", "1"); err != nil {
+			t.Fatal(err)
+		}
 
 		// variables CRUD
 		if _, err := runFj(t, binary, "actions", "variables", "create",

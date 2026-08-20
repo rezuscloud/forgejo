@@ -176,6 +176,9 @@ func newActionsDispatchCmd() *cobra.Command {
 }
 
 func newActionsRunsCmd() *cobra.Command {
+	var page, limit int
+	var status, event, headSha, ref, workflowID string
+	var runNumber int64
 	cmd := &cobra.Command{
 		Use:   "runs",
 		Short: "List action runs on a repo",
@@ -184,7 +187,8 @@ func newActionsRunsCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			res, _, err := c.Repo.ListActionRuns(context.Background(), owner, repo, 1, 20, nil, nil, 0, "", "", "")
+			res, _, err := c.Repo.ListActionRuns(context.Background(), owner, repo,
+				page, limit, parseStringSlice(event), parseStringSlice(status), runNumber, headSha, ref, workflowID)
 			if err != nil {
 				return err
 			}
@@ -205,6 +209,14 @@ func newActionsRunsCmd() *cobra.Command {
 			return nil
 		},
 	}
+	cmd.Flags().IntVar(&page, "page", 1, "page number")
+	cmd.Flags().IntVar(&limit, "limit", 20, "runs per page")
+	cmd.Flags().StringVar(&status, "status", "", "filter by status (comma-separated: success,failure,running,...)")
+	cmd.Flags().StringVar(&event, "event", "", "filter by event (comma-separated: push,pull_request,...)")
+	cmd.Flags().StringVar(&headSha, "head-sha", "", "filter by head commit sha")
+	cmd.Flags().StringVar(&ref, "ref", "", "filter by ref (branch)")
+	cmd.Flags().StringVar(&workflowID, "workflow-id", "", "filter by workflow id")
+	cmd.Flags().Int64Var(&runNumber, "run-number", 0, "filter by run number")
 	return cmd
 }
 
