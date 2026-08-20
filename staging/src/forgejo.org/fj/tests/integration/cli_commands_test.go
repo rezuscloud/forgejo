@@ -211,6 +211,49 @@ func TestCLICommands(t *testing.T) {
 		}
 	})
 
+	// ---- milestone: full lifecycle (create → list → view → edit → close →
+	// delete), mirroring the issue/release blocks --------------------
+	t.Run("milestone", func(t *testing.T) {
+		out, err := runFj(t, binary, "milestone", "create", "-r", ownerRepo,
+			"-t", "fj integration milestone", "-d", "created by the integration suite")
+		if err != nil {
+			t.Fatal(err)
+		}
+		id := extractID(t, out)
+
+		if out, err = runFj(t, binary, "milestone", "list", "-r", ownerRepo); err != nil {
+			t.Fatal(err)
+		}
+		contains(t, out, "fj integration milestone")
+
+		if out, err = runFj(t, binary, "milestone", "view", strconv.FormatInt(id, 10),
+			"-r", ownerRepo); err != nil {
+			t.Fatal(err)
+		}
+		contains(t, out, "fj integration milestone")
+		contains(t, out, "created by the integration suite")
+
+		if _, err = runFj(t, binary, "milestone", "edit", strconv.FormatInt(id, 10),
+			"-r", ownerRepo, "-t", "fj integration milestone renamed"); err != nil {
+			t.Fatal(err)
+		}
+
+		if _, err = runFj(t, binary, "milestone", "close", strconv.FormatInt(id, 10),
+			"-r", ownerRepo); err != nil {
+			t.Fatal(err)
+		}
+		// closed milestone visible under -s closed
+		if out, err = runFj(t, binary, "milestone", "list", "-s", "closed", "-r", ownerRepo); err != nil {
+			t.Fatal(err)
+		}
+		contains(t, out, "fj integration milestone renamed")
+
+		if _, err = runFj(t, binary, "milestone", "delete", strconv.FormatInt(id, 10),
+			"-r", ownerRepo); err != nil {
+			t.Fatal(err)
+		}
+	})
+
 	// ---- pull request: seed branch via API, then create/list/view/status/merge
 	t.Run("pr", func(t *testing.T) {
 		createFileOnBranch(t, repo, "feature.txt", "", "feature-branch", "hello")
