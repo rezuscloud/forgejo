@@ -26,6 +26,7 @@ func NewRootCmd() *cobra.Command {
 	root.AddCommand(newAuthCmd())
 	root.AddCommand(newRepoCmd())
 	root.AddCommand(newIssueCmd())
+	root.AddCommand(newMilestoneCmd())
 	root.AddCommand(newPrCmd())
 	root.AddCommand(newReleaseCmd())
 	root.AddCommand(newTagCmd())
