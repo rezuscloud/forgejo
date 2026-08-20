@@ -284,8 +284,8 @@ func (s *RepoService) ListActionRuns(ctx context.Context, owner string, repo str
 	qry := u.Query()
 	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
 	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
-	if event != nil { qry.Set("event", fmt.Sprintf("%v", event)) }
-	if status != nil { qry.Set("status", fmt.Sprintf("%v", status)) }
+	if event != nil { for _, v := range event { qry.Add("event", fmt.Sprintf("%v", v)) } }
+	if status != nil { for _, v := range status { qry.Add("status", fmt.Sprintf("%v", v)) } }
 	if runNumber != 0 { qry.Set("run_number", fmt.Sprintf("%v", runNumber)) }
 	if headSha != "" { qry.Set("head_sha", fmt.Sprintf("%v", headSha)) }
 	if ref != "" { qry.Set("ref", fmt.Sprintf("%v", ref)) }
@@ -312,7 +312,7 @@ func (s *RepoService) ListActionTasks(ctx context.Context, owner string, repo st
 	qry := u.Query()
 	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
 	if limit != 0 { qry.Set("limit", fmt.Sprintf("%v", limit)) }
-	if status != nil { qry.Set("status", fmt.Sprintf("%v", status)) }
+	if status != nil { for _, v := range status { qry.Add("status", fmt.Sprintf("%v", v)) } }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
@@ -1860,8 +1860,8 @@ func (s *RepoService) NotifyGetRepoList(ctx context.Context, owner string, repo 
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/notifications", owner, repo))
 	qry := u.Query()
 	if all != false { qry.Set("all", fmt.Sprintf("%v", all)) }
-	if statusTypes != nil { qry.Set("status-types", fmt.Sprintf("%v", statusTypes)) }
-	if subjectType != nil { qry.Set("subject-type", fmt.Sprintf("%v", subjectType)) }
+	if statusTypes != nil { for _, v := range statusTypes { qry.Add("status-types", fmt.Sprintf("%v", v)) } }
+	if subjectType != nil { for _, v := range subjectType { qry.Add("subject-type", fmt.Sprintf("%v", v)) } }
 	if since != (time.Time{}) { qry.Set("since", fmt.Sprintf("%v", since)) }
 	if before != (time.Time{}) { qry.Set("before", fmt.Sprintf("%v", before)) }
 	if page != 0 { qry.Set("page", fmt.Sprintf("%v", page)) }
@@ -1887,7 +1887,7 @@ func (s *RepoService) NotifyReadRepoList(ctx context.Context, owner string, repo
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/notifications", owner, repo))
 	qry := u.Query()
 	if all != false { qry.Set("all", fmt.Sprintf("%v", all)) }
-	if statusTypes != nil { qry.Set("status-types", fmt.Sprintf("%v", statusTypes)) }
+	if statusTypes != nil { for _, v := range statusTypes { qry.Add("status-types", fmt.Sprintf("%v", v)) } }
 	if toStatus != "" { qry.Set("to-status", fmt.Sprintf("%v", toStatus)) }
 	if lastReadAt != (time.Time{}) { qry.Set("last_read_at", fmt.Sprintf("%v", lastReadAt)) }
 	u.RawQuery = qry.Encode()
@@ -4231,7 +4231,7 @@ func (s *RepoService) RepoListPullRequests(ctx context.Context, owner string, re
 	if state != "" { qry.Set("state", fmt.Sprintf("%v", state)) }
 	if sort != "" { qry.Set("sort", fmt.Sprintf("%v", sort)) }
 	if milestone != 0 { qry.Set("milestone", fmt.Sprintf("%v", milestone)) }
-	if labels != nil { qry.Set("labels", fmt.Sprintf("%v", labels)) }
+	if labels != nil { for _, v := range labels { qry.Add("labels", fmt.Sprintf("%v", v)) } }
 	if poster != "" { qry.Set("poster", fmt.Sprintf("%v", poster)) }
 	if base != "" { qry.Set("base", fmt.Sprintf("%v", base)) }
 	if head != "" { qry.Set("head", fmt.Sprintf("%v", head)) }

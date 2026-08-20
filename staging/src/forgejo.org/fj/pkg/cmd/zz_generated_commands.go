@@ -23,7 +23,7 @@ func parseTime(s string) time.Time {
 // parseStringSlice converts a comma-separated string to []interface{}.
 func parseStringSlice(s string) []interface{} {
 	if s == "" { return nil }
-	parts := strings.Split(s, "/x/")
+	parts := strings.Split(s, ",")
 	res := make([]interface{}, len(parts))
 	for i, p := range parts { res[i] = p }
 	return res

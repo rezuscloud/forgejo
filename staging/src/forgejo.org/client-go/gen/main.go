@@ -284,6 +284,15 @@ func genMethod(svc string, m MD, spec *SwaggerSpec) string {
 	if len(qp) > 0 {
 		b.WriteString("\tqry := u.Query()\n")
 		for _, a2 := range qp {
+			// Only set non-zero-value optional query params. Slice params
+			// serialize as repeated query values — the server reads them via
+			// FormStrings (url.Values[key]), never as a joined string, so
+			// fmt.Sprintf("%v", slice) ("[a b]") or comma-joining are both
+			// rejected. Emit one value per occurrence with qry.Add.
+			if strings.HasPrefix(a2.t, "[]") {
+				b.WriteString(fmt.Sprintf("\tif %s != nil { for _, v := range %s { qry.Add(%q, fmt.Sprintf(\"%%v\", v)) } }\n", a2.n, a2.n, a2.sw))
+				continue
+			}
 			// Only set non-zero-value optional query params.
 			b.WriteString(fmt.Sprintf("\tif %s != %s { qry.Set(%q, fmt.Sprintf(\"%%v\", %s)) }\n", a2.n, zeroForType(a2.t), a2.sw, a2.n))
 		}
@@ -528,7 +537,7 @@ func genCLICommands(spec *SwaggerSpec) string {
 	b.WriteString("// parseStringSlice converts a comma-separated string to []interface{}.\n")
 	b.WriteString("func parseStringSlice(s string) []interface{} {\n")
 	b.WriteString("\tif s == \"\" { return nil }\n")
-	b.WriteString("\tparts := strings.Split(s, \"/x/\")\n")
+	b.WriteString("\tparts := strings.Split(s, \",\")\n")
 	b.WriteString("\tres := make([]interface{}, len(parts))\n")
 	b.WriteString("\tfor i, p := range parts { res[i] = p }\n")
 	b.WriteString("\treturn res\n")
