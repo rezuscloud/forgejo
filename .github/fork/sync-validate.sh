@@ -13,8 +13,12 @@ MERGE_BASE="${1:?usage: sync-validate.sh <merge-base-sha>}"
 HEAD_SHA=$(git rev-parse HEAD)
 
 SWAGGER_TEMPLATE="templates/swagger/v1_json.tmpl"
-SDK_DIR="staging/src/forgejo.org/client-go"
-FJ_DIR="staging/src/forgejo.org/fj"
+# Absolute paths: the regen below runs from inside $SDK_DIR, so relative
+# FJ_DIR paths used to resolve nowhere — and writeFile swallows errors, so
+# the CLI/test outputs silently never regenerated in CI. Absolute fixes
+# that and keeps -polish-out honest for the descriptor layer.
+SDK_DIR="$(pwd)/staging/src/forgejo.org/client-go"
+FJ_DIR="$(pwd)/staging/src/forgejo.org/fj"
 
 # Delta signatures — upstream-touched files where our modifications must
 # survive every merge. If a signature disappears, the merge dropped our
@@ -42,7 +46,8 @@ func main(){
 EOF
     go run /tmp/strip.go "$SWAGGER_TEMPLATE" "$SDK_DIR/spec/swagger.json"
     (cd "$SDK_DIR" && go run ./gen -spec spec/swagger.json -out . \
-      -cli-out "$FJ_DIR/pkg/cmd/" -test-out "$FJ_DIR/tests/integration/")
+      -cli-out "$FJ_DIR/pkg/cmd/" -test-out "$FJ_DIR/tests/integration/" \
+      -polish-out "$FJ_DIR/pkg/cmd/")
   else
     echo "swagger unchanged"
   fi
