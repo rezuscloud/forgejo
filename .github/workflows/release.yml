@@ -134,11 +134,18 @@ jobs:
     permissions: { contents: read }
     strategy:
       matrix:
+        # Parity with upstream forgejo-cli packaging (forgejo-contrib/forgejo-cli
+        # .woodpecker/publish.yml + its binstall metadata): windows ships as a
+        # zip, everything else as tar.gz. Coverage is a superset — upstream has
+        # linux x86_64/aarch64 + windows x86_64; Go cross-compiles darwin and
+        # windows/arm64 for free. Archive naming stays fj-{goos}-{goarch}.
         include:
           - { goos: linux,  goarch: amd64 }
           - { goos: linux,  goarch: arm64 }
           - { goos: darwin, goarch: amd64 }
           - { goos: darwin, goarch: arm64 }
+          - { goos: windows, goarch: amd64 }
+          - { goos: windows, goarch: arm64 }
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
@@ -151,19 +158,30 @@ jobs:
           CGO_ENABLED: "0"
         run: |
           set -euo pipefail
-          mkdir -p dist
+          EXE=""; [[ "${{ matrix.goos }}" == windows ]] && EXE=".exe"
+          mkdir -p dist out
           go build -mod=mod -trimpath -ldflags "-s -w -X 'forgejo.org/fj/pkg/cmd.cliVersion=${{ needs.prepare.outputs.version_file }}'" \
-            -o "dist/fj-${{ matrix.goos }}-${{ matrix.goarch }}" ./cmd/fj
-          tar -C dist -czf "dist/fj-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz" "fj-${{ matrix.goos }}-${{ matrix.goarch }}"
+            -o "dist/fj-${{ matrix.goos }}-${{ matrix.goarch }}${EXE}" ./cmd/fj
       - name: Verify stamped version
-        # Only verify the binary that can run on the amd64 runner; arm64 is
-        # cross-compiled and cannot execute here.
+        # Only verify the binary that can run on the amd64 runner; other
+        # targets are cross-compiled and cannot execute here.
         if: matrix.goos == 'linux' && matrix.goarch == 'amd64'
         run: "./dist/fj-linux-${{ matrix.goarch }} version --client"
+      - name: Archive (tar.gz on unix, zip on windows — upstream fj convention)
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXE=""; [[ "${{ matrix.goos }}" == windows ]] && EXE=".exe"
+          NAME="fj-${{ matrix.goos }}-${{ matrix.goarch }}${EXE}"
+          if [[ "${{ matrix.goos }}" == windows ]]; then
+            (cd dist && zip -q "../out/${NAME%.exe}.zip" "$NAME")
+          else
+            tar -C dist -czf "out/${NAME}.tar.gz" "$NAME"
+          fi
       - uses: actions/upload-artifact@v4
         with:
           name: fj-cli-${{ matrix.goos }}-${{ matrix.goarch }}
-          path: dist/fj-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz
+          path: out/
 
   build-repo-map:
     needs: prepare
@@ -218,6 +236,10 @@ jobs:
         with: { pattern: fj-cli-*, merge-multiple: true, path: dist-cli }
       - uses: actions/download-artifact@v4
         with: { name: repo-map, path: dist-rig }
+      - name: CLI checksums
+        # sha256 over every fj archive (tar.gz + zip) — the release ships six
+        # binaries across three OSes; checksums make them verifiable.
+        run: cd dist-cli && sha256sum fj-* > checksums.txt && cat checksums.txt
       - name: Create GitHub release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
@@ -225,6 +247,8 @@ jobs:
           files: |
             dist/${{ needs.prepare.outputs.chart_archive }}
             dist-cli/fj-*.tar.gz
+            dist-cli/fj-*.zip
+            dist-cli/checksums.txt
             dist-rig/repo-map.json
           generate_release_notes: true
           body: |
@@ -232,7 +256,7 @@ jobs:
 
             All artifacts share the same version:
             - server image: `${{ needs.prepare.outputs.image_repository }}:${{ needs.prepare.outputs.release_version }}` (+ `-rootless`)
-            - fj CLI (Client Version matches the release): `fj-{linux,darwin}-{amd64,arm64}.tar.gz`
+            - fj CLI (Client Version matches the release): `fj-{linux,darwin}-{amd64,arm64}.tar.gz`, `fj-windows-{amd64,arm64}.zip` — all listed in `checksums.txt`
             - OCI Helm chart: `${{ needs.prepare.outputs.chart_repository }}/forgejo:${{ needs.prepare.outputs.chart_version }}` (appVersion = release version)
             - Repository Intelligence Graph (RIG): `repo-map.json` (deterministic architecture graph for the wiki C4D2 workflow)
 
