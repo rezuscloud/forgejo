@@ -1,0 +1,83 @@
+{
+  "$comment": "Polished command descriptors. The generator (gen/main.go, -polish-out) emits zz_generated_polished.go from this file: each group maps commands to SDK operations by operationId. Contract: `params` binds query params (key = swagger param name); `args` binds path params as positionals (key = swagger param name); `body`/`bodyConst` bind option-struct fields (key = swagger json field name; kinds derive from the spec); `row`/`lines` render with printf formats whose columns are constrained expressions — response fields (Go names), bound arg/flag vars, or shared render helpers by name (statusSymbol, stateStr, timeStr). `unlessEmpty` guards a line on a response json field (string: != \"\", date-time: != nil). Validation is fail-loudly at generation time: unknown op/field/func, unbound params, verb/format mismatch. Add groups here + regenerate; never hand-write a polished command file.",
+  "groups": [
+    {
+      "name": "milestone",
+      "alias": "milestones",
+      "short": "Manage milestones",
+      "commands": [
+        {
+          "name": "list",
+          "short": "List milestones on a repo",
+          "op": "issueGetMilestonesList",
+          "params": {
+            "state": { "flag": "state", "short": "s", "default": "open", "help": "milestone state (open/closed/all)" },
+            "name": { "flag": "name", "help": "filter by milestone title" }
+          },
+          "consts": { "page": 1, "limit": 20 },
+          "empty": "no milestones",
+          "row": {
+            "format": "#%d %s [%s] %s\n",
+            "columns": ["Id", "statusSymbol(stateStr(State))", "stateStr(State)", "Title"]
+          }
+        },
+        {
+          "name": "view",
+          "short": "View a milestone",
+          "use": "view <ID>",
+          "op": "issueGetMilestone",
+          "args": [{ "name": "id", "use": "<ID>" }],
+          "lines": [
+            { "format": "#%d %s\n", "columns": ["Id", "Title"] },
+            { "format": "State: %s\n", "columns": ["stateStr(State)"] },
+            { "format": "Due: %s\n", "columns": ["timeStr(DueOn)"], "unlessEmpty": "due_on" },
+            { "format": "Issues: %d open / %d closed\n", "columns": ["OpenIssues", "ClosedIssues"] },
+            { "format": "\n%s\n", "columns": ["Description"], "unlessEmpty": "description" }
+          ]
+        },
+        {
+          "name": "create",
+          "short": "Create a new milestone",
+          "op": "issueCreateMilestone",
+          "body": {
+            "title": { "flag": "title", "short": "t", "required": true, "help": "milestone title (required)" },
+            "description": { "flag": "description", "short": "d", "help": "milestone description" },
+            "due_on": { "flag": "due", "help": "due date (RFC3339)" }
+          },
+          "lines": [{ "format": "Created #%d: %s\n", "columns": ["Id", "Title"] }]
+        },
+        {
+          "name": "edit",
+          "short": "Edit a milestone",
+          "use": "edit <ID>",
+          "op": "issueEditMilestone",
+          "args": [{ "name": "id", "use": "<ID>" }],
+          "body": {
+            "title": { "flag": "title", "short": "t", "help": "new milestone title" },
+            "description": { "flag": "description", "short": "d", "help": "new milestone description" },
+            "state": { "flag": "state", "help": "milestone state (open/closed)" },
+            "due_on": { "flag": "due", "help": "due date (RFC3339)" }
+          },
+          "lines": [{ "format": "Updated #%d: %s\n", "columns": ["Id", "Title"] }]
+        },
+        {
+          "name": "close",
+          "short": "Close a milestone",
+          "use": "close <ID>",
+          "op": "issueEditMilestone",
+          "args": [{ "name": "id", "use": "<ID>" }],
+          "bodyConst": { "state": "closed" },
+          "lines": [{ "format": "Closed #%d\n", "columns": ["id"] }]
+        },
+        {
+          "name": "delete",
+          "short": "Delete a milestone",
+          "use": "delete <ID>",
+          "op": "issueDeleteMilestone",
+          "args": [{ "name": "id", "use": "<ID>" }],
+          "lines": [{ "format": "Deleted milestone #%d\n", "columns": ["id"] }]
+        }
+      ]
+    }
+  ]
+}

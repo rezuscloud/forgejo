@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -61,6 +62,8 @@ func main() {
 	outDir := flag.String("out", "api/", "")
 	cliOutDir := flag.String("cli-out", "", "output dir for generated CLI commands (empty = skip)")
 	testOutDir := flag.String("test-out", "", "output dir for generated integration tests (empty = skip)")
+	polishOutDir := flag.String("polish-out", "", "output dir for descriptor-driven polished commands (empty = skip)")
+	polishDesc := flag.String("polish", "gen/polish.json", "polish descriptor (groups -> operations)")
 	flag.Parse()
 	raw, _ := os.ReadFile(*specPath)
 	var spec SwaggerSpec
@@ -99,6 +102,30 @@ func main() {
 	if *testOutDir != "" {
 		writeFile(filepath.Join(*testOutDir, "zz_generated_integration_test.go"), genIntegrationTests(&spec))
 		fmt.Printf("wrote zz_generated_integration_test.go (%d services)\n", len(groupByService(&spec)))
+	}
+
+	// Generate the descriptor-driven polished command groups (gen/polish.json):
+	// human-readable top-level commands (fj milestone, …) bound to SDK
+	// operations by operationId, with flag/arg/body bindings and printf-style
+	// rendering via the shared render helpers. A group is added by editing
+	// the descriptor and regenerating — never by hand-writing a command file.
+	// Validation is fail-loudly (unknown op/field/helper, verb mismatch), so
+	// descriptor drift breaks the build instead of shipping wrong wiring.
+	if *polishOutDir != "" {
+		raw, err := os.ReadFile(*polishDesc)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "polish descriptor: %v\n", err)
+			os.Exit(1)
+		}
+		var pd struct {
+			Groups []PolishGroup `json:"groups"`
+		}
+		if err := json.Unmarshal(raw, &pd); err != nil {
+			fmt.Fprintf(os.Stderr, "polish descriptor: %v\n", err)
+			os.Exit(1)
+		}
+		writeFile(filepath.Join(*polishOutDir, "zz_generated_polished.go"), genPolished(&spec, pd.Groups))
+		fmt.Printf("wrote zz_generated_polished.go (%d groups)\n", len(pd.Groups))
 	}
 }
 
@@ -913,5 +940,822 @@ func genIntegrationTests(spec *SwaggerSpec) string {
 	b.WriteString("}\n\n")
 
 	_ = totalMethods
+	return b.String()
+}
+// ---------- POLISHED COMMANDS (descriptor-driven) ----------
+//
+// The `fj api` tree covers 100% of the API with JSON output. Polished,
+// human-readable command groups used to be hand-written one file per group
+// (issue.go, pr.go, release.go…). The polish layer moves that shape into a
+// descriptor (gen/polish.json): each group maps commands to SDK operations
+// (by operationId) with flag/arg/body bindings and printf-style rendering.
+// The generator emits zz_generated_polished.go (NewPolishedCmds) — a group
+// is added by editing the descriptor and regenerating, never by hand-writing
+// a command file. Rendering stays shared: column expressions reference the
+// hand-written render helpers (statusSymbol, stateStr, timeStr…) by name.
+//
+// Everything is validated fail-loudly at generation time (like the delta
+// signatures in sync-validate.sh): unknown op, unbound param, unknown
+// field/helper, printf-verb/format mismatch, unsupported kinds.
+//
+// Deliberate scope limits (extend when a port needs them):
+//   - repo-scoped commands only (resolveClient supplies owner/repo)
+//   - path args: int64/int or string
+//   - body fields: string, bool, int64/int, date-time; bodyConst: string
+//   - columns: response fields, bound args/flags, single-arg render helpers
+
+type PolishGroup struct {
+	Name     string          `json:"name"`
+	Alias    string          `json:"alias,omitempty"`
+	Short    string          `json:"short"`
+	Commands []PolishCommand `json:"commands"`
+}
+
+type PolishCommand struct {
+	Name      string                     `json:"name"`
+	Short     string                     `json:"short"`
+	Use       string                     `json:"use,omitempty"`
+	Op        string                     `json:"op"`
+	Args      []PolishArg                `json:"args,omitempty"`
+	Params    map[string]PolishFlag      `json:"params,omitempty"`
+	Consts    map[string]float64         `json:"consts,omitempty"`
+	Body      map[string]PolishBodyField `json:"body,omitempty"`
+	BodyConst map[string]string          `json:"bodyConst,omitempty"`
+	Empty     string                     `json:"empty,omitempty"`
+	Row       *PolishRender              `json:"row,omitempty"`
+	Lines     []PolishLine               `json:"lines,omitempty"`
+}
+
+type PolishArg struct {
+	Name string `json:"name"` // swagger path param name
+	Use  string `json:"use"`  // Use placeholder, e.g. "<ID>"
+}
+
+type PolishFlag struct {
+	Flag    string `json:"flag"`
+	Short   string `json:"short,omitempty"`
+	Default string `json:"default,omitempty"`
+	Help    string `json:"help,omitempty"`
+}
+
+type PolishBodyField struct {
+	Flag     string `json:"flag"`
+	Short    string `json:"short,omitempty"`
+	Required bool   `json:"required,omitempty"`
+	Help     string `json:"help,omitempty"`
+}
+
+type PolishRender struct {
+	Format  string   `json:"format"`
+	Columns []string `json:"columns"`
+}
+
+type PolishLine struct {
+	Format      string   `json:"format"`
+	Columns     []string `json:"columns"`
+	UnlessEmpty string   `json:"unlessEmpty,omitempty"` // response json field name
+}
+
+// polishRenderers is the render vocabulary column expressions may call.
+// name -> printf verb of the return value. A name not listed here fails
+// generation. Kept in one place on purpose: this is the contract between
+// the descriptor DSL and the hand-written render layer (render.go/helpers.go).
+var polishRenderers = map[string]string{
+	"statusSymbol": "s",
+	"stateStr":     "s",
+	"timeStr":      "s",
+	"valI64":       "d",
+}
+
+func polishFatal(format string, a ...any) {
+	fmt.Fprintf(os.Stderr, "polish: "+format+"\n", a...)
+	os.Exit(1)
+}
+
+var polishIdentRe = regexp.MustCompile(`^[A-Za-z_][A-Za-z0-9_]*$`)
+var polishFuncRe = regexp.MustCompile(`^([A-Za-z_][A-Za-z0-9_]*)\s*\((.*)\)$`)
+
+// goFieldName replicates the zz_generated_types.go field naming (json name →
+// Go exported name) so descriptor references cannot drift from the SDK types.
+func goFieldName(jn string) string {
+	cn := jn
+	if len(cn) > 0 && !isAlpha(rune(cn[0])) {
+		cn = "X" + strings.TrimLeft(cn, "@#$%^&*")
+	}
+	f := pc(cn)
+	if kw(f) {
+		f += "_"
+	}
+	return f
+}
+
+func isRequiredProp(s Schema, pn string) bool {
+	for _, r := range s.Required {
+		if r == pn {
+			return true
+		}
+	}
+	return false
+}
+
+// verbForType maps a Go field type to its printf verb; "" = not printable
+// bare (pointers, structs — must be wrapped in a render helper).
+func verbForType(t string) string {
+	switch t {
+	case "int", "int64":
+		return "d"
+	case "string":
+		return "s"
+	case "bool":
+		return "t"
+	case "float64":
+		return "f"
+	case "time.Time":
+		return "s" // Stringer
+	}
+	return ""
+}
+
+// responseFields maps Go field name → printf verb for a spec definition.
+// Pointer-ish fields map to "" (wrap them: stateStr(State), timeStr(DueOn)).
+func responseFields(def string, spec *SwaggerSpec) map[string]string {
+	s, ok := spec.Defs[def]
+	if !ok {
+		polishFatal("definition %q not in spec", def)
+	}
+	fields := map[string]string{}
+	for pn, ps := range s.Props {
+		t := gt(&ps, spec)
+		if ps.Type == "string" && ps.Format == "date-time" && !isRequiredProp(s, pn) {
+			t = "*time.Time"
+		}
+		fields[goFieldName(pn)] = verbForType(t)
+	}
+	return fields
+}
+
+// polishResolve resolves a bare identifier: response fields get the receiver
+// prefix (and mark the result as used), bound args/flags pass through.
+// Pointer-ish fields resolve with verb "" — printable only inside a helper.
+func polishResolve(name, recv string, fields, vars map[string]string, where string, touched *bool) (string, string) {
+	if v, ok := fields[name]; ok {
+		*touched = true
+		return recv + "." + name, v
+	}
+	if v, ok := vars[name]; ok {
+		return name, v
+	}
+	polishFatal("%s: unknown identifier %q (not a response field, bound arg, or flag)", where, name)
+	return "", ""
+}
+
+// polishArgExpr renders an expression in helper-argument position. Pointer
+// fields are exactly what helpers exist for, so no bare-print restriction.
+func polishArgExpr(e, recv string, fields, vars map[string]string, where string, touched *bool) string {
+	e = strings.TrimSpace(e)
+	if m := polishFuncRe.FindStringSubmatch(e); m != nil && !strings.Contains(m[2], ",") {
+		if _, ok := polishRenderers[m[1]]; !ok {
+			polishFatal("%s: unknown render helper %q", where, m[1])
+		}
+		return m[1] + "(" + polishArgExpr(m[2], recv, fields, vars, where, touched) + ")"
+	}
+	if polishIdentRe.MatchString(e) {
+		expr, _ := polishResolve(e, recv, fields, vars, where, touched)
+		return expr
+	}
+	polishFatal("%s: unsupported column expression %q", where, e)
+	return ""
+}
+
+// polishRenderExpr renders one top-level column expression, returning the
+// expression and its printf verb. Grammar: IDENT | FUNC '(' EXPR ')'.
+// At the top level a pointer-ish field cannot be printed bare — it must be
+// wrapped in a render helper (stateStr(State), timeStr(DueOn)); the verb
+// then comes from the helper's registry entry. touched reports whether any
+// response field was referenced (decides if the SDK result is bound).
+func polishRenderExpr(e, recv string, fields, vars map[string]string, where string, touched *bool) (string, string) {
+	e = strings.TrimSpace(e)
+	if m := polishFuncRe.FindStringSubmatch(e); m != nil && !strings.Contains(m[2], ",") {
+		verb, ok := polishRenderers[m[1]]
+		if !ok {
+			polishFatal("%s: unknown render helper %q", where, m[1])
+		}
+		return m[1] + "(" + polishArgExpr(m[2], recv, fields, vars, where, touched) + ")", verb
+	}
+	if polishIdentRe.MatchString(e) {
+		expr, verb := polishResolve(e, recv, fields, vars, where, touched)
+		if verb == "" {
+			polishFatal("%s: field %s cannot be printed bare — wrap it in a render helper", where, e)
+		}
+		return expr, verb
+	}
+	polishFatal("%s: unsupported column expression %q", where, e)
+	return "", ""
+}
+
+// polishVerbs extracts printf verbs in order from a format string.
+func polishVerbs(format string) []string {
+	var verbs []string
+	for i := 0; i < len(format); i++ {
+		if format[i] != '%' {
+			continue
+		}
+		if i+1 >= len(format) {
+			polishFatal("dangling %% in format %q", format)
+		}
+		switch format[i+1] {
+		case '%':
+			i++
+		case 'd', 's', 't', 'f':
+			verbs = append(verbs, string(format[i+1]))
+			i++
+		default:
+			polishFatal("unsupported verb %%%c in format %q", format[i+1], format)
+		}
+	}
+	return verbs
+}
+
+// polishOpRef joins a swagger operation to its classify() service.
+type polishOpRef struct {
+	svc string
+	m   MD
+}
+
+func genPolished(spec *SwaggerSpec, groups []PolishGroup) string {
+	// Index every operation by operationId — the descriptor's join key.
+	ops := map[string]polishOpRef{}
+	for svc, methods := range groupByService(spec) {
+		for _, m := range methods {
+			ops[m.OpID] = polishOpRef{svc, m}
+		}
+	}
+
+	var b strings.Builder
+	b.WriteString("// Code generated by api/gen from gen/polish.json; DO NOT EDIT.\n\n")
+	b.WriteString("package cmd\n\n")
+	b.WriteString("import (\n")
+	b.WriteString("\t\"context\"\n")
+	b.WriteString("\t\"fmt\"\n")
+	b.WriteString("\t\"strconv\"\n")
+	b.WriteString("\t\"time\"\n\n")
+	b.WriteString("\tforgejo \"forgejo.org/client-go\"\n")
+	b.WriteString("\t\"github.com/spf13/cobra\"\n")
+	b.WriteString(")\n\n")
+
+	// Validating optional-time parser: absent flag → nil (omitempty drops it
+	// server-side, preserving partial-PATCH semantics); invalid values are
+	// errors — a zero time would marshal 0001-01-01 and clobber the field.
+	b.WriteString("func parseOptTime(s string) (*time.Time, error) {\n")
+	b.WriteString("\tif s == \"\" { return nil, nil }\n")
+	b.WriteString("\tt, err := time.Parse(time.RFC3339, s)\n")
+	b.WriteString("\tif err != nil { return nil, fmt.Errorf(\"invalid time (RFC3339): %s\", s) }\n")
+	b.WriteString("\treturn &t, nil\n")
+	b.WriteString("}\n\n")
+
+	for _, g := range groups {
+		b.WriteString(genPolishGroup(g, ops, spec))
+	}
+
+	b.WriteString("// NewPolishedCmds returns the descriptor-driven polished command groups\n")
+	b.WriteString("// (gen/polish.json). Root registers these once; adding a group is a\n")
+	b.WriteString("// descriptor edit + regen — no hand-written command file, no root edit.\n")
+	b.WriteString("func NewPolishedCmds() []*cobra.Command {\n")
+	b.WriteString("\treturn []*cobra.Command{\n")
+	for _, g := range groups {
+		b.WriteString(fmt.Sprintf("\t\tnewPolish%sCmd(),\n", pc(g.Name)))
+	}
+	b.WriteString("\t}\n}\n\n")
+	return b.String()
+}
+
+func genPolishGroup(g PolishGroup, ops map[string]polishOpRef, spec *SwaggerSpec) string {
+	var b strings.Builder
+	b.WriteString(fmt.Sprintf("func newPolish%sCmd() *cobra.Command {\n", pc(g.Name)))
+	b.WriteString("\tcmd := &cobra.Command{\n")
+	b.WriteString(fmt.Sprintf("\t\tUse:   %q,\n", g.Name))
+	b.WriteString(fmt.Sprintf("\t\tShort: %q,\n", g.Short))
+	if g.Alias != "" {
+		b.WriteString(fmt.Sprintf("\t\tAliases: []string{%q},\n", g.Alias))
+	}
+	b.WriteString("\t}\n")
+	var defs strings.Builder
+	for _, c := range g.Commands {
+		defs.WriteString(genPolishCommand(g, c, ops, spec))
+		b.WriteString(fmt.Sprintf("\tcmd.AddCommand(newPolish%s%sCmd())\n", pc(g.Name), pc(c.Name)))
+	}
+	b.WriteString("\treturn cmd\n}\n\n")
+	b.WriteString(defs.String())
+	return b.String()
+}
+
+func genPolishCommand(g PolishGroup, c PolishCommand, ops map[string]polishOpRef, spec *SwaggerSpec) string {
+	where := fmt.Sprintf("%s.%s", g.Name, c.Name)
+	ref, ok := ops[c.Op]
+	if !ok {
+		polishFatal("%s: unknown operationId %q", where, c.Op)
+	}
+	m := ref.m
+	svcFld := serviceField(ref.svc)
+	methodName := pc(m.OpID)
+	fname := fmt.Sprintf("newPolish%s%sCmd", pc(g.Name), pc(c.Name))
+
+	reserved := map[string]bool{"cmd": true, "args": true, "err": true, "res": true, "it": true, "c": true, "owner": true, "repo": true, "fmt": true}
+	safeVar := func(n string) string {
+		v := cc(n)
+		if reserved[v] || kw(v) {
+			polishFatal("%s: identifier %q collides with a reserved name — rename the flag/arg", where, n)
+		}
+		return v
+	}
+
+	// ---- resolve bindings ------------------------------------------------
+	// args: path params as positionals
+	argVars := map[string]string{} // param name -> var name
+	argVerbs := map[string]string{}
+	for _, a := range c.Args {
+		found := false
+		for i := range m.Params {
+			p := &m.Params[i]
+			if p.Name == a.Name && p.In == "path" {
+				found = true
+				switch pt(p, spec) {
+				case "int64", "int":
+					argVerbs[a.Name] = "d"
+				case "string":
+					argVerbs[a.Name] = "s"
+				default:
+					polishFatal("%s: arg %s has unsupported type %s", where, a.Name, pt(p, spec))
+				}
+				argVars[a.Name] = safeVar(a.Name)
+			}
+		}
+		if !found {
+			polishFatal("%s: arg %q is not a path param of %s", where, a.Name, c.Op)
+		}
+	}
+
+	// params: query params -> flags
+	type pBind struct {
+		varName string
+		kind    string // string|bool|int64|int|time
+		flag    PolishFlag
+	}
+	paramBinds := map[string]pBind{}
+	for i := range m.Params {
+		p := &m.Params[i]
+		if p.In != "query" {
+			continue
+		}
+		f, ok := c.Params[p.Name]
+		if !ok {
+			continue
+		}
+		t := pt(p, spec)
+		var kind string
+		switch {
+		case t == "string":
+			kind = "string"
+		case t == "bool":
+			kind = "bool"
+		case t == "int64":
+			kind = "int64"
+		case t == "int":
+			kind = "int"
+		case t == "time.Time":
+			kind = "time"
+		default:
+			polishFatal("%s: param %s has unsupported type %s", where, p.Name, t)
+		}
+		if (kind != "string") && f.Default != "" {
+			polishFatal("%s: default values are only supported for string flags (%s)", where, p.Name)
+		}
+		paramBinds[p.Name] = pBind{safeVar(f.Flag), kind, f}
+	}
+
+	// body schema + field binds
+	var bodyDef Schema
+	var bodyGo string
+	haveBody := false
+	for i := range m.Params {
+		p := &m.Params[i]
+		if p.In != "body" {
+			continue
+		}
+		if p.Schema == nil || p.Schema.Ref == "" {
+			polishFatal("%s: body param %s must reference a named schema", where, p.Name)
+		}
+		dn := last(p.Schema.Ref)
+		d, ok := spec.Defs[dn]
+		if !ok {
+			polishFatal("%s: body schema %q not in spec", where, dn)
+		}
+		bodyDef, bodyGo, haveBody = d, "forgejo."+pc(dn), true
+	}
+	if (len(c.Body) > 0 || len(c.BodyConst) > 0) && !haveBody {
+		polishFatal("%s: body/bodyConst given but %s takes no body", where, c.Op)
+	}
+
+	type bBind struct {
+		goName string
+		kind   string // string|bool|int64|int|time|const
+		f      PolishBodyField
+		val    string
+	}
+	bodyBinds := map[string]bBind{}
+	for jn, f := range c.Body {
+		ps, ok := bodyDef.Props[jn]
+		if !ok {
+			polishFatal("%s: body field %q not in the %s schema", where, jn, bodyGo)
+		}
+		if _, dup := c.BodyConst[jn]; dup {
+			polishFatal("%s: body field %q bound twice (flag + const)", where, jn)
+		}
+		t := gt(&ps, spec)
+		var kind string
+		switch {
+		case t == "string":
+			kind = "string"
+		case t == "bool":
+			kind = "bool"
+		case t == "int64":
+			kind = "int64"
+		case t == "int":
+			kind = "int"
+		case t == "time.Time" || t == "*time.Time":
+			kind = "time"
+		default:
+			polishFatal("%s: body field %q has unsupported type %s", where, jn, t)
+		}
+		bodyBinds[jn] = bBind{goFieldName(jn), kind, f, ""}
+	}
+	for jn, val := range c.BodyConst {
+		ps, ok := bodyDef.Props[jn]
+		if !ok {
+			polishFatal("%s: bodyConst field %q not in the %s schema", where, jn, bodyGo)
+		}
+		if ps.Type != "string" {
+			polishFatal("%s: bodyConst supports string fields only (%s is %s)", where, jn, ps.Type)
+		}
+		bodyBinds[jn] = bBind{goFieldName(jn), "const", PolishBodyField{}, val}
+	}
+
+	// consts: literal call values for int query params
+	constVerbs := map[string]bool{}
+	for pn := range c.Consts {
+		t := ""
+		for i := range m.Params {
+			if m.Params[i].Name == pn && m.Params[i].In == "query" {
+				t = pt(&m.Params[i], spec)
+			}
+		}
+		if t != "int" && t != "int64" {
+			polishFatal("%s: const %q must bind an int query param (got %q)", where, pn, t)
+		}
+		constVerbs[pn] = true
+	}
+
+	// ---- response fields + pre-rendered output ---------------------------
+	var fields map[string]string
+	if m.HasRet && m.RetTy != "" {
+		base := m.RetTy
+		if strings.HasPrefix(base, "[]") {
+			base = strings.TrimPrefix(base, "[]")
+		}
+		if _, ok := spec.Defs[base]; ok {
+			fields = responseFields(base, spec)
+		}
+	}
+	vars := map[string]string{}
+	for n, v := range argVars {
+		vars[v] = argVerbs[n]
+	}
+	for _, pb := range paramBinds {
+		switch pb.kind {
+		case "string", "time":
+			vars[pb.varName] = "s"
+		case "bool":
+			vars[pb.varName] = "t"
+		default:
+			vars[pb.varName] = "d"
+		}
+	}
+	for jn, bb := range bodyBinds {
+		if bb.kind == "string" {
+			vars[safeVar(bb.f.Flag)] = "s"
+		}
+		_ = jn
+	}
+
+	type outLine struct {
+		exprs  []string
+		verbs  []string
+		format string
+		guard  string
+	}
+	var rows *outLine
+	var lines []outLine
+	touched := false
+
+	if c.Row != nil {
+		if fields == nil || !strings.HasPrefix(m.RetTy, "[]") {
+			polishFatal("%s: row rendering requires an array-of-object return (%s returns %q)", where, c.Op, m.RetTy)
+		}
+		r := &outLine{format: c.Row.Format}
+		for _, col := range c.Row.Columns {
+			e, v := polishRenderExpr(col, "it", fields, vars, where, &touched)
+			r.exprs = append(r.exprs, e)
+			r.verbs = append(r.verbs, v)
+		}
+		rows = r
+	}
+	for _, ln := range c.Lines {
+		ol := outLine{format: ln.Format}
+		for _, col := range ln.Columns {
+			e, v := polishRenderExpr(col, "res", fields, vars, where, &touched)
+			ol.exprs = append(ol.exprs, e)
+			ol.verbs = append(ol.verbs, v)
+		}
+		if ln.UnlessEmpty != "" {
+			if fields == nil || strings.HasPrefix(m.RetTy, "[]") {
+				polishFatal("%s: unlessEmpty requires a single-object return", where)
+			}
+			base := m.RetTy
+			ps, ok := spec.Defs[base].Props[ln.UnlessEmpty]
+			if !ok {
+				polishFatal("%s: unlessEmpty field %q not in %s", where, ln.UnlessEmpty, base)
+			}
+			gn := goFieldName(ln.UnlessEmpty)
+			if ps.Type == "string" && ps.Format == "" {
+				ol.guard = fmt.Sprintf("res.%s != \"\"", gn)
+			} else if ps.Type == "string" && ps.Format == "date-time" {
+				ol.guard = fmt.Sprintf("res.%s != nil", gn)
+			} else {
+				polishFatal("%s: unlessEmpty supports string and date-time fields (%s is %s/%s)", where, ln.UnlessEmpty, ps.Type, ps.Format)
+			}
+		}
+		lines = append(lines, ol)
+	}
+	for _, ol := range append(lines, func() []outLine {
+		if rows != nil {
+			return []outLine{*rows}
+		}
+		return nil
+	}()...) {
+		verbs := polishVerbs(ol.format)
+		if len(verbs) != len(ol.verbs) {
+			polishFatal("%s: format %q has %d verbs but %d columns", where, ol.format, len(verbs), len(ol.verbs))
+		}
+		for i, v := range verbs {
+			if v != ol.verbs[i] {
+				polishFatal("%s: format %q verb %d is %%%c but column %d is %%%c", where, ol.format, i+1, v, i+1, ol.verbs[i])
+			}
+		}
+	}
+
+	// ---- emit ------------------------------------------------------------
+	var b strings.Builder
+	b.WriteString(fmt.Sprintf("// %s — %s\n", fname, c.Short))
+	b.WriteString(fmt.Sprintf("func %s() *cobra.Command {\n", fname))
+
+	// flag var declarations
+	varDecls := []string{}
+	flagRegs := []string{}
+	reg := func(varName, flagName, short, def, help string) {
+		if help == "" {
+			help = flagName
+		}
+		if short != "" {
+			flagRegs = append(flagRegs, fmt.Sprintf("\tcmd.Flags().StringVarP(&%s, %q, %q, %q, %q)", varName, flagName, short, def, eq(help)))
+		} else {
+			flagRegs = append(flagRegs, fmt.Sprintf("\tcmd.Flags().StringVar(&%s, %q, %q, %q)", varName, flagName, def, eq(help)))
+		}
+	}
+	// params in spec order
+	for i := range m.Params {
+		p := &m.Params[i]
+		pb, ok := paramBinds[p.Name]
+		if !ok {
+			continue
+		}
+		help := pb.flag.Help
+		switch pb.kind {
+		case "string":
+			varDecls = append(varDecls, fmt.Sprintf("\tvar %s string", pb.varName))
+			reg(pb.varName, pb.flag.Flag, pb.flag.Short, pb.flag.Default, help)
+		case "time":
+			varDecls = append(varDecls, fmt.Sprintf("\tvar %s string", pb.varName))
+			reg(pb.varName, pb.flag.Flag, pb.flag.Short, "", help)
+		case "bool":
+			varDecls = append(varDecls, fmt.Sprintf("\tvar %s bool", pb.varName))
+			flagRegs = append(flagRegs, fmt.Sprintf("\tcmd.Flags().BoolVar(&%s, %q, false, %q)", pb.varName, pb.flag.Flag, eq(help)))
+		case "int64":
+			varDecls = append(varDecls, fmt.Sprintf("\tvar %s int64", pb.varName))
+			flagRegs = append(flagRegs, fmt.Sprintf("\tcmd.Flags().Int64Var(&%s, %q, 0, %q)", pb.varName, pb.flag.Flag, eq(help)))
+		case "int":
+			varDecls = append(varDecls, fmt.Sprintf("\tvar %s int", pb.varName))
+			flagRegs = append(flagRegs, fmt.Sprintf("\tcmd.Flags().IntVar(&%s, %q, 0, %q)", pb.varName, pb.flag.Flag, eq(help)))
+		}
+	}
+	// body fields, deterministic order
+	bodyJns := make([]string, 0, len(bodyBinds))
+	for jn := range bodyBinds {
+		bodyJns = append(bodyJns, jn)
+	}
+	sort.Strings(bodyJns)
+	for _, jn := range bodyJns {
+		bb := bodyBinds[jn]
+		if bb.kind == "const" {
+			continue
+		}
+		help := bb.f.Help
+		vn := safeVar(bb.f.Flag)
+		switch bb.kind {
+		case "string":
+			varDecls = append(varDecls, fmt.Sprintf("\tvar %s string", vn))
+			reg(vn, bb.f.Flag, bb.f.Short, "", help)
+		case "time":
+			varDecls = append(varDecls, fmt.Sprintf("\tvar %s string", vn))
+			reg(vn, bb.f.Flag, bb.f.Short, "", help)
+		case "bool":
+			varDecls = append(varDecls, fmt.Sprintf("\tvar %s bool", vn))
+			flagRegs = append(flagRegs, fmt.Sprintf("\tcmd.Flags().BoolVar(&%s, %q, false, %q)", vn, bb.f.Flag, eq(help)))
+		case "int64":
+			varDecls = append(varDecls, fmt.Sprintf("\tvar %s int64", vn))
+			flagRegs = append(flagRegs, fmt.Sprintf("\tcmd.Flags().Int64Var(&%s, %q, 0, %q)", vn, bb.f.Flag, eq(help)))
+		case "int":
+			varDecls = append(varDecls, fmt.Sprintf("\tvar %s int", vn))
+			flagRegs = append(flagRegs, fmt.Sprintf("\tcmd.Flags().IntVar(&%s, %q, 0, %q)", vn, bb.f.Flag, eq(help)))
+		}
+	}
+	for _, d := range varDecls {
+		b.WriteString(d + "\n")
+	}
+
+	use := c.Use
+	if use == "" {
+		use = c.Name
+	}
+	b.WriteString("\tcmd := &cobra.Command{\n")
+	b.WriteString(fmt.Sprintf("\t\tUse:   %q,\n", use))
+	b.WriteString(fmt.Sprintf("\t\tShort: %q,\n", c.Short))
+	if len(c.Args) > 0 {
+		b.WriteString(fmt.Sprintf("\t\tArgs:  cobra.ExactArgs(%d),\n", len(c.Args)))
+	}
+	b.WriteString("\t\tRunE: func(cmd *cobra.Command, args []string) error {\n")
+
+	// required checks
+	for _, jn := range bodyJns {
+		bb := bodyBinds[jn]
+		if bb.kind != "const" && bb.f.Required {
+			b.WriteString(fmt.Sprintf("\t\t\tif %s == \"\" { return fmt.Errorf(\"--%s is required\") }\n", safeVar(bb.f.Flag), bb.f.Flag))
+		}
+	}
+	// time parses
+	for _, jn := range bodyJns {
+		bb := bodyBinds[jn]
+		if bb.kind == "time" {
+			vn := safeVar(bb.f.Flag)
+			b.WriteString(fmt.Sprintf("\t\t\t%sVal, err := parseOptTime(%s)\n", vn, vn))
+			b.WriteString("\t\t\tif err != nil { return err }\n")
+		}
+	}
+	for i := range m.Params {
+		p := &m.Params[i]
+		if p.In != "query" {
+			continue
+		}
+		if pb, ok := paramBinds[p.Name]; ok && pb.kind == "time" {
+			b.WriteString(fmt.Sprintf("\t\t\t%sVal, err := parseOptTime(%s)\n", pb.varName, pb.varName))
+			b.WriteString("\t\t\tif err != nil { return err }\n")
+		}
+	}
+	// arg parses
+	for _, a := range c.Args {
+		v := argVars[a.Name]
+		kind := ""
+		for i := range m.Params {
+			p := &m.Params[i]
+			if p.Name == a.Name && p.In == "path" {
+				if t := pt(p, spec); t == "int64" || t == "int" {
+					kind = "int"
+				} else {
+					kind = "string"
+				}
+			}
+		}
+		if kind == "int" {
+			b.WriteString(fmt.Sprintf("\t\t\t%s, err := strconv.ParseInt(args[0], 10, 64)\n", v))
+			b.WriteString(fmt.Sprintf("\t\t\tif err != nil { return fmt.Errorf(\"invalid %s: %%s\", args[0]) }\n", a.Name))
+		} else {
+			b.WriteString(fmt.Sprintf("\t\t\t%s := args[0]\n", v))
+		}
+	}
+
+	b.WriteString("\t\t\tc, owner, repo, err := resolveClient(cmd)\n")
+	b.WriteString("\t\t\tif err != nil { return err }\n")
+
+	// call args in spec order (mirrors the SDK signature exactly)
+	var callArgs []string
+	sawOwner, sawRepo := false, false
+	for i := range m.Params {
+		p := &m.Params[i]
+		switch p.In {
+		case "path":
+			switch p.Name {
+			case "owner":
+				sawOwner = true
+				callArgs = append(callArgs, "owner")
+			case "repo":
+				sawRepo = true
+				callArgs = append(callArgs, "repo")
+			default:
+				if _, ok := argVars[p.Name]; ok {
+					callArgs = append(callArgs, argVars[p.Name])
+				} else if pb, ok := paramBinds[p.Name]; ok {
+					callArgs = append(callArgs, pb.varName)
+				} else {
+					polishFatal("%s: path param %s unbound — declare an arg or a param", where, p.Name)
+				}
+			}
+		case "query":
+			if pb, ok := paramBinds[p.Name]; ok {
+				if pb.kind == "time" {
+					polishFatal("%s: time-typed query params are not supported yet (%s)", where, p.Name)
+				}
+				callArgs = append(callArgs, pb.varName)
+			} else if cv, ok := c.Consts[p.Name]; ok {
+				callArgs = append(callArgs, strconv.FormatInt(int64(cv), 10))
+			} else {
+				polishFatal("%s: query param %s unbound — bind a flag or a const", where, p.Name)
+			}
+		case "body":
+			lit := "&" + bodyGo + "{"
+			for _, jn := range bodyJns {
+				bb := bodyBinds[jn]
+				switch bb.kind {
+				case "const":
+					lit += fmt.Sprintf("\n\t\t\t\t%s: %q,", bb.goName, bb.val)
+				case "time":
+					lit += fmt.Sprintf("\n\t\t\t\t%s: %sVal,", bb.goName, safeVar(bb.f.Flag))
+				default:
+					lit += fmt.Sprintf("\n\t\t\t\t%s: %s,", bb.goName, safeVar(bb.f.Flag))
+				}
+			}
+			if len(bodyJns) > 0 {
+				lit += "\n\t\t\t}"
+			} else {
+				lit += "}"
+			}
+			callArgs = append(callArgs, lit)
+		}
+	}
+	if !sawOwner || !sawRepo {
+		polishFatal("%s: polished commands are repo-scoped; %s has no owner/repo path params", where, c.Op)
+	}
+
+	callStr := fmt.Sprintf("c.%s.%s(context.Background()", svcFld, methodName)
+	if len(callArgs) > 0 {
+		callStr += ", " + strings.Join(callArgs, ", ")
+	}
+	callStr += ")"
+
+	switch {
+	case rows != nil || touched:
+		b.WriteString(fmt.Sprintf("\t\t\tres, _, err := %s\n", callStr))
+	case m.HasRet:
+		// err is already declared (arg parse / resolveClient) — assignment, not declaration
+		b.WriteString(fmt.Sprintf("\t\t\t_, _, err = %s\n", callStr))
+	default:
+		b.WriteString(fmt.Sprintf("\t\t\t_, err = %s\n", callStr))
+	}
+	b.WriteString("\t\t\tif err != nil { return err }\n")
+
+	if rows != nil {
+		empty := c.Empty
+		if empty == "" {
+			empty = "no results"
+		}
+		b.WriteString(fmt.Sprintf("\t\t\tif len(res) == 0 {\n\t\t\t\tfmt.Println(%q)\n\t\t\t\treturn nil\n\t\t\t}\n", empty))
+		b.WriteString("\t\t\tfor _, it := range res {\n")
+		b.WriteString(fmt.Sprintf("\t\t\t\tfmt.Printf(%q, %s)\n", rows.format, strings.Join(rows.exprs, ", ")))
+		b.WriteString("\t\t\t}\n")
+	}
+	for _, ol := range lines {
+		call := fmt.Sprintf("fmt.Printf(%q, %s)", ol.format, strings.Join(ol.exprs, ", "))
+		if ol.guard != "" {
+			b.WriteString(fmt.Sprintf("\t\t\tif %s {\n\t\t\t\t%s\n\t\t\t}\n", ol.guard, call))
+		} else {
+			b.WriteString(fmt.Sprintf("\t\t\t%s\n", call))
+		}
+	}
+
+	b.WriteString("\t\t\treturn nil\n")
+	b.WriteString("\t\t},\n")
+	b.WriteString("\t}\n")
+	for _, r := range flagRegs {
+		b.WriteString(r + "\n")
+	}
+	b.WriteString("\treturn cmd\n}\n\n")
 	return b.String()
 }
