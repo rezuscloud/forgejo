@@ -15,8 +15,11 @@
 set -euo pipefail
 
 # ── pinned inputs ────────────────────────────────────────────────────────────
-RUNNER_VERSION="12.7.3-rezus.1"   # keep in lockstep with the k8s fleet (v12.7.3)
-FORK_REPO="rezuscloud/forgejo-runner"
+# Binaries ship with the monorepo release (rezuscloud/forgejo): asset
+# forgejo-runner-darwin-arm64.tar.gz on tag v<release>, binary stamped
+# <upstream>-rezus.<N>. Bump the vendored tree via hack/sync-runner.sh.
+RELEASE_TAG="v16.0.2-rezus.1"     # monorepo release tag carrying the assets
+RUNNER_UPSTREAM="v12.7.3"         # expected runner lineage; see runners/RUNNER_UPSTREAM
 FORGEJO_URL="https://git.rezus.cloud"
 LABELS="macos-arm64:host"         # name:schema — see runners/README.md contract
 CAPACITY="1"                      # a laptop: one job at a time
@@ -36,14 +39,14 @@ uname -s | grep -q Darwin || die "this installer is for macOS hosts"
 mkdir -p "$STATE_DIR" "$BIN_DIR" "$STATE_DIR/logs" "$STATE_DIR/cache" "$STATE_DIR/work"
 
 # ── 1. binary: download pinned release, sha256-verify ───────────────────────
-ASSET="forgejo-runner-${RUNNER_VERSION}-darwin-arm64.tar.gz"
-URL="https://github.com/${FORK_REPO}/releases/download/v${RUNNER_VERSION}/${ASSET}"
-INSTALLED_VER="$("$BIN_DIR/forgejo-runner" --version 2>/dev/null | grep -oE '[0-9][0-9a-z.+*-]*' | head -1 || true)"
+ASSET="forgejo-runner-darwin-arm64.tar.gz"
+URL="https://github.com/rezuscloud/forgejo/releases/download/${RELEASE_TAG}/${ASSET}"
+INSTALLED_UPSTREAM="$("$BIN_DIR"/forgejo-runner --version 2>/dev/null | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -1 || true)"
 
-if [ "${INSTALLED_VER#v}" = "$RUNNER_VERSION" ]; then
-  echo "· forgejo-runner $RUNNER_VERSION already installed"
+if [ "$INSTALLED_UPSTREAM" = "$RUNNER_UPSTREAM" ]; then
+  echo "· forgejo-runner already installed at $RUNNER_UPSTREAM lineage (bump RELEASE_TAG when the release moves)"
 else
-  echo "· fetching $ASSET"
+  echo "· fetching $ASSET from $RELEASE_TAG"
   curl -fsSL -o "$STATE_DIR/$ASSET" "$URL"
   curl -fsSL -o "$STATE_DIR/$ASSET.sha256" "$URL.sha256"
   # normalize checksum entry to the bare filename (some releases embed CI paths)

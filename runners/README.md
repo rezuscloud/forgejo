@@ -16,11 +16,16 @@ build action, so no macOS assets exist at any upstream version.
 
 ## Binary source
 
-[`rezuscloud/forgejo-runner`](https://github.com/rezuscloud/forgejo-runner) —
-fork of upstream adding darwin-amd64/arm64 tarballs + checksums on fork tags
-`v*-rezus.*` (Gitea publishes darwin in every runner release; this restores
-that coverage for the Forgejo runner). Pin the version in `install.sh` to the
-same runner version as the k8s fleet (protocol parity).
+The runner source is **vendored pristine upstream** at `runner/` (pinned tag in
+`runners/RUNNER_UPSTREAM`, bumped by `hack/sync-runner.sh` — the
+`charts/forgejo` pattern). Upstream ships linux-only release binaries, so the
+monorepo's `release.yml` builds the darwin pair on every `v*-rezus.*` tag and
+attaches versionless assets (`forgejo-runner-{goos}-{goarch}.tar.gz` + bare-name
+`.sha256` + `checksums.txt`) next to the fj binaries. The binary stamps its own
+lineage `<upstream>-rezus.<N>` (e.g. `v12.7.3-rezus.4`); the linux fleet keeps
+consuming the upstream OCI image. The standalone fork
+`rezuscloud/forgejo-runner` is retired (archived) — this monorepo is the single
+release point.
 
 ## Labels contract
 

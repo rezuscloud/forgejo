@@ -1,0 +1,837 @@
+package exprparser
+
+import (
+	"encoding"
+	"fmt"
+	"math"
+	"reflect"
+	"strings"
+
+	"code.forgejo.org/forgejo/runner/v12/act/model"
+	"github.com/rhysd/actionlint"
+)
+
+type EvaluationEnvironment struct {
+	Github    *model.GithubContext
+	Env       map[string]string
+	Job       *model.JobContext
+	Jobs      *map[string]*model.WorkflowCallResult
+	Steps     map[string]*model.StepResult
+	Runner    map[string]any
+	Secrets   map[string]string
+	Vars      map[string]string
+	Strategy  map[string]any
+	Matrix    map[string]any
+	Needs     map[string]Needs
+	Inputs    map[string]any
+	HashFiles func([]reflect.Value) (any, error)
+	ErrorMode ErrorMode
+}
+
+type Needs struct {
+	Outputs map[string]string `json:"outputs"`
+	Result  string            `json:"result"`
+}
+
+type Config struct {
+	Run        *model.Run
+	WorkingDir string
+	Context    string
+}
+
+type DefaultStatusCheck int
+
+const (
+	DefaultStatusCheckNone DefaultStatusCheck = iota
+	DefaultStatusCheckSuccess
+	DefaultStatusCheckAlways
+	DefaultStatusCheckCanceled
+	DefaultStatusCheckFailure
+)
+
+type ErrorMode int
+
+const (
+	InvalidJobOutput ErrorMode = 1 << iota
+	InvalidMatrixDimension
+	// Future: add flags enums for other error modes
+)
+
+func (dsc DefaultStatusCheck) String() string {
+	switch dsc {
+	case DefaultStatusCheckSuccess:
+		return "success"
+	case DefaultStatusCheckAlways:
+		return "always"
+	case DefaultStatusCheckCanceled:
+		return "cancelled"
+	case DefaultStatusCheckFailure:
+		return "failure"
+	}
+	return ""
+}
+
+type Interpreter interface {
+	Evaluate(input string, defaultStatusCheck DefaultStatusCheck) (any, error)
+}
+
+type interperterImpl struct {
+	env    *EvaluationEnvironment
+	config Config
+}
+
+func NewInterpreter(env *EvaluationEnvironment, config Config) Interpreter {
+	return &interperterImpl{
+		env:    env,
+		config: config,
+	}
+}
+
+func (impl *interperterImpl) Evaluate(input string, defaultStatusCheck DefaultStatusCheck) (any, error) {
+	input = strings.TrimPrefix(input, "${{")
+	if defaultStatusCheck != DefaultStatusCheckNone && input == "" {
+		input = "success()"
+	}
+	parser := actionlint.NewExprParser()
+	exprNode, err := parser.Parse(actionlint.NewExprLexer(input + "}}"))
+	if err != nil {
+		return nil, fmt.Errorf("Failed to parse: %s", err.Message)
+	}
+
+	if defaultStatusCheck != DefaultStatusCheckNone {
+		hasStatusCheckFunction := false
+		actionlint.VisitExprNode(exprNode, func(node, _ actionlint.ExprNode, entering bool) {
+			if funcCallNode, ok := node.(*actionlint.FuncCallNode); entering && ok {
+				switch strings.ToLower(funcCallNode.Callee) {
+				case "success", "always", "cancelled", "failure":
+					hasStatusCheckFunction = true
+				}
+			}
+		})
+
+		if !hasStatusCheckFunction {
+			exprNode = &actionlint.LogicalOpNode{
+				Kind: actionlint.LogicalOpNodeKindAnd,
+				Left: &actionlint.FuncCallNode{
+					Callee: defaultStatusCheck.String(),
+					Args:   []actionlint.ExprNode{},
+				},
+				Right: exprNode,
+			}
+		}
+	}
+
+	result, err2 := impl.evaluateNode(exprNode)
+
+	return result, err2
+}
+
+func (impl *interperterImpl) evaluateNode(exprNode actionlint.ExprNode) (any, error) {
+	switch node := exprNode.(type) {
+	case *actionlint.VariableNode:
+		return impl.evaluateVariable(node)
+	case *actionlint.BoolNode:
+		return node.Value, nil
+	case *actionlint.NullNode:
+		return nil, nil
+	case *actionlint.IntNode:
+		return node.Value, nil
+	case *actionlint.FloatNode:
+		return node.Value, nil
+	case *actionlint.StringNode:
+		return node.Value, nil
+	case *actionlint.IndexAccessNode:
+		return impl.evaluateIndexAccess(node)
+	case *actionlint.ObjectDerefNode:
+		return impl.evaluateObjectDeref(node)
+	case *actionlint.ArrayDerefNode:
+		return impl.evaluateArrayDeref(node)
+	case *actionlint.NotOpNode:
+		return impl.evaluateNot(node)
+	case *actionlint.CompareOpNode:
+		return impl.evaluateCompare(node)
+	case *actionlint.LogicalOpNode:
+		return impl.evaluateLogicalCompare(node)
+	case *actionlint.FuncCallNode:
+		return impl.evaluateFuncCall(node)
+	default:
+		return nil, fmt.Errorf("Fatal error! Unknown node type: %s node: %+v", reflect.TypeOf(exprNode), exprNode)
+	}
+}
+
+func (impl *interperterImpl) evaluateVariable(variableNode *actionlint.VariableNode) (any, error) {
+	switch strings.ToLower(variableNode.Name) {
+	case "github":
+		return impl.env.Github, nil
+	case "gitea": // compatible with Gitea
+		return impl.env.Github, nil
+	case "forge":
+		return impl.env.Github, nil
+	case "forgejo":
+		return impl.env.Github, nil
+	case "env":
+		return impl.env.Env, nil
+	case "job":
+		return impl.env.Job, nil
+	case "jobs":
+		if impl.env.Jobs == nil {
+			return nil, fmt.Errorf("Unavailable context: jobs")
+		}
+		return impl.env.Jobs, nil
+	case "steps":
+		return impl.env.Steps, nil
+	case "runner":
+		return impl.env.Runner, nil
+	case "secrets":
+		return impl.env.Secrets, nil
+	case "vars":
+		return impl.env.Vars, nil
+	case "strategy":
+		return impl.env.Strategy, nil
+	case "matrix":
+		return &MatrixWrapper{Matrix: impl.env.Matrix}, nil
+	case "needs":
+		return impl.env.Needs, nil
+	case "inputs":
+		return impl.env.Inputs, nil
+	case "infinity":
+		return math.Inf(1), nil
+	case "nan":
+		return math.NaN(), nil
+	default:
+		return nil, fmt.Errorf("Unavailable context: %s", variableNode.Name)
+	}
+}
+
+func (impl *interperterImpl) evaluateIndexAccess(indexAccessNode *actionlint.IndexAccessNode) (any, error) {
+	left, err := impl.evaluateNode(indexAccessNode.Operand)
+	if err != nil {
+		return nil, err
+	}
+
+	leftValue := reflect.ValueOf(left)
+
+	right, err := impl.evaluateNode(indexAccessNode.Index)
+	if err != nil {
+		return nil, err
+	}
+
+	rightValue := reflect.ValueOf(right)
+
+	switch rightValue.Kind() {
+	case reflect.String:
+		rightString := rightValue.String()
+		accessedValue, useAccessedValue, err := impl.drilldownSpecialObjectsObject(left, rightString)
+		if useAccessedValue {
+			return accessedValue, err
+		}
+		return impl.getPropertyValue(leftValue, rightString)
+
+	case reflect.Int:
+		switch leftValue.Kind() {
+		case reflect.Slice:
+			if rightValue.Int() < 0 || rightValue.Int() >= int64(leftValue.Len()) {
+				return nil, nil
+			}
+			return leftValue.Index(int(rightValue.Int())).Interface(), nil
+		default:
+			return nil, nil
+		}
+
+	default:
+		return nil, nil
+	}
+}
+
+type JobOutputsWrapper struct {
+	JobID string
+	Needs *Needs
+}
+
+type NeedsWrapper struct {
+	JobID   string
+	Outputs map[string]string
+}
+
+type InvalidJobOutputReferencedError struct {
+	JobID      string
+	OutputName string
+	String     string
+}
+
+func (e *InvalidJobOutputReferencedError) Error() string {
+	return e.String
+}
+
+type MatrixWrapper struct {
+	Matrix map[string]any
+}
+
+type InvalidMatrixDimensionReferencedError struct {
+	Dimension string
+	String    string
+}
+
+func (e *InvalidMatrixDimensionReferencedError) Error() string {
+	return e.String
+}
+
+func (impl *interperterImpl) evaluateObjectDeref(objectDerefNode *actionlint.ObjectDerefNode) (any, error) {
+	left, err := impl.evaluateNode(objectDerefNode.Receiver)
+	if err != nil {
+		return nil, err
+	}
+
+	_, receiverIsDeref := objectDerefNode.Receiver.(*actionlint.ArrayDerefNode)
+	if receiverIsDeref {
+		return impl.getPropertyValueDereferenced(reflect.ValueOf(left), objectDerefNode.Property)
+	}
+
+	accessedValue, useAccessedValue, err := impl.drilldownSpecialObjectsObject(left, objectDerefNode.Property)
+	if useAccessedValue {
+		return accessedValue, err
+	}
+
+	return impl.getPropertyValue(reflect.ValueOf(left), objectDerefNode.Property)
+}
+
+func (impl *interperterImpl) drilldownSpecialObjectsObject(left any, property string) (any, bool, error) {
+	// When the environment is configured with the `InvalidJobOutput` error mode, exprparser detects specifically the
+	// access to `needs.some-job.outputs.some-output` and returns a typed error if `some-output` isn't presently a valid
+	// output.
+	if impl.env.ErrorMode&InvalidJobOutput == InvalidJobOutput {
+		if jobMap, ok := left.(map[string]Needs); ok {
+			// We've accessed `needs.some-job...`.  In this error mode, if `some-job` doesn't exist then we want to
+			// trigger an error rather than treating it as an empty variable.
+			jobNeeds, ok := jobMap[property]
+			if !ok {
+				return nil, true, &InvalidJobOutputReferencedError{
+					JobID:  property,
+					String: fmt.Sprintf("job %q is not available", property),
+				}
+			}
+			return &JobOutputsWrapper{JobID: property, Needs: &jobNeeds}, true, nil
+		}
+		if outputsWrapper, ok := left.(*JobOutputsWrapper); ok {
+			switch property {
+			case "outputs":
+				// We've accessed `needs.some-job.outputs`.  In order to easily detect the next access, wrap the result in
+				// an expected type that we can inspect as we evaluate the next node.
+				return &NeedsWrapper{JobID: outputsWrapper.JobID, Outputs: outputsWrapper.Needs.Outputs}, true, nil
+			case "result":
+				return outputsWrapper.Needs.Result, true, nil
+			}
+		}
+		if needsWrapper, ok := left.(*NeedsWrapper); ok {
+			// We've accessed `needs.some-job.outputs.some-output` and `some-output` is in property.
+			// Because we're in `InvalidJobOutput` error mode, we'll treat this as an error if the output doesn't exist.
+			output, ok := needsWrapper.Outputs[property]
+			if !ok {
+				return nil, true, &InvalidJobOutputReferencedError{
+					JobID:      needsWrapper.JobID,
+					OutputName: property,
+					String:     fmt.Sprintf("output %q is not available on job %q", property, needsWrapper.JobID),
+				}
+			}
+			return output, true, nil
+		}
+	}
+
+	if matrixWrapper, ok := left.(*MatrixWrapper); ok {
+		if impl.env.ErrorMode&InvalidMatrixDimension == InvalidMatrixDimension {
+			if _, ok := matrixWrapper.Matrix[property]; !ok {
+				return nil, true, &InvalidMatrixDimensionReferencedError{
+					Dimension: property,
+					String:    fmt.Sprintf("matrix dimension %q is not defined", property),
+				}
+			}
+		}
+		left = matrixWrapper.Matrix
+		value, err := impl.getPropertyValue(reflect.ValueOf(left), property)
+		if err != nil {
+			return nil, true, err
+		}
+		return value, true, nil
+	}
+
+	return nil, false, nil
+}
+
+func (impl *interperterImpl) evaluateArrayDeref(arrayDerefNode *actionlint.ArrayDerefNode) (any, error) {
+	left, err := impl.evaluateNode(arrayDerefNode.Receiver)
+	if err != nil {
+		return nil, err
+	}
+
+	// When the environment is configured with the `InvalidJobOutput` error mode, exprparser injects some specialized
+	// types like `NeedsWrapper` in order to track access to variables in `needs.some-job.outputs.some-output`.  If
+	// we're derefing an array like `needs.some-job.outputs.*` then we need to handle those wrapper objects:
+	if impl.env.ErrorMode&InvalidJobOutput == InvalidJobOutput {
+		if outputsWrapper, ok := left.(*JobOutputsWrapper); ok {
+			// We've accessed `needs.some-job.*`.
+			return outputsWrapper.Needs, nil
+		}
+		if needsWrapper, ok := left.(*NeedsWrapper); ok {
+			// We've accessed `needs.some-job.outputs.*`.
+			return needsWrapper.Outputs, nil
+		}
+	}
+	// MatrixWrapper has to be part of the the expression tree regardless of whether the related error mode is used
+	if matrixWrapper, ok := left.(*MatrixWrapper); ok {
+		return matrixWrapper.Matrix, nil
+	}
+
+	return impl.getSafeValue(reflect.ValueOf(left)), nil
+}
+
+func (impl *interperterImpl) getPropertyValue(left reflect.Value, property string) (value any, err error) {
+	switch left.Kind() {
+	case reflect.Ptr:
+		return impl.getPropertyValue(left.Elem(), property)
+
+	case reflect.Struct:
+		leftType := left.Type()
+		for i := 0; i < leftType.NumField(); i++ {
+			jsonName := leftType.Field(i).Tag.Get("json")
+			if jsonName == property {
+				property = leftType.Field(i).Name
+				break
+			}
+		}
+
+		fieldValue := left.FieldByNameFunc(func(name string) bool {
+			return strings.EqualFold(name, property)
+		})
+
+		if fieldValue.Kind() == reflect.Invalid {
+			return "", nil
+		}
+
+		i := fieldValue.Interface()
+		// The type stepStatus int is an integer, but should be treated as string
+		if m, ok := i.(encoding.TextMarshaler); ok {
+			text, err := m.MarshalText()
+			if err != nil {
+				return nil, err
+			}
+			return string(text), nil
+		}
+		return i, nil
+
+	case reflect.Map:
+		iter := left.MapRange()
+
+		for iter.Next() {
+			key := iter.Key()
+
+			switch key.Kind() {
+			case reflect.String:
+				if strings.EqualFold(key.String(), property) {
+					return impl.getMapValue(iter.Value())
+				}
+
+			default:
+				return nil, fmt.Errorf("'%s' in map key not implemented", key.Kind())
+			}
+		}
+
+		return nil, nil
+
+	case reflect.Slice:
+		var values []any
+
+		for i := 0; i < left.Len(); i++ {
+			value, err := impl.getPropertyValue(left.Index(i).Elem(), property)
+			if err != nil {
+				return nil, err
+			}
+
+			values = append(values, value)
+		}
+
+		return values, nil
+	}
+
+	return nil, nil
+}
+
+func (impl *interperterImpl) getPropertyValueDereferenced(left reflect.Value, property string) (value any, err error) {
+	switch left.Kind() {
+	case reflect.Map:
+		iter := left.MapRange()
+
+		var values []any
+		for iter.Next() {
+			value, err := impl.getPropertyValue(iter.Value(), property)
+			if err != nil {
+				return nil, err
+			}
+
+			values = append(values, value)
+		}
+
+		return values, nil
+	case reflect.Ptr, reflect.Struct, reflect.Slice:
+		return impl.getPropertyValue(left, property)
+	}
+
+	return nil, nil
+}
+
+func (impl *interperterImpl) getMapValue(value reflect.Value) (any, error) {
+	if value.Kind() == reflect.Ptr {
+		return impl.getMapValue(value.Elem())
+	}
+
+	return value.Interface(), nil
+}
+
+func (impl *interperterImpl) evaluateNot(notNode *actionlint.NotOpNode) (any, error) {
+	operand, err := impl.evaluateNode(notNode.Operand)
+	if err != nil {
+		return nil, err
+	}
+
+	return !IsTruthy(operand), nil
+}
+
+func (impl *interperterImpl) evaluateCompare(compareNode *actionlint.CompareOpNode) (any, error) {
+	left, err := impl.evaluateNode(compareNode.Left)
+	if err != nil {
+		return nil, err
+	}
+
+	right, err := impl.evaluateNode(compareNode.Right)
+	if err != nil {
+		return nil, err
+	}
+
+	leftValue := reflect.ValueOf(left)
+	rightValue := reflect.ValueOf(right)
+
+	return impl.compareValues(leftValue, rightValue, compareNode.Kind)
+}
+
+func (impl *interperterImpl) compareValues(leftValue, rightValue reflect.Value, kind actionlint.CompareOpNodeKind) (any, error) {
+	if leftValue.Kind() != rightValue.Kind() {
+		if !impl.isNumber(leftValue) {
+			leftValue = impl.coerceToNumber(leftValue)
+		}
+		if !impl.isNumber(rightValue) {
+			rightValue = impl.coerceToNumber(rightValue)
+		}
+	}
+
+	switch leftValue.Kind() {
+	case reflect.Bool:
+		return impl.compareNumber(float64(impl.coerceToNumber(leftValue).Int()), float64(impl.coerceToNumber(rightValue).Int()), kind)
+	case reflect.String:
+		return impl.compareString(strings.ToLower(leftValue.String()), strings.ToLower(rightValue.String()), kind)
+
+	case reflect.Int:
+		if rightValue.Kind() == reflect.Float64 {
+			return impl.compareNumber(float64(leftValue.Int()), rightValue.Float(), kind)
+		}
+
+		return impl.compareNumber(float64(leftValue.Int()), float64(rightValue.Int()), kind)
+
+	case reflect.Float64:
+		if rightValue.Kind() == reflect.Int {
+			return impl.compareNumber(leftValue.Float(), float64(rightValue.Int()), kind)
+		}
+
+		return impl.compareNumber(leftValue.Float(), rightValue.Float(), kind)
+
+	case reflect.Invalid:
+		if rightValue.Kind() == reflect.Invalid {
+			return true, nil
+		}
+
+		// not possible situation - params are converted to the same type in code above
+		return nil, fmt.Errorf("Compare params of Invalid type: left: %+v, right: %+v", leftValue.Kind(), rightValue.Kind())
+
+	default:
+		return nil, fmt.Errorf("Compare not implemented for types: left: %+v, right: %+v", leftValue.Kind(), rightValue.Kind())
+	}
+}
+
+func (impl *interperterImpl) coerceToNumber(value reflect.Value) reflect.Value {
+	switch value.Kind() {
+	case reflect.Invalid:
+		return reflect.ValueOf(0)
+
+	case reflect.Bool:
+		switch value.Bool() {
+		case true:
+			return reflect.ValueOf(1)
+		case false:
+			return reflect.ValueOf(0)
+		}
+
+	case reflect.String:
+		if value.String() == "" {
+			return reflect.ValueOf(0)
+		}
+
+		// try to parse the string as a number
+		evaluated, err := impl.Evaluate(value.String(), DefaultStatusCheckNone)
+		if err != nil {
+			return reflect.ValueOf(math.NaN())
+		}
+
+		if value := reflect.ValueOf(evaluated); impl.isNumber(value) {
+			return value
+		}
+	}
+
+	return reflect.ValueOf(math.NaN())
+}
+
+func (impl *interperterImpl) coerceToString(value reflect.Value) reflect.Value {
+	switch value.Kind() {
+	case reflect.Invalid:
+		return reflect.ValueOf("")
+
+	case reflect.Bool:
+		switch value.Bool() {
+		case true:
+			return reflect.ValueOf("true")
+		case false:
+			return reflect.ValueOf("false")
+		}
+
+	case reflect.String:
+		return value
+
+	case reflect.Int:
+		return reflect.ValueOf(fmt.Sprint(value))
+
+	case reflect.Float64:
+		if math.IsInf(value.Float(), 1) {
+			return reflect.ValueOf("Infinity")
+		} else if math.IsInf(value.Float(), -1) {
+			return reflect.ValueOf("-Infinity")
+		}
+		return reflect.ValueOf(fmt.Sprintf("%.15G", value.Float()))
+
+	case reflect.Slice:
+		return reflect.ValueOf("Array")
+
+	case reflect.Map:
+		return reflect.ValueOf("Object")
+	}
+
+	return value
+}
+
+func (impl *interperterImpl) compareString(left, right string, kind actionlint.CompareOpNodeKind) (bool, error) {
+	switch kind {
+	case actionlint.CompareOpNodeKindLess:
+		return left < right, nil
+	case actionlint.CompareOpNodeKindLessEq:
+		return left <= right, nil
+	case actionlint.CompareOpNodeKindGreater:
+		return left > right, nil
+	case actionlint.CompareOpNodeKindGreaterEq:
+		return left >= right, nil
+	case actionlint.CompareOpNodeKindEq:
+		return left == right, nil
+	case actionlint.CompareOpNodeKindNotEq:
+		return left != right, nil
+	default:
+		return false, fmt.Errorf("TODO: not implemented to compare '%+v'", kind)
+	}
+}
+
+func (impl *interperterImpl) compareNumber(left, right float64, kind actionlint.CompareOpNodeKind) (bool, error) {
+	switch kind {
+	case actionlint.CompareOpNodeKindLess:
+		return left < right, nil
+	case actionlint.CompareOpNodeKindLessEq:
+		return left <= right, nil
+	case actionlint.CompareOpNodeKindGreater:
+		return left > right, nil
+	case actionlint.CompareOpNodeKindGreaterEq:
+		return left >= right, nil
+	case actionlint.CompareOpNodeKindEq:
+		return left == right, nil
+	case actionlint.CompareOpNodeKindNotEq:
+		return left != right, nil
+	default:
+		return false, fmt.Errorf("TODO: not implemented to compare '%+v'", kind)
+	}
+}
+
+func IsTruthy(input any) bool {
+	value := reflect.ValueOf(input)
+	switch value.Kind() {
+	case reflect.Bool:
+		return value.Bool()
+
+	case reflect.String:
+		return value.String() != ""
+
+	case reflect.Int:
+		return value.Int() != 0
+
+	case reflect.Float64:
+		if math.IsNaN(value.Float()) {
+			return false
+		}
+
+		return value.Float() != 0
+
+	case reflect.Map, reflect.Slice:
+		return true
+
+	default:
+		return false
+	}
+}
+
+func (impl *interperterImpl) isNumber(value reflect.Value) bool {
+	switch value.Kind() {
+	case reflect.Int, reflect.Float64:
+		return true
+	default:
+		return false
+	}
+}
+
+func (impl *interperterImpl) getSafeValue(value reflect.Value) any {
+	switch value.Kind() {
+	case reflect.Invalid:
+		return nil
+
+	case reflect.Float64:
+		if value.Float() == 0 {
+			return 0
+		}
+	}
+
+	return value.Interface()
+}
+
+func (impl *interperterImpl) evaluateLogicalCompare(compareNode *actionlint.LogicalOpNode) (any, error) {
+	left, err := impl.evaluateNode(compareNode.Left)
+	if err != nil {
+		return nil, err
+	}
+
+	leftValue := reflect.ValueOf(left)
+
+	if IsTruthy(left) == (compareNode.Kind == actionlint.LogicalOpNodeKindOr) {
+		return impl.getSafeValue(leftValue), nil
+	}
+
+	right, err := impl.evaluateNode(compareNode.Right)
+	if err != nil {
+		return nil, err
+	}
+
+	rightValue := reflect.ValueOf(right)
+
+	switch compareNode.Kind {
+	case actionlint.LogicalOpNodeKindAnd:
+		return impl.getSafeValue(rightValue), nil
+	case actionlint.LogicalOpNodeKindOr:
+		return impl.getSafeValue(rightValue), nil
+	}
+
+	return nil, fmt.Errorf("Unable to compare incompatibles types '%s' and '%s'", leftValue.Kind(), rightValue.Kind())
+}
+
+func (impl *interperterImpl) evaluateFuncCall(funcCallNode *actionlint.FuncCallNode) (any, error) {
+	args := make([]reflect.Value, 0)
+
+	for _, arg := range funcCallNode.Args {
+		value, err := impl.evaluateNode(arg)
+		if err != nil {
+			return nil, err
+		}
+
+		args = append(args, reflect.ValueOf(value))
+	}
+
+	argCountCheck := func(argCount int) error {
+		if len(args) != argCount {
+			return fmt.Errorf("'%s' expected %d arguments but got %d instead", funcCallNode.Callee, argCount, len(args))
+		}
+		return nil
+	}
+
+	argAtLeastCheck := func(atLeast int) error {
+		if len(args) < atLeast {
+			return fmt.Errorf("'%s' expected at least %d arguments but got %d instead", funcCallNode.Callee, atLeast, len(args))
+		}
+		return nil
+	}
+
+	switch strings.ToLower(funcCallNode.Callee) {
+	case "contains":
+		if err := argCountCheck(2); err != nil {
+			return nil, err
+		}
+		return impl.contains(args[0], args[1])
+	case "startswith":
+		if err := argCountCheck(2); err != nil {
+			return nil, err
+		}
+		return impl.startsWith(args[0], args[1])
+	case "endswith":
+		if err := argCountCheck(2); err != nil {
+			return nil, err
+		}
+		return impl.endsWith(args[0], args[1])
+	case "format":
+		if err := argAtLeastCheck(1); err != nil {
+			return nil, err
+		}
+		return impl.format(args[0], args[1:]...)
+	case "join":
+		if err := argAtLeastCheck(1); err != nil {
+			return nil, err
+		}
+		if len(args) == 1 {
+			return impl.join(args[0], reflect.ValueOf(","))
+		}
+		return impl.join(args[0], args[1])
+	case "tojson":
+		if err := argCountCheck(1); err != nil {
+			return nil, err
+		}
+		return impl.toJSON(args[0])
+	case "fromjson":
+		if err := argCountCheck(1); err != nil {
+			return nil, err
+		}
+		return impl.fromJSON(args[0])
+	case "hashfiles":
+		if impl.env.HashFiles != nil {
+			return impl.env.HashFiles(args)
+		}
+		return impl.hashFiles(args...)
+	case "always":
+		return impl.always()
+	case "success":
+		if impl.config.Context == "job" {
+			return impl.jobSuccess()
+		}
+		if impl.config.Context == "step" {
+			return impl.stepSuccess()
+		}
+		return nil, fmt.Errorf("Context '%s' must be one of 'job' or 'step'", impl.config.Context)
+	case "failure":
+		if impl.config.Context == "job" {
+			return impl.jobFailure()
+		}
+		if impl.config.Context == "step" {
+			return impl.stepFailure()
+		}
+		return nil, fmt.Errorf("Context '%s' must be one of 'job' or 'step'", impl.config.Context)
+	case "cancelled":
+		return impl.cancelled()
+	default:
+		return nil, fmt.Errorf("TODO: '%s' not implemented", funcCallNode.Callee)
+	}
+}

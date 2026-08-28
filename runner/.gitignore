@@ -1,0 +1,16 @@
+*~
+
+forgejo-runner*
+.env
+.runner
+coverage.txt
+/config.yaml
+
+# MS VSCode
+.vscode
+__debug_bin
+# gorelease binary folder
+dist
+
+# Jetbrains IDE
+.idea

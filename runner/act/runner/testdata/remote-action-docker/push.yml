@@ -1,0 +1,10 @@
+name: remote-action-docker
+on: push
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: https://code.forgejo.org/forgejo/hello-world-docker-action@v3
+      with:
+        who-to-greet: 'Mona the Octocat'

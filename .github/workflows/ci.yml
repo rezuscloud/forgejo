@@ -28,6 +28,20 @@ jobs:
         with:
           go-version-file: go.mod
 
+      - name: Vendored runner builds and reports its stamp
+        # runner/ is pristine upstream (hack/sync-runner.sh); CI asserts it
+        # compiles from the tree and carries the pinned lineage so packaging
+        # drift (module path moves, ver package renames) fails fast here.
+        run: |
+          set -euo pipefail
+          UPSTREAM="$(tail -1 runners/RUNNER_UPSTREAM | tr -d '[:space:]')"
+          VERPATH="$(go -C runner list -m)/internal/pkg/ver"
+          CGO_ENABLED=0 go -C runner build -tags 'netgo osusergo' -trimpath \
+            -ldflags "-s -w -X ${VERPATH}.version=${UPSTREAM}-smoke" -o /tmp/forgejo-runner .
+          OUT="$(/tmp/forgejo-runner --version)"
+          echo "$OUT"
+          echo "$OUT" | grep -qx "forgejo-runner version ${UPSTREAM}-smoke"
+
       - name: Start Forgejo container
         run: |
           set -euo pipefail

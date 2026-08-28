@@ -1,0 +1,385 @@
+// Copyright 2022 The Gitea Authors. All rights reserved.
+// SPDX-License-Identifier: MIT
+
+package cmd
+
+import (
+	"bufio"
+	"context"
+	"fmt"
+	"os"
+	"os/signal"
+	goruntime "runtime"
+	"strings"
+	"time"
+
+	pingv1 "code.forgejo.org/forgejo/actions-proto/ping/v1"
+	runnerv1 "code.forgejo.org/forgejo/actions-proto/runner/v1"
+	"connectrpc.com/connect"
+	"github.com/mattn/go-isatty"
+	log "github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
+
+	"code.forgejo.org/forgejo/runner/v12/internal/pkg/client"
+	"code.forgejo.org/forgejo/runner/v12/internal/pkg/config"
+	"code.forgejo.org/forgejo/runner/v12/internal/pkg/labels"
+	"code.forgejo.org/forgejo/runner/v12/internal/pkg/ver"
+)
+
+// runRegister registers a runner to the server
+func runRegister(ctx context.Context, regArgs *registerArgs, configFile *string) func(*cobra.Command, []string) error {
+	return func(cmd *cobra.Command, args []string) error {
+		log.SetReportCaller(false)
+		isTerm := isatty.IsTerminal(os.Stdout.Fd())
+		log.SetFormatter(&log.TextFormatter{
+			DisableColors:    !isTerm,
+			DisableTimestamp: true,
+		})
+		log.SetLevel(log.DebugLevel)
+
+		log.Infof("Registering runner, arch=%s, os=%s, version=%s.",
+			goruntime.GOARCH, goruntime.GOOS, ver.Version())
+
+		// runner always needs root permission
+		if os.Getuid() != 0 {
+			// TODO: use a better way to check root permission
+			log.Warnf("Runner in user-mode.")
+		}
+
+		if regArgs.NoInteractive {
+			if err := registerNoInteractive(ctx, *configFile, regArgs); err != nil {
+				return err
+			}
+		} else {
+			go func() {
+				if err := registerInteractive(ctx, *configFile); err != nil {
+					log.Fatal(err)
+					return
+				}
+				os.Exit(0)
+			}()
+
+			c := make(chan os.Signal, 1)
+			signal.Notify(c, os.Interrupt)
+			<-c
+		}
+
+		return nil
+	}
+}
+
+// registerArgs represents the arguments for register command
+type registerArgs struct {
+	NoInteractive bool
+	InstanceAddr  string
+	Token         string
+	RunnerName    string
+	Labels        string
+	Ephemeral     bool
+}
+
+type registerStage int8
+
+const (
+	StageUnknown              registerStage = -1
+	StageOverwriteLocalConfig registerStage = iota + 1
+	StageInputInstance
+	StageInputToken
+	StageInputRunnerName
+	StageInputLabels
+	StageWaitingForRegistration
+	StageExit
+)
+
+var defaultLabels = []string{
+	"docker:docker://data.forgejo.org/oci/node:lts",
+}
+
+type registerInputs struct {
+	InstanceAddr string
+	Token        string
+	RunnerName   string
+	Labels       []string
+	Ephemeral    bool
+}
+
+func (r *registerInputs) validate() error {
+	if r.InstanceAddr == "" {
+		return fmt.Errorf("instance address is empty")
+	}
+	if r.Token == "" {
+		return fmt.Errorf("token is empty")
+	}
+	if len(r.Labels) > 0 {
+		return validateLabels(r.Labels)
+	}
+	return nil
+}
+
+func validateLabels(ls []string) error {
+	for _, label := range ls {
+		if _, err := labels.Parse(label); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (r *registerInputs) assignToNext(stage registerStage, value string, cfg *config.Config) registerStage {
+	// must set instance address and token.
+	// if empty, keep current stage.
+	if stage == StageInputInstance || stage == StageInputToken {
+		if value == "" {
+			return stage
+		}
+	}
+
+	// set hostname for runner name if empty
+	if stage == StageInputRunnerName && value == "" {
+		value, _ = os.Hostname()
+	}
+
+	switch stage {
+	case StageOverwriteLocalConfig:
+		if value == "Y" || value == "y" {
+			return StageInputInstance
+		}
+		return StageExit
+	case StageInputInstance:
+		r.InstanceAddr = value
+		return StageInputToken
+	case StageInputToken:
+		r.Token = value
+		return StageInputRunnerName
+	case StageInputRunnerName:
+		r.RunnerName = value
+		// if there are some labels configured in config file, skip input labels stage
+		if len(cfg.Runner.DefaultLabels) > 0 {
+			ls := make([]string, 0, len(cfg.Runner.DefaultLabels))
+			for _, l := range cfg.Runner.DefaultLabels {
+				_, err := labels.Parse(l)
+				if err != nil {
+					log.WithError(err).Warnf("ignored invalid label %q", l)
+					continue
+				}
+				ls = append(ls, l)
+			}
+			if len(ls) == 0 {
+				log.Warn("no valid labels configured in config file, runner may not be able to pick up jobs")
+			}
+			r.Labels = ls
+			return StageWaitingForRegistration
+		}
+		return StageInputLabels
+	case StageInputLabels:
+		r.Labels = defaultLabels
+		if value != "" {
+			r.Labels = commaSplit(value)
+		}
+
+		if validateLabels(r.Labels) != nil {
+			log.Infoln("Invalid labels, please input again, leave blank to use the default labels (for example, ubuntu-20.04:docker://node:20-bookworm,ubuntu-18.04:docker://node:20-bookworm)")
+			return StageInputLabels
+		}
+		return StageWaitingForRegistration
+	}
+	return StageUnknown
+}
+
+func registerInteractive(ctx context.Context, configFile string) error {
+	var (
+		reader = bufio.NewReader(os.Stdin)
+		stage  = StageInputInstance
+		inputs = new(registerInputs)
+	)
+
+	cfg, err := config.New(config.FromFile(configFile))
+	if err != nil {
+		return fmt.Errorf("failed to load config: %v", err)
+	}
+	if f, err := os.Stat(cfg.Runner.File); err == nil && !f.IsDir() {
+		stage = StageOverwriteLocalConfig
+	}
+
+	for {
+		printStageHelp(stage)
+
+		cmdString, err := reader.ReadString('\n')
+		if err != nil {
+			return err
+		}
+		stage = inputs.assignToNext(stage, strings.TrimSpace(cmdString), cfg)
+
+		if stage == StageWaitingForRegistration {
+			log.Infof("Registering runner, name=%s, instance=%s, labels=%v.", inputs.RunnerName, inputs.InstanceAddr, inputs.Labels)
+			if err := doRegister(ctx, cfg, inputs); err != nil {
+				return fmt.Errorf("Failed to register runner: %w", err)
+			}
+			log.Infof("Runner registered successfully.")
+			return nil
+		}
+
+		if stage == StageExit {
+			return nil
+		}
+
+		if stage <= StageUnknown {
+			log.Errorf("Invalid input, please re-run act command.")
+			return nil
+		}
+	}
+}
+
+func printStageHelp(stage registerStage) {
+	switch stage {
+	case StageOverwriteLocalConfig:
+		log.Infoln("Runner is already registered, overwrite local config? [y/N]")
+	case StageInputInstance:
+		log.Infoln("Enter the Forgejo instance URL (for example, https://next.forgejo.org/):")
+	case StageInputToken:
+		log.Infoln("Enter the runner token:")
+	case StageInputRunnerName:
+		hostname, _ := os.Hostname()
+		log.Infof("Enter the runner name (if set empty, use hostname: %s):\n", hostname)
+	case StageInputLabels:
+		log.Infoln("Enter the runner labels, leave blank to use the default labels (comma-separated, for example, ubuntu-20.04:docker://node:20-bookworm,ubuntu-18.04:docker://node:20-bookworm):")
+	case StageWaitingForRegistration:
+		log.Infoln("Waiting for registration...")
+	}
+}
+
+func registerNoInteractive(ctx context.Context, configFile string, regArgs *registerArgs) error {
+	cfg, err := config.New(config.FromFile(configFile))
+	if err != nil {
+		return err
+	}
+	inputs := &registerInputs{
+		InstanceAddr: regArgs.InstanceAddr,
+		Token:        regArgs.Token,
+		RunnerName:   regArgs.RunnerName,
+		Labels:       defaultLabels,
+		Ephemeral:    regArgs.Ephemeral,
+	}
+	regArgs.Labels = strings.TrimSpace(regArgs.Labels)
+	// command line flag.
+	if regArgs.Labels != "" {
+		inputs.Labels = commaSplit(regArgs.Labels)
+	}
+	// specify labels in config file.
+	if len(cfg.Runner.DefaultLabels) > 0 {
+		if regArgs.Labels != "" {
+			log.Warn("Labels from command will be ignored, use labels defined in config file.")
+		}
+		inputs.Labels = cfg.Runner.DefaultLabels
+	}
+
+	if inputs.RunnerName == "" {
+		inputs.RunnerName, _ = os.Hostname()
+		log.Infof("Runner name is empty, use hostname '%s'.", inputs.RunnerName)
+	}
+	if err := inputs.validate(); err != nil {
+		log.WithError(err).Errorf("Invalid input, please re-run act command.")
+		return err
+	}
+	if err := doRegister(ctx, cfg, inputs); err != nil {
+		return fmt.Errorf("Failed to register runner: %w", err)
+	}
+	log.Infof("Runner registered successfully.")
+	return nil
+}
+
+func doRegister(ctx context.Context, cfg *config.Config, inputs *registerInputs) error {
+	// initial http client
+	cli := client.New(
+		inputs.InstanceAddr,
+		cfg.Runner.Insecure,
+		"",
+		"",
+		ver.Version(),
+		1*time.Second, // FetchInterval isn't defined in register, but it's irrelevant since we're not going to start a poller
+	)
+
+	for {
+		_, err := cli.Ping(ctx, connect.NewRequest(&pingv1.PingRequest{
+			Data: inputs.RunnerName,
+		}))
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+		}
+		if ctx.Err() != nil {
+			break
+		}
+		if err != nil {
+			log.WithError(err).
+				Errorln("Cannot ping the Forgejo instance server")
+			// TODO: if ping failed, retry or exit
+			time.Sleep(time.Second)
+		} else {
+			log.Debugln("Successfully pinged the Forgejo instance server")
+			break
+		}
+	}
+
+	reg := &config.Registration{
+		Name:    inputs.RunnerName,
+		Token:   inputs.Token,
+		Address: inputs.InstanceAddr,
+		Labels:  inputs.Labels,
+	}
+
+	ls := make([]string, len(reg.Labels))
+	for i, v := range reg.Labels {
+		l, _ := labels.Parse(v)
+		ls[i] = l.Name
+	}
+	// register new runner.
+	resp, err := cli.Register(ctx, connect.NewRequest(&runnerv1.RegisterRequest{
+		Name:        reg.Name,
+		Token:       reg.Token,
+		Version:     ver.Version(),
+		AgentLabels: ls, // Could be removed after Gitea 1.20
+		Labels:      ls,
+		Ephemeral:   inputs.Ephemeral,
+	}))
+	if err != nil {
+		log.WithError(err).Error("poller: cannot register new runner")
+		return err
+	}
+
+	reg.ID = resp.Msg.GetRunner().GetId()
+	reg.UUID = resp.Msg.GetRunner().GetUuid()
+	reg.Name = resp.Msg.GetRunner().GetName()
+	reg.Token = resp.Msg.GetRunner().GetToken()
+
+	if inputs.Ephemeral != resp.Msg.GetRunner().GetEphemeral() {
+		return fmt.Errorf("This Forgejo instance does not support ephemeral runners; requires Forgejo 15 or newer. The runner was registered as a non-ephemeral runner instead. Please manually delete the runner '%s' from the Forgejo UI to avoid a stale runner entry", reg.Name)
+	}
+
+	if err := config.SaveRegistration(cfg.Runner.File, reg); err != nil {
+		return fmt.Errorf("failed to save runner config: %w", err)
+	}
+	return nil
+}
+
+// Splits a string by commas, but trims whitespace around the commas. Used for label parsing to avoid a rogue whitespace
+// like "docker:docker://node:22-bookworm, self-hosted:host, lxc:lxc://debian:bookworm" becoming labeled with
+// " self-hosted" and " lxc".
+func commaSplit(s string) []string {
+	if s == "" {
+		return make([]string, 0)
+	}
+
+	parts := strings.Split(s, ",")
+	result := make([]string, 0, len(parts))
+
+	for _, part := range parts {
+		trimmed := strings.TrimSpace(part)
+		if trimmed != "" {
+			result = append(result, trimmed)
+		}
+	}
+
+	return result
+}

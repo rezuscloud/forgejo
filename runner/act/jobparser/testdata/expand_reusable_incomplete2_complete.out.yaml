@@ -1,0 +1,32 @@
+name: test
+jobs:
+  reusable:
+    name: reusable
+    needs:
+      - define-with
+      - reusable.job1
+    runs-on: []
+    if: false
+__metadata:
+  workflow_call_inputs:
+    runner: ubuntu-29.99
+  workflow_call_id: 465dfc6d9b59ff33335dd8b6b29a02b501567fc783c60390aba0de4395cd7407
+  workflow_call_parent: b000000000000000000000000b00000000000000000000000000000000000000
+---
+name: test
+"on":
+  workflow_call:
+    inputs:
+      runner:
+        default: ubuntu-29.99
+        type: string
+jobs:
+  reusable.job1:
+    name: job1
+    needs:
+      - define-with
+    runs-on: ubuntu-29.99
+    steps:
+      - run: echo "Woohoo!"
+__metadata:
+  workflow_call_parent: 465dfc6d9b59ff33335dd8b6b29a02b501567fc783c60390aba0de4395cd7407
