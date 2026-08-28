@@ -10,7 +10,7 @@
 #   RUNNER_NAME=tib-mbp ./install.sh      # defaults to hostname -s
 #
 # Registration token (instance-level, admin):
-#   fj api admin actions get-registration-token -H git.rezus.cloud
+#   fj api admin get-registration-token -H git.rezus.cloud
 # … or the Forgejo admin UI (Site administration → Actions → Runners).
 set -euo pipefail
 
@@ -64,7 +64,7 @@ echo "· wrote $STATE_DIR/config.yml (labels: $LABELS, capacity: $CAPACITY)"
 # ── 3. register (only when no .runner file) ─────────────────────────────────
 if [ ! -f "$STATE_DIR/.runner" ]; then
   [ -n "${RUNNER_TOKEN:-}" ] || die "no $STATE_DIR/.runner and RUNNER_TOKEN unset.
-  Get one:  fj api admin actions get-registration-token -H $FORGEJO_URL"
+  Get one:  fj api admin get-registration-token -H $FORGEJO_URL"
   ( cd "$STATE_DIR" && "$BIN_DIR/forgejo-runner" register \
       --no-interactive \
       --instance "$FORGEJO_URL" \

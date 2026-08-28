@@ -51,7 +51,7 @@ macOS:
 | `~/Library/LaunchAgents/com.rezuscloud.forgejo-runner.plist` | user agent: RunAtLoad + KeepAlive |
 
 Registration uses a one-shot instance-level registration token
-(`fj api admin actions get-registration-token`); the resulting `.runner` file
+(`fj api admin get-registration-token`); the resulting `.runner` file
 holds the per-runner secret. The registration token is never stored.
 
 ## References
