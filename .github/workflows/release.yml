@@ -43,6 +43,8 @@ jobs:
       image_repository: ${{ steps.meta.outputs.image_repository }}
       chart_repository: ${{ steps.meta.outputs.chart_repository }}
       chart_archive: ${{ steps.meta.outputs.chart_archive }}
+      runner_upstream: ${{ steps.meta.outputs.runner_upstream }}
+      runner_version: ${{ steps.meta.outputs.runner_version }}
       short_sha: ${{ steps.meta.outputs.short_sha }}
     steps:
       - uses: actions/checkout@v4
@@ -73,6 +75,10 @@ jobs:
           [[ "$runner_upstream" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || {
             echo "ERROR: runners/RUNNER_UPSTREAM is not a vX.Y.Z tag: '$runner_upstream'" >&2; exit 1; }
           runner_version="${runner_upstream#v}-rezus.${n}"
+          # hard guard: an empty/short version would stamp binaries with a bare
+          # "v" (silently — -X accepts any string); fail prepare instead
+          [[ "$runner_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+-rezus\.[0-9]+$ ]] || {
+            echo "ERROR: runner_version '$runner_version' is not <X.Y.Z>-rezus.<N>" >&2; exit 1; }
           {
             echo "release_version=$release_version"
             echo "version_file=$version_file"
@@ -228,12 +234,16 @@ jobs:
             -ldflags "-s -w -X ${VERPATH}.version=v${{ needs.prepare.outputs.runner_version }}" \
             -o "../dist/forgejo-runner-${{ matrix.goos }}-${{ matrix.goarch }}" .
       - name: Verify stamped version (linux/amd64 only)
+        # Non-tautological: derive the expectation from the pin file, not from
+        # the same (possibly empty) needs-context the ldflags used.
         if: matrix.verify_only
         run: |
           set -euo pipefail
+          EXPECT="v$(tail -1 runners/RUNNER_UPSTREAM | tr -d '[:space:]' | sed 's/^v//')-rezus.$(echo '${{ needs.prepare.outputs.release_version }}' | sed 's/.*-rezus\.//')"
           OUT="$(./dist/forgejo-runner-linux-amd64 --version)"
           echo "$OUT"
-          echo "$OUT" | grep -qx "forgejo-runner version v${{ needs.prepare.outputs.runner_version }}"
+          echo "$OUT" | grep -qx "forgejo-runner version $EXPECT"
+          echo "$OUT" | grep -Eq 'version v[0-9]+\.[0-9]+\.[0-9]+-rezus\.[0-9]+$'
       - name: Archive
         if: ${{ !matrix.verify_only }}
         shell: bash
