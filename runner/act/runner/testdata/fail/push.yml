@@ -1,0 +1,12 @@
+name: fail
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: code.forgejo.org/oci/node:22
+      env:
+        TEST_ENV: test-value
+    steps:
+      - run: echo ${TEST_ENV} | grep bazooka

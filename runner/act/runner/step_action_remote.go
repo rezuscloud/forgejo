@@ -1,0 +1,371 @@
+package runner
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"io"
+	"os"
+	"path"
+	"path/filepath"
+	"regexp"
+	"strings"
+
+	"code.forgejo.org/forgejo/runner/v12/act/common"
+	"code.forgejo.org/forgejo/runner/v12/act/common/git"
+	"code.forgejo.org/forgejo/runner/v12/act/model"
+	"github.com/Masterminds/semver"
+)
+
+type stepActionRemote struct {
+	Step                *model.Step
+	RunContext          *RunContext
+	compositeRunContext *RunContext
+	compositeSteps      *compositeSteps
+	readAction          readAction
+	runAction           runAction
+	action              *model.Action
+	env                 map[string]string
+	remoteAction        *remoteAction
+	workTree            git.Worktree
+}
+
+var stepActionRemoteGitClone = git.Clone
+
+var schemePattern = regexp.MustCompile("^https?://")
+
+func (sar *stepActionRemote) prepareActionExecutor() common.Executor {
+	return func(ctx context.Context) error {
+		if sar.remoteAction != nil && sar.action != nil {
+			// we are already good to run
+			return nil
+		}
+
+		// Since actions can specify the download source via a url prefix.
+		// The prefix may contain some sensitive information that needs to be stored in secrets,
+		// so we need to interpolate the expression value for uses first.
+		sar.Step.Uses = sar.RunContext.NewExpressionEvaluator(ctx).Interpolate(ctx, sar.Step.Uses)
+
+		sar.remoteAction = newRemoteAction(sar.Step.Uses)
+		if sar.remoteAction == nil {
+			return fmt.Errorf("Expected format {org}/{repo}[/path]@ref or https://example.com/{org}/{repo}[/path]@ref. Actual '%s' Input string was not in a correct format", sar.Step.Uses)
+		}
+
+		github := sar.getGithubContext(ctx)
+		if sar.remoteAction.IsCheckout() && isLocalCheckout(github, sar.Step) && !sar.RunContext.Config.NoSkipCheckout {
+			common.Logger(ctx).Debugf("Skipping local actions/checkout because workdir was already copied")
+			return nil
+		}
+
+		for _, action := range sar.RunContext.Config.ReplaceGheActionWithGithubCom {
+			if strings.EqualFold(fmt.Sprintf("%s/%s", sar.remoteAction.Org, sar.remoteAction.Repo), action) {
+				sar.remoteAction.URL = "https://github.com"
+				github.Token = sar.RunContext.Config.ReplaceGheActionTokenWithGithubCom
+			}
+		}
+
+		var ntErr common.Executor
+		if sar.workTree == nil {
+			token := ""
+			tokenSupported, err := tokenAuthSupported(sar.RunContext.Config.ServerVersion)
+			if err != nil {
+				common.Logger(ctx).Warnf("failed to determine token auth support from server version '%s': %w", sar.RunContext.Config.ServerVersion, err)
+			}
+			common.Logger(ctx).Debugf("Authentication with token supported: %v", tokenSupported)
+
+			// If we're pulling the action from the instance itself, set the auth token
+			if tokenSupported && actionHostedOnSameInstanceAsWorkflow(sar.remoteAction.URL, sar.RunContext.Config.GitHubInstance, sar.RunContext.Config.DefaultActionInstance) {
+				token = github.Token
+			} else {
+				common.Logger(ctx).Debugf("Authentication with token disabled for action URL %q, origin URL %q, and default URL %q",
+					sar.remoteAction.URL, sar.RunContext.Config.GitHubInstance, sar.RunContext.Config.DefaultActionInstance)
+			}
+
+			wt, err := stepActionRemoteGitClone(ctx, git.CloneInput{
+				CacheDir:    sar.RunContext.ActionCacheDir(),
+				URL:         sar.remoteAction.CloneURL(sar.RunContext.Config.DefaultActionInstance),
+				Ref:         sar.remoteAction.Ref,
+				Token:       token,
+				OfflineMode: sar.RunContext.Config.ActionOfflineMode,
+
+				InsecureSkipTLS: sar.cloneSkipTLS(), // For Gitea
+			})
+			if err != nil {
+				if errors.Is(err, git.ErrShortRef) {
+					return fmt.Errorf("unable to resolve action `%s`, because short references are not supported; use `%s` instead",
+						sar.Step.Uses, err.(*git.Error).Commit())
+				}
+				return err
+			}
+			sar.workTree = wt
+		}
+
+		remoteReader := func(ctx context.Context) actionYamlReader {
+			return func(filename string) (io.Reader, io.Closer, error) {
+				f, err := os.Open(filepath.Join(sar.workTree.WorktreeDir(), sar.remoteAction.Path, filename))
+				return f, f, err
+			}
+		}
+
+		return common.NewPipelineExecutor(
+			ntErr,
+			func(ctx context.Context) error {
+				actionModel, err := sar.readAction(ctx, sar.Step, sar.workTree.WorktreeDir(), sar.remoteAction.Path, remoteReader(ctx), os.WriteFile)
+				sar.action = actionModel
+				return err
+			},
+		)(ctx)
+	}
+}
+
+func (sar *stepActionRemote) pre() common.Executor {
+	sar.env = map[string]string{}
+
+	return common.NewPipelineExecutor(
+		sar.prepareActionExecutor(),
+		runStepExecutor(sar, stepStagePre, runPreStep(sar)).If(hasPreStep(sar)).If(shouldRunPreStep(sar)))
+}
+
+func (sar *stepActionRemote) main() common.Executor {
+	return common.NewPipelineExecutor(
+		sar.prepareActionExecutor(),
+		runStepExecutor(sar, stepStageMain, func(ctx context.Context) error {
+			github := sar.getGithubContext(ctx)
+			if sar.remoteAction.IsCheckout() && isLocalCheckout(github, sar.Step) && !sar.RunContext.Config.NoSkipCheckout {
+				if sar.RunContext.Config.BindWorkdir {
+					common.Logger(ctx).Debugf("Skipping local actions/checkout because you bound your workspace")
+					return nil
+				}
+				eval := sar.RunContext.NewExpressionEvaluator(ctx)
+				copyToPath := path.Join(sar.RunContext.JobContainer.ToContainerPath(sar.RunContext.Config.Workdir), eval.Interpolate(ctx, sar.Step.With["path"]))
+				return sar.RunContext.JobContainer.CopyDir(copyToPath, sar.RunContext.Config.Workdir+string(filepath.Separator)+".", sar.RunContext.Config.UseGitIgnore)(ctx)
+			}
+
+			actionDir := sar.workTree.WorktreeDir()
+
+			return sar.runAction(sar, actionDir, sar.remoteAction)(ctx)
+		}),
+	)
+}
+
+func (sar *stepActionRemote) post() common.Executor {
+	return runStepExecutor(sar, stepStagePost, runPostStep(sar)).
+		If(hasPostStep(sar)).
+		If(shouldRunPostStep(sar)).
+		Finally(func(ctx context.Context) error {
+			if sar.workTree != nil {
+				if err := sar.workTree.Close(ctx); err != nil {
+					common.Logger(ctx).Warnf("non-fatal error cleaning up step work tree: %v", err)
+				}
+			}
+			return nil
+		})
+}
+
+func (sar *stepActionRemote) getRunContext() *RunContext {
+	return sar.RunContext
+}
+
+func (sar *stepActionRemote) getGithubContext(ctx context.Context) *model.GithubContext {
+	ghc := sar.getRunContext().getGithubContext(ctx)
+
+	// extend github context if we already have an initialized remoteAction
+	remoteAction := sar.remoteAction
+	if remoteAction != nil {
+		ghc.ActionRepository = fmt.Sprintf("%s/%s", remoteAction.Org, remoteAction.Repo)
+		ghc.ActionRef = remoteAction.Ref
+	}
+
+	return ghc
+}
+
+func (sar *stepActionRemote) getStepModel() *model.Step {
+	return sar.Step
+}
+
+func (sar *stepActionRemote) getEnv() *map[string]string {
+	return &sar.env
+}
+
+func (sar *stepActionRemote) getIfExpression(ctx context.Context, stage stepStage) string {
+	switch stage {
+	case stepStagePre:
+		github := sar.getGithubContext(ctx)
+		if sar.remoteAction.IsCheckout() && isLocalCheckout(github, sar.Step) && !sar.RunContext.Config.NoSkipCheckout {
+			// skip local checkout pre step
+			return "false"
+		}
+		return sar.action.Runs.PreIf
+	case stepStageMain:
+		return sar.Step.If.Value
+	case stepStagePost:
+		return sar.action.Runs.PostIf
+	}
+	return ""
+}
+
+func (sar *stepActionRemote) getActionModel() *model.Action {
+	return sar.action
+}
+
+func (sar *stepActionRemote) getCompositeRunContext(ctx context.Context) *RunContext {
+	if sar.compositeRunContext == nil {
+		actionDir := sar.workTree.WorktreeDir()
+		actionLocation := path.Join(actionDir, sar.remoteAction.Path)
+		_, containerActionDir := getContainerActionPaths(sar.getStepModel(), actionLocation, sar.RunContext)
+
+		sar.compositeRunContext = newCompositeRunContext(ctx, sar.RunContext, sar, containerActionDir)
+		sar.compositeSteps = sar.compositeRunContext.compositeExecutor(sar.action)
+	} else {
+		// Re-evaluate environment here. For remote actions the environment
+		// need to be re-created for every stage (pre, main, post) as there
+		// might be required context changes (inputs/outputs) while the action
+		// stages are executed. (e.g. the output of another action is the
+		// input for this action during the main stage, but the env
+		// was already created during the pre stage)
+		env := evaluateCompositeInputAndEnv(ctx, sar.RunContext, sar)
+		sar.compositeRunContext.Env = env
+		sar.compositeRunContext.ExtraPath = sar.RunContext.ExtraPath
+	}
+	return sar.compositeRunContext
+}
+
+func (sar *stepActionRemote) getCompositeSteps() *compositeSteps {
+	return sar.compositeSteps
+}
+
+// For Gitea
+// cloneSkipTLS returns true if the runner can clone an action from the Gitea instance
+func (sar *stepActionRemote) cloneSkipTLS() bool {
+	if !sar.RunContext.Config.InsecureSkipTLS {
+		// Return false if the Gitea instance is not an insecure instance
+		return false
+	}
+	if sar.remoteAction.URL == "" {
+		// Empty URL means the default action instance should be used
+		// Return true if the URL of the Gitea instance is the same as the URL of the default action instance
+		return sar.RunContext.Config.DefaultActionInstance == sar.RunContext.Config.GitHubInstance
+	}
+	// Return true if the URL of the remote action is the same as the URL of the Gitea instance
+	return sar.remoteAction.URL == sar.RunContext.Config.GitHubInstance
+}
+
+type remoteAction struct {
+	URL  string
+	Org  string
+	Repo string
+	Path string
+	Ref  string
+}
+
+func (ra *remoteAction) CloneURL(u string) string {
+	if ra.URL == "" {
+		if !strings.HasPrefix(u, "http://") && !strings.HasPrefix(u, "https://") {
+			u = "https://" + u
+		}
+	} else {
+		u = ra.URL
+	}
+
+	return fmt.Sprintf("%s/%s/%s", u, ra.Org, ra.Repo)
+}
+
+func (ra *remoteAction) IsCheckout() bool {
+	if ra.Org == "actions" && ra.Repo == "checkout" {
+		return true
+	}
+	return false
+}
+
+func newRemoteAction(action string) *remoteAction {
+	// support http(s)://host/owner/repo@v3
+	for _, schema := range []string{"https://", "http://"} {
+		if after, ok := strings.CutPrefix(action, schema); ok {
+			splits := strings.SplitN(after, "/", 2)
+			if len(splits) != 2 {
+				return nil
+			}
+			ret := parseAction(splits[1])
+			if ret == nil {
+				return nil
+			}
+			ret.URL = schema + splits[0]
+			return ret
+		}
+	}
+
+	return parseAction(action)
+}
+
+func parseAction(action string) *remoteAction {
+	// GitHub's document[^] describes:
+	// > We strongly recommend that you include the version of
+	// > the action you are using by specifying a Git ref, SHA, or Docker tag number.
+	// Actually, the workflow stops if there is the uses directive that hasn't @ref.
+	// [^]: https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions
+	r := regexp.MustCompile(`^([^/@]+)/([^/@]+)(/([^@]*))?(@(.*))?$`)
+	matches := r.FindStringSubmatch(action)
+	if len(matches) < 7 || matches[6] == "" {
+		return nil
+	}
+	return &remoteAction{
+		Org:  matches[1],
+		Repo: matches[2],
+		Path: matches[4],
+		Ref:  matches[6],
+		URL:  "",
+	}
+}
+
+// Helper function to determine if token auth will work for cloning
+// actions from "public" repos.
+// See: https://codeberg.org/forgejo/forgejo/pulls/8889
+func tokenAuthSupported(serverVersion string) (bool, error) {
+	if serverVersion == "" {
+		return false, nil
+	}
+
+	v, err := semver.NewVersion(serverVersion)
+	if err != nil {
+		return false, err
+	}
+
+	c, err := semver.NewConstraint(">= 13.0.0-0")
+	if err != nil {
+		return false, err
+	}
+
+	return c.Check(v), nil
+}
+
+// actionHostedOnSameInstanceAsWorkflow tests whether an action is hosted on the same instance as the workflow that is
+// being run. Returns `true` if both URLs match (including scheme, ports, and paths), `false` otherwise.
+func actionHostedOnSameInstanceAsWorkflow(actionURL, originInstance, defaultActionsInstance string) bool {
+	// Remove trailing slashes if present. It preserves the meaning of the URLs while removing a source of configuration
+	// problems.
+	actionURL = strings.TrimSuffix(actionURL, "/")
+	originInstance = strings.TrimSuffix(originInstance, "/")
+	defaultActionsInstance = strings.TrimSuffix(defaultActionsInstance, "/")
+
+	isHostname := func(s string) bool {
+		return !strings.HasPrefix(s, "http://") && !strings.HasPrefix(s, "https://")
+	}
+
+	// Handle an action reference with an empty URL like `uses: actions/checkout`.
+	if actionURL == "" {
+		if isHostname(originInstance) || isHostname(defaultActionsInstance) {
+			originInstance = schemePattern.ReplaceAllString(originInstance, "")
+			defaultActionsInstance = schemePattern.ReplaceAllString(defaultActionsInstance, "")
+		}
+		return originInstance == defaultActionsInstance
+	}
+
+	// Test if an action loaded from an arbitrary URL (like `uses: https://forge.example.com/actions/checkout`) comes
+	// from the same instance as the workflow that is being run. Because Forgejo can be hosted on paths or use
+	// arbitrary ports, looking at the hostname is not sufficient. Both URLs have to be equal.
+	if isHostname(originInstance) || isHostname(actionURL) {
+		originInstance = schemePattern.ReplaceAllString(originInstance, "")
+		actionURL = schemePattern.ReplaceAllString(actionURL, "")
+	}
+	return originInstance == actionURL
+}

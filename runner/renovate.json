@@ -1,0 +1,40 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["local>forgejo/renovate-config"],
+  "prConcurrentLimit": 3,
+  "packageRules": [
+    {
+      "description": "separate minor and patch for some packages",
+      "matchDepNames": ["github.com/rhysd/actionlint"],
+      "separateMinorPatch": true
+    },
+    {
+      "description": "separate multiple major and minor for forgejo",
+      "matchDepNames": ["code.forgejo.org/forgejo/forgejo"],
+      "separateMultipleMajor": true,
+      "separateMultipleMinor": true
+    },
+    {
+      "description":"separate major updates for lxc nodejs version",
+      "matchFileNames": ["act/runner/run_context.go"],
+      "separateMultipleMajor": true
+    },
+    {
+      "description": "group runner updates",
+      "matchDepNames": ["code.forgejo.org/forgejo/runner", "forgejo/runner"],
+      "groupName": "forgejo-runner"
+    }
+  ],
+  "labels": ["Kind/DependencyUpdate", "run-end-to-end-tests"],
+  "ignorePaths": ["**/testdata/**", "**/node_modules/**"],
+  "customManagers": [
+    {
+      "description": "Update NodeJs in `act/runner/run_context.go`",
+      "customType": "regex",
+      "managerFilePatterns": ["act/runner/run_context.go"],
+      "matchStrings": ["NODE_MAJOR=(?<currentValue>\\d+)"],
+      "datasourceTemplate": "node-version",
+      "depNameTemplate": "lxc-node"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+name: services skip empty image
+on: push
+jobs:
+  optional-service:
+    runs-on: ubuntu-latest
+    services:
+      conditional-db:
+        image: ''
+        env:
+          POSTGRES_PASSWORD: optional
+        ports:
+          - 5433:5432
+    steps:
+      - name: Confirm steps still run without the optional service
+        run: echo "workflow continues even when the service is skipped"

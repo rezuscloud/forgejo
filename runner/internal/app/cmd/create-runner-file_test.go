@@ -1,0 +1,143 @@
+// SPDX-License-Identifier: MIT
+
+package cmd
+
+import (
+	"context"
+	"os"
+	"testing"
+	"time"
+
+	runnerv1 "code.forgejo.org/forgejo/actions-proto/runner/v1"
+	"code.forgejo.org/forgejo/runner/v12/internal/pkg/client"
+	"code.forgejo.org/forgejo/runner/v12/internal/pkg/config"
+	"code.forgejo.org/forgejo/runner/v12/internal/pkg/ver"
+	"connectrpc.com/connect"
+	"github.com/stretchr/testify/require"
+
+	"github.com/stretchr/testify/assert"
+	"go.yaml.in/yaml/v3"
+)
+
+func Test_createRunnerFileCmd(t *testing.T) {
+	configFile := "config.yml"
+	ctx := context.Background()
+	cmd := createRunnerFileCmd(ctx, &configFile)
+	output, _, _, err := executeCommand(ctx, t, cmd)
+	assert.ErrorContains(t, err, `required flag(s) "instance", "secret" not set`)
+	assert.Contains(t, output, "Usage:")
+}
+
+func Test_validateSecret(t *testing.T) {
+	assert.ErrorContains(t, validateSecret("abc"), "exactly 40 characters")
+	assert.ErrorContains(t, validateSecret("ZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"), "must be an hexadecimal")
+}
+
+func Test_uuidFromSecret(t *testing.T) {
+	uuid, err := uuidFromSecret("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+	assert.NoError(t, err)
+	assert.EqualValues(t, uuid, "41414141-4141-4141-4141-414141414141")
+}
+
+func getForgejoFromEnv(t *testing.T) string {
+	t.Helper()
+	address := os.Getenv("FORGEJO_URL")
+	if address == "" {
+		t.Skip("skipping because FORGEJO_URL is not set")
+	}
+	return address
+}
+
+func Test_ping(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping integration test")
+	}
+
+	cfg := &config.Config{}
+	address := getForgejoFromEnv(t)
+	reg := &config.Registration{
+		Address: address,
+		UUID:    "create-runner-file_test.go",
+	}
+	assert.NoError(t, ping(cfg, reg))
+}
+
+func TestCreateRunnerFile_OfflineRunnerFileCreation(t *testing.T) {
+	configFile, configuration, err := prepareConfig(t.TempDir())
+	require.NoError(t, err)
+
+	secret := "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+	instance := "https://example.com/"
+	name := "offline-runner"
+
+	cmd := createRunnerFileCmd(t.Context(), &configFile)
+	output, _, _, err := executeCommand(t.Context(), t, cmd, "--secret", secret, "--instance", instance, "--name", name)
+
+	require.NoError(t, err)
+	assert.Empty(t, output)
+
+	reg, err := config.LoadRegistration(configuration.Runner.File)
+	require.NoError(t, err)
+	assert.Zero(t, reg.ID)
+	assert.Equal(t, "41414141-4141-4141-4141-414141414141", reg.UUID)
+	assert.Equal(t, secret, reg.Token)
+	assert.Equal(t, instance, reg.Address)
+	assert.Equal(t, name, reg.Name)
+}
+
+func Test_runCreateRunnerFile(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping integration test")
+	}
+
+	instance := getForgejoFromEnv(t)
+
+	//
+	// Set the .runner file to be in a temporary directory
+	//
+	dir := t.TempDir()
+	configFile := dir + "/config.yml"
+	runnerFile := dir + "/.runner"
+	cfg, _ := config.New()
+	cfg.Runner.File = runnerFile
+	yamlData, err := yaml.Marshal(cfg)
+	assert.NoError(t, err)
+	assert.NoError(t, os.WriteFile(configFile, yamlData, 0o666))
+
+	secret, has := os.LookupEnv("FORGEJO_RUNNER_SECRET")
+	assert.True(t, has)
+	name := "testrunner"
+
+	//
+	// Run create-runner-file
+	//
+	ctx := context.Background()
+	cmd := createRunnerFileCmd(ctx, &configFile)
+	output, _, _, err := executeCommand(ctx, t, cmd, "--connect", "--secret", secret, "--instance", instance, "--name", name)
+	assert.NoError(t, err)
+	assert.EqualValues(t, "", output)
+
+	//
+	// Read back the runner file and verify its content
+	//
+	reg, err := config.LoadRegistration(runnerFile)
+	assert.NoError(t, err)
+	assert.EqualValues(t, secret, reg.Token)
+	assert.EqualValues(t, instance, reg.Address)
+
+	//
+	// Verify that fetching a task successfully returns there is
+	// no task for this runner
+	//
+	cli := client.New(
+		reg.Address,
+		cfg.Runner.Insecure,
+		reg.UUID,
+		reg.Token,
+		ver.Version(),
+		1*time.Second, // FetchInterval isn't defined in create-runner-file, but it's irrelevant since we're not going to start a poller
+	)
+	resp, err := cli.FetchTask(ctx, connect.NewRequest(&runnerv1.FetchTaskRequest{}))
+	assert.NoError(t, err)
+	assert.Nil(t, resp.Msg.GetTask())
+}

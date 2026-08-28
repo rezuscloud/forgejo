@@ -1,0 +1,10 @@
+on: push
+jobs:
+  _:
+    runs-on: ubuntu-latest
+    steps:
+    - run: |
+        FROM code.forgejo.org/oci/alpine:latest
+        ENTRYPOINT [ "sh", "-c", "echo OK" ]
+      shell: mv {0} Dockerfile
+    - uses: ./

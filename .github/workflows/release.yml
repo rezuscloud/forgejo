@@ -67,10 +67,18 @@ jobs:
           rest="${identity#*.}"
           chart_version="$((major + 2)).${rest}-rezus.${n}"
           short_sha="$(git rev-parse --short=12 HEAD)"
+          # vendored forgejo/runner (runner/, hack/sync-runner.sh): the runner
+          # binaries keep their own version lineage — <upstream tag>-rezus.<N>
+          runner_upstream="$(tail -1 runners/RUNNER_UPSTREAM | tr -d '[:space:]')"
+          [[ "$runner_upstream" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || {
+            echo "ERROR: runners/RUNNER_UPSTREAM is not a vX.Y.Z tag: '$runner_upstream'" >&2; exit 1; }
+          runner_version="${runner_upstream#v}-rezus.${n}"
           {
             echo "release_version=$release_version"
             echo "version_file=$version_file"
             echo "chart_version=$chart_version"
+            echo "runner_upstream=$runner_upstream"
+            echo "runner_version=$runner_version"
             echo "image_repository=ghcr.io/rezuscloud/forgejo"
             echo "chart_repository=oci://ghcr.io/rezuscloud/charts"
             echo "chart_archive=forgejo-${chart_version}.tgz"
@@ -183,6 +191,64 @@ jobs:
           name: fj-cli-${{ matrix.goos }}-${{ matrix.goarch }}
           path: out/
 
+  build-runner:
+    # forgejo/runner is vendored pristine at runner/ (hack/sync-runner.sh);
+    # upstream ships linux-only release binaries, so the darwin pair is built
+    # here alongside the rest of the release. Versionless asset names (like the
+    # fj assets) — the version comes from the release tag; the binary stamps
+    # its own lineage <upstream>-rezus.<N>.
+    needs: prepare
+    runs-on: ubuntu-latest
+    permissions: { contents: read }
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { goos: darwin, goarch: arm64 }
+          - { goos: darwin, goarch: amd64 }
+          # verify-only leg: the only target that can execute on the runner —
+          # proves the ldflags stamp; produces no artifact.
+          - { goos: linux, goarch: amd64, verify_only: true }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with: { go-version-file: runner/go.mod }
+      - name: Build forgejo-runner (stamped <upstream>-rezus.<N>)
+        shell: bash
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          CGO_ENABLED: "0"
+        run: |
+          set -euo pipefail
+          VERPATH="$(go -C runner list -m)/internal/pkg/ver"
+          # -C runner: all paths after it resolve relative to runner/, so the
+          # output lands in the workspace-root dist/ via ../dist
+          go build -C runner -tags 'netgo osusergo' -trimpath \
+            -ldflags "-s -w -X ${VERPATH}.version=v${{ needs.prepare.outputs.runner_version }}" \
+            -o "../dist/forgejo-runner-${{ matrix.goos }}-${{ matrix.goarch }}" .
+      - name: Verify stamped version (linux/amd64 only)
+        if: matrix.verify_only
+        run: |
+          set -euo pipefail
+          OUT="$(./dist/forgejo-runner-linux-amd64 --version)"
+          echo "$OUT"
+          echo "$OUT" | grep -qx "forgejo-runner version v${{ needs.prepare.outputs.runner_version }}"
+      - name: Archive
+        if: ${{ !matrix.verify_only }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          NAME="forgejo-runner-${{ matrix.goos }}-${{ matrix.goarch }}"
+          mkdir -p out
+          tar -C dist -czf "out/${NAME}.tar.gz" "${NAME}"
+          ( cd out && sha256sum "${NAME}.tar.gz" > "${NAME}.tar.gz.sha256" )
+      - uses: actions/upload-artifact@v4
+        if: ${{ !matrix.verify_only }}
+        with:
+          name: runner-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: out/
+
   build-repo-map:
     needs: prepare
     runs-on: ubuntu-latest
@@ -207,7 +273,7 @@ jobs:
           path: repo-map.json
 
   publish-chart-and-release:
-    needs: [prepare, build-server-images, build-cli, build-repo-map]
+    needs: [prepare, build-server-images, build-cli, build-runner, build-repo-map]
     runs-on: ubuntu-latest
     permissions: { contents: write, packages: write }
     steps:
@@ -235,11 +301,15 @@ jobs:
       - uses: actions/download-artifact@v4
         with: { pattern: fj-cli-*, merge-multiple: true, path: dist-cli }
       - uses: actions/download-artifact@v4
+        with: { pattern: runner-*, merge-multiple: true, path: dist-runner }
+      - uses: actions/download-artifact@v4
         with: { name: repo-map, path: dist-rig }
       - name: CLI checksums
         # sha256 over every fj archive (tar.gz + zip) — the release ships six
         # binaries across three OSes; checksums make them verifiable.
         run: cd dist-cli && sha256sum fj-* > checksums.txt && cat checksums.txt
+      - name: Runner checksums
+        run: cd dist-runner && sha256sum forgejo-runner-*.tar.gz > checksums.txt && cat checksums.txt
       - name: Create GitHub release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
@@ -249,6 +319,9 @@ jobs:
             dist-cli/fj-*.tar.gz
             dist-cli/fj-*.zip
             dist-cli/checksums.txt
+            dist-runner/forgejo-runner-*.tar.gz
+            dist-runner/forgejo-runner-*.tar.gz.sha256
+            dist-runner/checksums.txt
             dist-rig/repo-map.json
           generate_release_notes: true
           body: |
@@ -257,6 +330,7 @@ jobs:
             All artifacts share the same version:
             - server image: `${{ needs.prepare.outputs.image_repository }}:${{ needs.prepare.outputs.release_version }}` (+ `-rootless`)
             - fj CLI (Client Version matches the release): `fj-{linux,darwin}-{amd64,arm64}.tar.gz`, `fj-windows-{amd64,arm64}.zip` — all listed in `checksums.txt`
+            - forgejo-runner binaries (vendored at `runner/`, stamped `${{ needs.prepare.outputs.runner_version }}`): `forgejo-runner-darwin-{amd64,arm64}.tar.gz` — listed in the runner `checksums.txt` (linux fleet uses the upstream OCI image)
             - OCI Helm chart: `${{ needs.prepare.outputs.chart_repository }}/forgejo:${{ needs.prepare.outputs.chart_version }}` (appVersion = release version)
             - Repository Intelligence Graph (RIG): `repo-map.json` (deterministic architecture graph for the wiki C4D2 workflow)
 

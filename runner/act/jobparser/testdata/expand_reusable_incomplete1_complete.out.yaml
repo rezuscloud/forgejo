@@ -1,0 +1,71 @@
+name: test
+jobs:
+  reusable:
+    name: Reusable with runner-a (runner-a)
+    needs:
+      - define-runs-on
+      - reusable.job1
+    runs-on: []
+    if: false
+    strategy:
+      matrix:
+        runner:
+          - runner-a
+__metadata:
+  workflow_call_inputs:
+    runner: runner-a
+  workflow_call_id: 6bfb4df14c57048b39c2f1f13599a56c1b759945ce6d7989f5b1c18515065b85
+---
+name: test
+jobs:
+  reusable:
+    name: Reusable with runner-b (runner-b)
+    needs:
+      - define-runs-on
+      - reusable.job1
+    runs-on: []
+    if: false
+    strategy:
+      matrix:
+        runner:
+          - runner-b
+__metadata:
+  workflow_call_inputs:
+    runner: runner-b
+  workflow_call_id: b565a7a3c40b3c52a9bea031b589477796e45e7318953894f4f82547c1438e7d
+---
+name: test
+"on":
+  workflow_call:
+    inputs:
+      runner:
+        default: runner-a
+        type: string
+jobs:
+  reusable.job1:
+    name: job1
+    needs:
+      - define-runs-on
+    runs-on: runner-a
+    steps:
+      - run: echo "Woohoo!"
+__metadata:
+  workflow_call_parent: 6bfb4df14c57048b39c2f1f13599a56c1b759945ce6d7989f5b1c18515065b85
+---
+name: test
+"on":
+  workflow_call:
+    inputs:
+      runner:
+        default: runner-b
+        type: string
+jobs:
+  reusable.job1:
+    name: job1
+    needs:
+      - define-runs-on
+    runs-on: runner-b
+    steps:
+      - run: echo "Woohoo!"
+__metadata:
+  workflow_call_parent: b565a7a3c40b3c52a9bea031b589477796e45e7318953894f4f82547c1438e7d
