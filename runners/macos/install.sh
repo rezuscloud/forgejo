@@ -46,7 +46,8 @@ else
   echo "· fetching $ASSET"
   curl -fsSL -o "$STATE_DIR/$ASSET" "$URL"
   curl -fsSL -o "$STATE_DIR/$ASSET.sha256" "$URL.sha256"
-  ( cd "$STATE_DIR" && shasum -a 256 -c "$ASSET.sha256" )
+  # normalize checksum entry to the bare filename (some releases embed CI paths)
+  ( cd "$STATE_DIR" && sed -i '' -E 's|(  ).*/|\1|' "$ASSET.sha256" && shasum -a 256 -c "$ASSET.sha256" )
   tar -xzf "$STATE_DIR/$ASSET" -C "$STATE_DIR"
   install -m755 "$STATE_DIR/forgejo-runner" "$BIN_DIR/forgejo-runner"
   rm -f "$STATE_DIR/$ASSET" "$STATE_DIR/$ASSET.sha256" "$STATE_DIR/forgejo-runner"
