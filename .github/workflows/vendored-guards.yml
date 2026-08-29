@@ -1,0 +1,101 @@
+name: vendored-guards
+
+# Rot detection for vendored upstream trees (runner/ today; charts/forgejo may
+# join). Three guards with one shared severity rule — RED means something
+# automation should have already fixed, WARN means policy-gated manual action:
+#
+#   pristine    runner/ must be byte-identical to the upstream archive at the
+#               tag in runners/RUNNER_UPSTREAM (hack/sync-runner.sh writes both).
+#               RED = unaccounted local edits (re-sync is mechanical).
+#   govulncheck symbol-level CVE scan of the runner module. Findings are WARN:
+#               the tree is pristine upstream, so the only remedy is a pin bump
+#               (patch = auto, minor = manual review, major = evaluation).
+#   lag         upstream tag cadence vs the pin. RED = a patch in the vendored
+#               minor line sat unreleased past the window (patch bumps are auto).
+#               WARN = minor/major ahead (manual/evaluation per policy).
+#
+# A tool failure is never masked as WARN — broken guards fail red.
+
+on:
+  push:
+    branches: [rezus/forgejo-16]
+    paths:
+      - 'runner/**'
+      - 'runners/**'
+      - 'hack/check-runner-*.sh'
+      - '.github/workflows/vendored-guards.yml'
+  pull_request:
+    paths:
+      - 'runner/**'
+      - 'runners/**'
+      - 'hack/check-runner-*.sh'
+      - '.github/workflows/vendored-guards.yml'
+  schedule:
+    - cron: '23 4 * * *'   # daily: lag
+    - cron: '47 5 * * 1'   # mondays: pristine + govulncheck (fresh CVE DB)
+  workflow_dispatch:
+    inputs:
+      only:
+        description: 'Which guard to run (all | pristine | govulncheck | lag)'
+        default: all
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vendored-guards
+  cancel-in-progress: false
+
+jobs:
+  pristine:
+    name: runner/ pristine vs pin
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: >-
+      (github.event_name != 'schedule' || github.event.schedule == '47 5 * * 1') &&
+      (github.event_name != 'workflow_dispatch' || inputs.only == 'all' || inputs.only == 'pristine')
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pristine check
+        run: hack/check-runner-pristine.sh
+
+  govulncheck:
+    name: runner/ govulncheck (advisory)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: >-
+      (github.event_name != 'schedule' || github.event.schedule == '47 5 * * 1') &&
+      (github.event_name != 'workflow_dispatch' || inputs.only == 'all' || inputs.only == 'govulncheck')
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: runner/go.mod
+      - name: govulncheck (findings = WARN, tool failure = RED)
+        working-directory: runner
+        run: |
+          set -uo pipefail
+          OUT="$(go run golang.org/x/vuln/cmd/govulncheck@v1.7.0 ./... 2>&1)" || {
+            echo "$OUT"
+            if echo "$OUT" | grep -qE 'affected by [0-9]+ vulnerabilit|No vulnerabilities found'; then
+              echo "::warning::govulncheck findings in vendored runner/ — remedy is a pin bump per the bump policy (patch=auto, minor=manual, major=evaluation); see issue #96/#94"
+              exit 0
+            fi
+            echo "::error::govulncheck itself failed — fix the guard, never mask a broken guard as advisory"
+            exit 1
+          }
+          echo "$OUT"
+          echo "✓ no vulnerabilities reach code in runner/"
+
+  lag:
+    name: runner/ sync-lag vs upstream
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: >-
+      (github.event_name != 'schedule' || github.event.schedule == '23 4 * * *') &&
+      (github.event_name != 'workflow_dispatch' || inputs.only == 'all' || inputs.only == 'lag')
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lag check
+        run: hack/check-runner-lag.sh
