@@ -12,6 +12,29 @@ helm install forgejo oci://ghcr.io/rezuscloud/forgejo-monorepo-charts/forgejo \
 
 Everything in the upstream `README.md` below (parameters, persistence, ingress, OAuth2, commit signing, …) applies verbatim.
 
+## Vendoring contract (upstream re-sync)
+
+The chart is vendored from the upstream [forgejo-helm](https://code.forgejo.org/forgejo-helm/forgejo)
+chart by `hack/sync-forgejo-chart.sh <upstream-version>` and maintained by the
+fork-maintenance engine (`forks/forgejo-chart.yaml` in k8s-config, `mode:
+subtree`). Three files form the contract:
+
+| File | Role |
+|------|------|
+| `charts/forgejo.rezuscloud/UPSTREAM_CHART` | the upstream pin (one semver line, comments allowed) |
+| `charts/forgejo.rezuscloud/PATCHES.yaml` | the allowed delta: `preserve:` (locally-added paths) + `patches:` (differing files, each with a `signature` that must be present) |
+| `hack/check-chart-patches.sh` | the CI twin of the engine gate (`.github/workflows/vendored-guards.yml`, job `chart`) |
+
+Rule: **every difference between this tree and the upstream chart at the pin
+must be declared in PATCHES.yaml** — an undeclared diff, or a declared patch
+whose signature vanished, is RED (unaccounted drift; re-vendoring is
+mechanical). A declared patch that no longer differs is a WARN (stale entry).
+The local chart version + appVersion are preserved across re-vendoring (chart
+N+2 → app N, driven by `distributions/*.env` + `forgejo-release.yml`), so an
+upstream bump never bumps the local release line. Bump classes follow the same
+matrix as `runner/` (see `runners/README.md`): patch → auto PR + auto-merge
+after CI; minor → prepared PR + manual merge; major → advisory only.
+
 ## Versioning model (stable vs RC)
 
 The chart version mirrors the upstream `forgejo-helm` numbering scheme (chart `N+2` → app `N`):
