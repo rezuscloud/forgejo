@@ -1,12 +1,17 @@
 name: vendored-guards
 
-# Rot detection for vendored upstream trees (runner/ today; charts/forgejo may
-# join). Three guards with one shared severity rule — RED means something
-# automation should have already fixed, WARN means policy-gated manual action:
+# Rot detection for vendored upstream trees (runner/, charts/forgejo). Guards
+# with one shared severity rule — RED means something automation should have
+# already fixed, WARN means policy-gated manual action:
 #
 #   pristine    runner/ must be byte-identical to the upstream archive at the
 #               tag in runners/RUNNER_UPSTREAM (hack/sync-runner.sh writes both).
 #               RED = unaccounted local edits (re-sync is mechanical).
+#   chart       charts/forgejo must differ from the upstream chart at the pin
+#               (charts/forgejo.rezuscloud/UPSTREAM_CHART) by EXACTLY the
+#               contract in charts/forgejo.rezuscloud/PATCHES.yaml (declared
+#               preserve paths + signed patches; helm lint/template sanity).
+#               RED = unaccounted drift; WARN = stale contract entry.
 #   govulncheck symbol-level CVE scan of the runner module. Findings are WARN:
 #               the tree is pristine upstream, so the only remedy is a pin bump
 #               (patch = auto, minor = manual review, major = evaluation).
@@ -22,21 +27,27 @@ on:
     paths:
       - 'runner/**'
       - 'runners/**'
+      - 'charts/forgejo/**'
+      - 'charts/forgejo.rezuscloud/**'
       - 'hack/check-runner-*.sh'
+      - 'hack/check-chart-patches.sh'
       - '.github/workflows/vendored-guards.yml'
   pull_request:
     paths:
       - 'runner/**'
       - 'runners/**'
+      - 'charts/forgejo/**'
+      - 'charts/forgejo.rezuscloud/**'
       - 'hack/check-runner-*.sh'
+      - 'hack/check-chart-patches.sh'
       - '.github/workflows/vendored-guards.yml'
   schedule:
     - cron: '23 4 * * *'   # daily: lag
-    - cron: '47 5 * * 1'   # mondays: pristine + govulncheck (fresh CVE DB)
+    - cron: '47 5 * * 1'   # mondays: pristine + chart + govulncheck (fresh CVE DB)
   workflow_dispatch:
     inputs:
       only:
-        description: 'Which guard to run (all | pristine | govulncheck | lag)'
+        description: 'Which guard to run (all | pristine | chart | govulncheck | lag)'
         default: all
         type: string
 
@@ -59,6 +70,18 @@ jobs:
       - uses: actions/checkout@v4
       - name: Pristine check
         run: hack/check-runner-pristine.sh
+
+  chart:
+    name: charts/forgejo patches vs pin
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: >-
+      (github.event_name != 'schedule' || github.event.schedule == '47 5 * * 1') &&
+      (github.event_name != 'workflow_dispatch' || inputs.only == 'all' || inputs.only == 'chart')
+    steps:
+      - uses: actions/checkout@v4
+      - name: Chart patch-accounting
+        run: hack/check-chart-patches.sh
 
   govulncheck:
     name: runner/ govulncheck (advisory)
