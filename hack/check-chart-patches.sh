@@ -72,6 +72,11 @@ while IFS= read -r d; do
   esac
 done < <(diff -rq --strip-trailing-cr "$SRC_DIR" "$CHART_DIR" 2>/dev/null || true)
 
+while IFS= read -r e; do
+  [ -z "$e" ] && continue
+  [ -e "$CHART_DIR/$e" ] || { echo "::error::preserve entry $e missing from charts/forgejo — a vanished preserved file is invisible to the diff"; red=1; }
+done < <(yq -r '.preserve[]' "$CONTRACT" 2>/dev/null)
+
 while IFS= read -r p; do
   [ -z "$p" ] && continue
   if [ ! -e "$CHART_DIR/$p" ]; then

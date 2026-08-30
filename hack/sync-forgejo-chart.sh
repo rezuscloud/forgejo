@@ -35,9 +35,12 @@ APP_VERSION="$(yq -r '.appVersion' "$CHART_DIR/Chart.yaml" | tr -d '"')"
 CHART_VERSION="${CHART_VERSION_OVERRIDE:-$CHART_VERSION}"
 APP_VERSION="${APP_VERSION_OVERRIDE:-$APP_VERSION}"
 
-# Back up the vendored dependency tarballs (preserve-list: charts/) across the swap.
+# Back up the vendored dependency tarballs (preserve-list: charts/) across the swap —
+# copy them OUT first: the paths alone would point at files rm -rf deletes.
 DEP_TGZ=()
 [ -d "$CHART_DIR/charts" ] && DEP_TGZ=("$CHART_DIR"/charts/*.tgz)
+mkdir -p "$TMP/deps"
+for t in "${DEP_TGZ[@]}"; do [ -e "$t" ] && cp "$t" "$TMP/deps/"; done
 
 echo "· vendoring $UPSTREAM_OCI at $UPSTREAM_REF (local chart $CHART_VERSION / app $APP_VERSION)"
 helm pull "$UPSTREAM_OCI" --version "$UPSTREAM_REF" --untar --untardir "$TMP" \
@@ -51,7 +54,7 @@ for f in REZUSCLOUD.md values-rc-testing.yaml; do
   [ -f "$SIDECAR/$f" ] && cp "$SIDECAR/$f" "$CHART_DIR/$f"
 done
 mkdir -p "$CHART_DIR/charts"
-for t in "${DEP_TGZ[@]}"; do [ -e "$t" ] && cp "$t" "$CHART_DIR/charts/"; done
+for t in "$TMP/deps/"*.tgz; do [ -e "$t" ] && cp "$t" "$CHART_DIR/charts/"; done
 
 python3 <<PYEOF
 import re
@@ -82,8 +85,8 @@ v = v.replace(
 v = v.replace("registry: code.forgejo.org", "registry: ghcr.io")
 v = v.replace("repository: forgejo/forgejo", "repository: rezuscloud/forgejo")
 v = v.replace(
-    "## @param image.tag Visit: [Image tag](https://code.forgejo.org/forgejo/-/packages/container/forgejo/versions). Defaults to `appVersion` within Chart.yaml.\n",
-    "## @param image.tag Custom Rezuscloud Forgejo image tag. Defaults to `appVersion` within Chart.yaml.\n",
+    "## @param image.tag Visit: [Image tag](https://code.forgejo.org/forgejo/-/packages/container/forgejo/versions). Defaults to \`appVersion\` within Chart.yaml.\n",
+    "## @param image.tag Custom Rezuscloud Forgejo image tag. Defaults to \`appVersion\` within Chart.yaml.\n",
 )
 values.write_text(v)
 PYEOF
