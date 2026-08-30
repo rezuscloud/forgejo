@@ -59,6 +59,34 @@ Registration uses a one-shot instance-level registration token
 (`fj api admin get-registration-token`); the resulting `.runner` file
 holds the per-runner secret. The registration token is never stored.
 
+## Bump-class matrix (in-repo contract)
+
+The vendored `runner/` tree is maintained by the fork-maintenance engine
+(k8s-config `forks/forgejo-runner.yaml`, `mode: subtree`). The pin lives in
+`runners/RUNNER_UPSTREAM`; propagation is delegated to `hack/sync-runner.sh`
+and byte-verified against the upstream archive (pristine gate). How a newer
+upstream tag is handled depends on its class **relative to the pin**:
+
+| Class | Example (pin v12.7.3) | Engine action | Merge | Validation |
+|-------|----------------------|---------------|-------|------------|
+| patch | v12.7.4 | auto PR (branch `rezus/sync-subtree-forgejo-runner-*`) | **auto**, only after PR CI is green (never red) | monorepo-ci, stamp |
+| minor | v12.13.2 | auto PR (prepared) | **manual** — changelog/CVE review required | monorepo-ci, stamp, **smoke-macos** |
+| major | v13.0.0 | advisory only | never (upstream majors are evaluations) | — |
+
+Notes:
+
+- Propagation prefers the pin's own `major.minor` lane (patch first), then the
+  newest minor of the pin's major. A newer overall major is an advisory, never
+  the bump.
+- Only the patch class may auto-merge. Minor PRs wait for a human — review the
+  upstream changelog + govulncheck delta, then merge.
+- **smoke-macos** (minor and above): after the release built from the merged
+  pin (`v*-rezus.*`), dispatch the smoke workflow on `tibrez/runner-macos-smoke`
+  (git.rezus.cloud) against the new binary on the macOS runner host.
+- After a merge the vendored-guards lag check resets automatically (it reads
+  this pin file); releases ride the monorepo tag cycle — the engine never tags
+  for a subtree, it only reports unreleased-pending.
+
 ## References
 
 - Gitea labels & host mode: https://docs.gitea.com/runner/labels/
