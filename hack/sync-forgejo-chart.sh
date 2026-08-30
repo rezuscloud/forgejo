@@ -30,8 +30,8 @@ cleanup() { rm -rf "$TMP"; }
 trap cleanup EXIT
 
 # Preserve the local release-line identity before the swap.
-CHART_VERSION="$(yq '.version' "$CHART_DIR/Chart.yaml")"
-APP_VERSION="$(yq '.appVersion' "$CHART_DIR/Chart.yaml")"
+CHART_VERSION="$(yq -r '.version' "$CHART_DIR/Chart.yaml" | tr -d '"')"
+APP_VERSION="$(yq -r '.appVersion' "$CHART_DIR/Chart.yaml" | tr -d '"')"
 CHART_VERSION="${CHART_VERSION_OVERRIDE:-$CHART_VERSION}"
 APP_VERSION="${APP_VERSION_OVERRIDE:-$APP_VERSION}"
 
