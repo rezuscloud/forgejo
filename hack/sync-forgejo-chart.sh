@@ -40,7 +40,8 @@ DEP_TGZ=()
 [ -d "$CHART_DIR/charts" ] && DEP_TGZ=("$CHART_DIR"/charts/*.tgz)
 
 echo "· vendoring $UPSTREAM_OCI at $UPSTREAM_REF (local chart $CHART_VERSION / app $APP_VERSION)"
-helm pull "$UPSTREAM_OCI" --version "$UPSTREAM_REF" --untar --untardir "$TMP"
+helm pull "$UPSTREAM_OCI" --version "$UPSTREAM_REF" --untar --untardir "$TMP" \
+  || helm pull "$UPSTREAM_OCI" --version "$UPSTREAM_REF" --untar --untardir "$TMP" --plain-http
 
 rm -rf "$CHART_DIR"
 cp -a "$TMP/forgejo" "$CHART_DIR"
