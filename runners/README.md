@@ -62,7 +62,10 @@ holds the per-runner secret. The registration token is never stored.
 ## Bump-class matrix (in-repo contract)
 
 The vendored `runner/` tree is maintained by the fork-maintenance engine
-(k8s-config `forks/forgejo-runner.yaml`, `mode: subtree`). The pin lives in
+(k8s-config `forks/forgejo-runner.yaml`, `mode: subtree`; agent-side
+operating knowledge lives in the fork-maintenance skill — vendored-tree
+mode section, incl. the four maintenance shapes and the onboarding
+recipe). The pin lives in
 `runners/RUNNER_UPSTREAM`; propagation is delegated to `hack/sync-runner.sh`
 and byte-verified against the upstream archive (pristine gate). How a newer
 upstream tag is handled depends on its class **relative to the pin**:
