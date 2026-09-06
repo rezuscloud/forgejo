@@ -3,7 +3,7 @@ name: dev-build
 # Dev channel — continuous deployment of the release branch.
 # https://github.com/tibrezus/harmostes/issues/201
 #
-# Fires on pushes to rezus/forgejo-16 (sync.yml merges + PR merges).
+# Fires on pushes to rezus/forgejo-16 (upstream-sync merges + PR merges).
 # Builds 16.0.2-dev.NNNNNN (immutable, zero-padded run number: lexical ==
 # numeric; the Flux ImagePolicy orders on it) + 16.0.2-dev-<sha8>
 # (addressable) + dev-16 / dev (mutable). Prod rolls on this channel.

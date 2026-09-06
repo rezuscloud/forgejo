@@ -3,7 +3,7 @@
 #
 # Runs after every upstream merge, before the merge is pushed. The model:
 #   ours ⊇ theirs must hold AND our delta must still build + be intact.
-# Regen output (SDK, tidy) is EXPECTED here — sync.yml commits it on top of
+# Regen output (SDK, tidy) is EXPECTED here — the sync commits it on top of
 # the merge before pushing. The image build (dev-build.yml) is the final gate.
 #
 # Usage: sync-validate.sh <merge-base-sha>   (run from the repo root)
