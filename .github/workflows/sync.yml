@@ -30,8 +30,15 @@ name: sync
 # on retirement. Nothing else in this file is fork-specific except ROWS.
 
 on:
-  schedule:
-    - cron: '0 3 * * *'   # daily
+  # DORMANT since the engine-transport cutover (2026-09-06): the harmostes
+  # engine (mode: mapping) walks the mapping table daily at 04:00. This
+  # workflow is the manual fallback only — dispatching it is safe at any
+  # time because its walk no-ops when ours ⊇ theirs already holds. Its
+  # scheduled cron was removed at cutover: at 03:00 it ran BEFORE the
+  # engine and would have stolen every real sync (the engine would have
+  # no-op'd forever). Decommission entirely after two consecutive green
+  # daily engine syncs (docs: k8s-config platform/harmostes/fork-maintenance
+  # /docs/forgejo-cutover.md).
   workflow_dispatch: {}
 
 concurrency:
