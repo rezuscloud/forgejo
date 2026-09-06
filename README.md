@@ -47,5 +47,7 @@ If you are interested in making Forgejo better, either by reporting a bug or by 
 
 ## Fork maintenance
 
-This fork is maintained by the mapping-table model — see `.github/workflows/sync.yml`
-and the [harmostes wiki](https://github.com/tibrezus/harmostes/wiki/Fork-Maintenance).
+This fork is maintained by the harmostes `fork-maintenance` workflow — the
+mapping-table model (mode `mapping` for this repo) whose sync definitions live
+in `k8s-config/platform/harmostes/fork-maintenance/` — see the
+[harmostes wiki](https://github.com/tibrezus/harmostes/wiki/Fork-Maintenance).
