@@ -549,7 +549,13 @@ type CreatePullReviewComment struct {
 	Path string `json:"path,omitempty"`
 }
 
-type CreatePullReviewCommentOptions map[string]interface{}
+type CreatePullReviewCommentOptions struct {
+	Body string `json:"body,omitempty"`
+	ExtraLinesCount int64 `json:"extra_lines_count,omitempty"`
+	NewPosition int64 `json:"new_position,omitempty"`
+	OldPosition int64 `json:"old_position,omitempty"`
+	Path string `json:"path,omitempty"`
+}
 
 type CreatePullReviewOptions struct {
 	Body string `json:"body,omitempty"`
