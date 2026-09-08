@@ -196,12 +196,126 @@ func newPolishMilestoneDeleteCmd() *cobra.Command {
 	return cmd
 }
 
+func newPolishReviewCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "review",
+		Short: "Create and submit code reviews on a pull request",
+	}
+	cmd.AddCommand(newPolishReviewCreateCmd())
+	cmd.AddCommand(newPolishReviewCommentCmd())
+	cmd.AddCommand(newPolishReviewSubmitCmd())
+	return cmd
+}
+
+// newPolishReviewCreateCmd — Create a review on a pull request
+func newPolishReviewCreateCmd() *cobra.Command {
+	var body string
+	var commitId string
+	var event string
+	cmd := &cobra.Command{
+		Use:   "create",
+		Short: "Create a review on a pull request",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if event == "" { return fmt.Errorf("--event is required") }
+			var eventP *forgejo.ReviewStateType
+			if event != "" { conv := forgejo.ReviewStateType(event); eventP = &conv }
+			index, err := strconv.ParseInt(args[0], 10, 64)
+			if err != nil { return fmt.Errorf("invalid index: %s", args[0]) }
+			c, owner, repo, err := resolveClient(cmd)
+			if err != nil { return err }
+			res, _, err := c.Repo.RepoCreatePullReview(context.Background(), owner, repo, index, &forgejo.CreatePullReviewOptions{
+				Body: body,
+				CommitId: commitId,
+				Event: eventP,
+			})
+			if err != nil { return err }
+			fmt.Printf("review #%d created\n", res.Id)
+			return nil
+		},
+	}
+	cmd.Flags().StringVar(&body, "body", "", "review summary comment")
+	cmd.Flags().StringVar(&commitId, "commit-id", "", "SHA the review applies to")
+	cmd.Flags().StringVar(&event, "event", "", "review verdict: APPROVED, REQUEST_CHANGES, or COMMENT")
+	return cmd
+}
+
+// newPolishReviewCommentCmd — Add a code-anchored comment to a pending review
+func newPolishReviewCommentCmd() *cobra.Command {
+	var body string
+	var newPosition int64
+	var oldPosition int64
+	var path string
+	cmd := &cobra.Command{
+		Use:   "comment",
+		Short: "Add a code-anchored comment to a pending review",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if body == "" { return fmt.Errorf("--body is required") }
+			if path == "" { return fmt.Errorf("--path is required") }
+			index, err := strconv.ParseInt(args[0], 10, 64)
+			if err != nil { return fmt.Errorf("invalid index: %s", args[0]) }
+			id, err := strconv.ParseInt(args[0], 10, 64)
+			if err != nil { return fmt.Errorf("invalid id: %s", args[0]) }
+			c, owner, repo, err := resolveClient(cmd)
+			if err != nil { return err }
+			res, _, err := c.Repo.RepoCreatePullReviewComment(context.Background(), owner, repo, index, id, &forgejo.CreatePullReviewCommentOptions{
+				Body: body,
+				NewPosition: newPosition,
+				OldPosition: oldPosition,
+				Path: path,
+			})
+			if err != nil { return err }
+			fmt.Printf("comment #%d created\n", res.Id)
+			return nil
+		},
+	}
+	cmd.Flags().StringVar(&body, "body", "", "comment text")
+	cmd.Flags().Int64Var(&newPosition, "new-position", 0, "line on the new (diff head) side, 0 to omit")
+	cmd.Flags().Int64Var(&oldPosition, "old-position", 0, "line on the old (diff base) side, 0 to omit")
+	cmd.Flags().StringVar(&path, "path", "", "tree path of the commented file")
+	return cmd
+}
+
+// newPolishReviewSubmitCmd — Submit a pending review with a verdict
+func newPolishReviewSubmitCmd() *cobra.Command {
+	var body string
+	var event string
+	cmd := &cobra.Command{
+		Use:   "submit",
+		Short: "Submit a pending review with a verdict",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if event == "" { return fmt.Errorf("--event is required") }
+			var eventP *forgejo.ReviewStateType
+			if event != "" { conv := forgejo.ReviewStateType(event); eventP = &conv }
+			index, err := strconv.ParseInt(args[0], 10, 64)
+			if err != nil { return fmt.Errorf("invalid index: %s", args[0]) }
+			id, err := strconv.ParseInt(args[0], 10, 64)
+			if err != nil { return fmt.Errorf("invalid id: %s", args[0]) }
+			c, owner, repo, err := resolveClient(cmd)
+			if err != nil { return err }
+			res, _, err := c.Repo.RepoSubmitPullReview(context.Background(), owner, repo, index, id, &forgejo.SubmitPullReviewOptions{
+				Body: body,
+				Event: eventP,
+			})
+			if err != nil { return err }
+			fmt.Printf("review #%d submitted\n", res.Id)
+			return nil
+		},
+	}
+	cmd.Flags().StringVar(&body, "body", "", "review summary comment")
+	cmd.Flags().StringVar(&event, "event", "", "review verdict: APPROVED, REQUEST_CHANGES, or COMMENT")
+	return cmd
+}
+
 // NewPolishedCmds returns the descriptor-driven polished command groups
 // (gen/polish.json). Root registers these once; adding a group is a
 // descriptor edit + regen — no hand-written command file, no root edit.
 func NewPolishedCmds() []*cobra.Command {
 	return []*cobra.Command{
 		newPolishMilestoneCmd(),
+		newPolishReviewCmd(),
 	}
 }
 

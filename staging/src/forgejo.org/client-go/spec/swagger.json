@@ -25137,7 +25137,34 @@
       "x-go-package": "forgejo.org/modules/structs"
     },
     "CreatePullReviewCommentOptions": {
-      "$ref": "#/definitions/CreatePullReviewComment"
+      "description": "CreatePullReviewCommentOptions are options to add a comment to a pull review. Enriched by hand: the server type is an alias (CreatePullReviewComment), so swaggo reflection emits an empty schema and upstream can never produce these properties — see rezuscloud/forgejo#109.",
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "string",
+          "x-go-name": "Body"
+        },
+        "extra_lines_count": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "ExtraLinesCount"
+        },
+        "new_position": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "NewLineNum"
+        },
+        "old_position": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "OldLineNum"
+        },
+        "path": {
+          "type": "string",
+          "x-go-name": "Path"
+        }
+      },
+      "x-go-package": "forgejo.org/modules/structs"
     },
     "CreatePullReviewOptions": {
       "description": "CreatePullReviewOptions are options to create a pull review",

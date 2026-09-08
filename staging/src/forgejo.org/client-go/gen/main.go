@@ -1049,6 +1049,18 @@ func goFieldName(jn string) string {
 	return f
 }
 
+// isStringAlias reports whether t names a defined string type (e.g.
+// *ReviewStateType): a $ref to a spec definition whose underlying type is
+// string. Polished commands bind those as plain string flags with a
+// conversion at the call site.
+func isStringAlias(t string, spec *SwaggerSpec) bool {
+	if t == "string" || t == "*string" {
+		return false
+	}
+	d, ok := spec.Defs[strings.TrimPrefix(t, "*")]
+	return ok && d.Type == "string"
+}
+
 func isRequiredProp(s Schema, pn string) bool {
 	for _, r := range s.Required {
 		if r == pn {
@@ -1358,9 +1370,10 @@ func genPolishCommand(g PolishGroup, c PolishCommand, ops map[string]polishOpRef
 
 	type bBind struct {
 		goName string
-		kind   string // string|bool|int64|int|time|const
+		kind   string // string|stringalias|bool|int64|int|time|const
 		f      PolishBodyField
 		val    string
+		aliasT string // stringalias: the named type (e.g. ReviewStateType)
 	}
 	bodyBinds := map[string]bBind{}
 	for jn, f := range c.Body {
@@ -1373,6 +1386,7 @@ func genPolishCommand(g PolishGroup, c PolishCommand, ops map[string]polishOpRef
 		}
 		t := gt(&ps, spec)
 		var kind string
+		var alias string
 		switch {
 		case t == "string":
 			kind = "string"
@@ -1384,10 +1398,13 @@ func genPolishCommand(g PolishGroup, c PolishCommand, ops map[string]polishOpRef
 			kind = "int"
 		case t == "time.Time" || t == "*time.Time":
 			kind = "time"
+		case isStringAlias(t, spec):
+			kind = "stringalias"
+			alias = strings.TrimPrefix(t, "*")
 		default:
 			polishFatal("%s: body field %q has unsupported type %s", where, jn, t)
 		}
-		bodyBinds[jn] = bBind{goFieldName(jn), kind, f, ""}
+		bodyBinds[jn] = bBind{goName: goFieldName(jn), kind: kind, f: f, aliasT: alias}
 	}
 	for jn, val := range c.BodyConst {
 		ps, ok := bodyDef.Props[jn]
@@ -1397,7 +1414,7 @@ func genPolishCommand(g PolishGroup, c PolishCommand, ops map[string]polishOpRef
 		if ps.Type != "string" {
 			polishFatal("%s: bodyConst supports string fields only (%s is %s)", where, jn, ps.Type)
 		}
-		bodyBinds[jn] = bBind{goFieldName(jn), "const", PolishBodyField{}, val}
+		bodyBinds[jn] = bBind{goName: goFieldName(jn), kind: "const", f: PolishBodyField{}, val: val}
 	}
 
 	// consts: literal call values for int query params
@@ -1441,7 +1458,7 @@ func genPolishCommand(g PolishGroup, c PolishCommand, ops map[string]polishOpRef
 		}
 	}
 	for jn, bb := range bodyBinds {
-		if bb.kind == "string" {
+		if bb.kind == "string" || bb.kind == "stringalias" {
 			vars[safeVar(bb.f.Flag)] = "s"
 		}
 		_ = jn
@@ -1571,7 +1588,7 @@ func genPolishCommand(g PolishGroup, c PolishCommand, ops map[string]polishOpRef
 		help := bb.f.Help
 		vn := safeVar(bb.f.Flag)
 		switch bb.kind {
-		case "string":
+		case "string", "stringalias":
 			varDecls = append(varDecls, fmt.Sprintf("\tvar %s string", vn))
 			reg(vn, bb.f.Flag, bb.f.Short, "", help)
 		case "time":
@@ -1618,6 +1635,15 @@ func genPolishCommand(g PolishGroup, c PolishCommand, ops map[string]polishOpRef
 			vn := safeVar(bb.f.Flag)
 			b.WriteString(fmt.Sprintf("\t\t\t%sVal, err := parseOptTime(%s)\n", vn, vn))
 			b.WriteString("\t\t\tif err != nil { return err }\n")
+		}
+	}
+	// string-alias conversions: nil-when-empty pointer to the named type
+	for _, jn := range bodyJns {
+		bb := bodyBinds[jn]
+		if bb.kind == "stringalias" {
+			vn := safeVar(bb.f.Flag)
+			b.WriteString(fmt.Sprintf("\t\t\tvar %sP *forgejo.%s\n", vn, bb.aliasT))
+			b.WriteString(fmt.Sprintf("\t\t\tif %s != \"\" { conv := forgejo.%s(%s); %sP = &conv }\n", vn, bb.aliasT, vn, vn))
 		}
 	}
 	for i := range m.Params {
@@ -1698,6 +1724,8 @@ func genPolishCommand(g PolishGroup, c PolishCommand, ops map[string]polishOpRef
 					lit += fmt.Sprintf("\n\t\t\t\t%s: %q,", bb.goName, bb.val)
 				case "time":
 					lit += fmt.Sprintf("\n\t\t\t\t%s: %sVal,", bb.goName, safeVar(bb.f.Flag))
+				case "stringalias":
+					lit += fmt.Sprintf("\n\t\t\t\t%s: %sP,", bb.goName, safeVar(bb.f.Flag))
 				default:
 					lit += fmt.Sprintf("\n\t\t\t\t%s: %s,", bb.goName, safeVar(bb.f.Flag))
 				}

@@ -78,6 +78,56 @@
           "lines": [{ "format": "Deleted milestone #%d\n", "columns": ["id"] }]
         }
       ]
+    },
+    {
+      "name": "review",
+      "short": "Create and submit code reviews on a pull request",
+      "commands": [
+        {
+          "name": "create",
+          "short": "Create a review on a pull request",
+          "op": "repoCreatePullReview",
+          "args": [
+            { "name": "index", "use": "<PR>" }
+          ],
+          "body": {
+            "body": { "flag": "body", "help": "review summary comment" },
+            "event": { "flag": "event", "help": "review verdict: APPROVED, REQUEST_CHANGES, or COMMENT", "required": true },
+            "commit_id": { "flag": "commit-id", "help": "SHA the review applies to" }
+          },
+          "lines": [{ "format": "review #%d created\n", "columns": ["Id"] }]
+        },
+        {
+          "name": "comment",
+          "short": "Add a code-anchored comment to a pending review",
+          "op": "repoCreatePullReviewComment",
+          "args": [
+            { "name": "index", "use": "<PR>" },
+            { "name": "id", "use": "<REVIEW>" }
+          ],
+          "body": {
+            "body": { "flag": "body", "help": "comment text", "required": true },
+            "path": { "flag": "path", "help": "tree path of the commented file", "required": true },
+            "old_position": { "flag": "old-position", "help": "line on the old (diff base) side, 0 to omit" },
+            "new_position": { "flag": "new-position", "help": "line on the new (diff head) side, 0 to omit" }
+          },
+          "lines": [{ "format": "comment #%d created\n", "columns": ["Id"] }]
+        },
+        {
+          "name": "submit",
+          "short": "Submit a pending review with a verdict",
+          "op": "repoSubmitPullReview",
+          "args": [
+            { "name": "index", "use": "<PR>" },
+            { "name": "id", "use": "<REVIEW>" }
+          ],
+          "body": {
+            "body": { "flag": "body", "help": "review summary comment" },
+            "event": { "flag": "event", "help": "review verdict: APPROVED, REQUEST_CHANGES, or COMMENT", "required": true }
+          },
+          "lines": [{ "format": "review #%d submitted\n", "columns": ["Id"] }]
+        }
+      ]
     }
   ]
 }
