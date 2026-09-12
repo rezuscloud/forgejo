@@ -1612,6 +1612,9 @@ func genPolishCommand(g PolishGroup, c PolishCommand, ops map[string]polishOpRef
 	use := c.Use
 	if use == "" {
 		use = c.Name
+		for _, a := range c.Args {
+			use += " " + a.Use
+		}
 	}
 	b.WriteString("\tcmd := &cobra.Command{\n")
 	b.WriteString(fmt.Sprintf("\t\tUse:   %q,\n", use))
@@ -1657,7 +1660,7 @@ func genPolishCommand(g PolishGroup, c PolishCommand, ops map[string]polishOpRef
 		}
 	}
 	// arg parses
-	for _, a := range c.Args {
+	for ai, a := range c.Args {
 		v := argVars[a.Name]
 		kind := ""
 		for i := range m.Params {
@@ -1671,10 +1674,10 @@ func genPolishCommand(g PolishGroup, c PolishCommand, ops map[string]polishOpRef
 			}
 		}
 		if kind == "int" {
-			b.WriteString(fmt.Sprintf("\t\t\t%s, err := strconv.ParseInt(args[0], 10, 64)\n", v))
-			b.WriteString(fmt.Sprintf("\t\t\tif err != nil { return fmt.Errorf(\"invalid %s: %%s\", args[0]) }\n", a.Name))
+			b.WriteString(fmt.Sprintf("\t\t\t%s, err := strconv.ParseInt(args[%d], 10, 64)\n", v, ai))
+			b.WriteString(fmt.Sprintf("\t\t\tif err != nil { return fmt.Errorf(\"invalid %s: %%s\", args[%d]) }\n", a.Name, ai))
 		} else {
-			b.WriteString(fmt.Sprintf("\t\t\t%s := args[0]\n", v))
+			b.WriteString(fmt.Sprintf("\t\t\t%s := args[%d]\n", v, ai))
 		}
 	}
 
