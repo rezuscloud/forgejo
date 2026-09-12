@@ -213,7 +213,7 @@ func newPolishReviewCreateCmd() *cobra.Command {
 	var commitId string
 	var event string
 	cmd := &cobra.Command{
-		Use:   "create",
+		Use:   "create <PR>",
 		Short: "Create a review on a pull request",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -247,7 +247,7 @@ func newPolishReviewCommentCmd() *cobra.Command {
 	var oldPosition int64
 	var path string
 	cmd := &cobra.Command{
-		Use:   "comment",
+		Use:   "comment <PR> <REVIEW>",
 		Short: "Add a code-anchored comment to a pending review",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -255,8 +255,8 @@ func newPolishReviewCommentCmd() *cobra.Command {
 			if path == "" { return fmt.Errorf("--path is required") }
 			index, err := strconv.ParseInt(args[0], 10, 64)
 			if err != nil { return fmt.Errorf("invalid index: %s", args[0]) }
-			id, err := strconv.ParseInt(args[0], 10, 64)
-			if err != nil { return fmt.Errorf("invalid id: %s", args[0]) }
+			id, err := strconv.ParseInt(args[1], 10, 64)
+			if err != nil { return fmt.Errorf("invalid id: %s", args[1]) }
 			c, owner, repo, err := resolveClient(cmd)
 			if err != nil { return err }
 			res, _, err := c.Repo.RepoCreatePullReviewComment(context.Background(), owner, repo, index, id, &forgejo.CreatePullReviewCommentOptions{
@@ -282,7 +282,7 @@ func newPolishReviewSubmitCmd() *cobra.Command {
 	var body string
 	var event string
 	cmd := &cobra.Command{
-		Use:   "submit",
+		Use:   "submit <PR> <REVIEW>",
 		Short: "Submit a pending review with a verdict",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -291,8 +291,8 @@ func newPolishReviewSubmitCmd() *cobra.Command {
 			if event != "" { conv := forgejo.ReviewStateType(event); eventP = &conv }
 			index, err := strconv.ParseInt(args[0], 10, 64)
 			if err != nil { return fmt.Errorf("invalid index: %s", args[0]) }
-			id, err := strconv.ParseInt(args[0], 10, 64)
-			if err != nil { return fmt.Errorf("invalid id: %s", args[0]) }
+			id, err := strconv.ParseInt(args[1], 10, 64)
+			if err != nil { return fmt.Errorf("invalid id: %s", args[1]) }
 			c, owner, repo, err := resolveClient(cmd)
 			if err != nil { return err }
 			res, _, err := c.Repo.RepoSubmitPullReview(context.Background(), owner, repo, index, id, &forgejo.SubmitPullReviewOptions{
