@@ -78,8 +78,9 @@ jobs:
           FORGEJO_TEST_USER: root
         run: |
           cd staging/src/forgejo.org/fj
-          # TestCLICommands exercises every hand-written fj subcommand (read +
-          # write) end-to-end against the throwaway instance.
+          # TestCLICommands exercises every fj subcommand — hand-written and
+          # descriptor-driven polished (gen/polish.json) alike (read + write)
+          # — end-to-end against the throwaway instance.
           #
           # The sibling TestSDK*/TestCLIApi*/TestGenerated_* tests (raw HTTP +
           # auto-generated `api` passthrough) pre-date CI and have known

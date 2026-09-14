@@ -19,6 +19,11 @@ func parseOptTime(s string) (*time.Time, error) {
 	return &t, nil
 }
 
+func timeArg(t *time.Time) time.Time {
+	if t == nil { return time.Time{} }
+	return *t
+}
+
 func newPolishMilestoneCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "milestone",
@@ -309,6 +314,226 @@ func newPolishReviewSubmitCmd() *cobra.Command {
 	return cmd
 }
 
+func newPolishIssueCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "issue",
+		Short: "Manage issues",
+		Aliases: []string{"issues"},
+	}
+	cmd.AddCommand(newPolishIssueListCmd())
+	cmd.AddCommand(newPolishIssueViewCmd())
+	cmd.AddCommand(newPolishIssueCommentsCmd())
+	cmd.AddCommand(newPolishIssueCreateCmd())
+	cmd.AddCommand(newPolishIssueCommentCmd())
+	cmd.AddCommand(newPolishIssueCloseCmd())
+	cmd.AddCommand(newPolishIssueReopenCmd())
+	return cmd
+}
+
+// newPolishIssueListCmd — List issues on a repo
+func newPolishIssueListCmd() *cobra.Command {
+	var state string
+	var labels string
+	var q string
+	var kind string
+	var milestones string
+	var since string
+	var before string
+	var createdBy string
+	var assignedBy string
+	var mentionedBy string
+	var sort string
+	cmd := &cobra.Command{
+		Use:   "list",
+		Short: "List issues on a repo",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			sinceVal, err := parseOptTime(since)
+			if err != nil { return err }
+			beforeVal, err := parseOptTime(before)
+			if err != nil { return err }
+			c, owner, repo, err := resolveClient(cmd)
+			if err != nil { return err }
+			res, _, err := c.Repo.IssueListIssues(context.Background(), owner, repo, state, labels, q, kind, milestones, timeArg(sinceVal), timeArg(beforeVal), createdBy, assignedBy, mentionedBy, 1, 20, sort)
+			if err != nil { return err }
+			if len(res) == 0 {
+				fmt.Println("no issues")
+				return nil
+			}
+			for _, it := range res {
+				fmt.Printf("#%d %s [%s] %s\n", it.Number, statusSymbol(stateStr(it.State)), stateStr(it.State), it.Title)
+			}
+			return nil
+		},
+	}
+	cmd.Flags().StringVarP(&state, "state", "s", "open", "issue state (open/closed/all)")
+	cmd.Flags().StringVar(&labels, "labels", "", "comma-separated label names")
+	cmd.Flags().StringVar(&q, "q", "", "search issues by string")
+	cmd.Flags().StringVar(&kind, "kind", "", "filter by type (issues/pull requests)")
+	cmd.Flags().StringVar(&milestones, "milestones", "", "comma-separated milestone names")
+	cmd.Flags().StringVar(&since, "since", "", "only issues updated after (RFC3339)")
+	cmd.Flags().StringVar(&before, "before", "", "only issues updated before (RFC3339)")
+	cmd.Flags().StringVar(&createdBy, "created-by", "", "filter by creator")
+	cmd.Flags().StringVar(&assignedBy, "assigned-by", "", "filter by assignee")
+	cmd.Flags().StringVar(&mentionedBy, "mentioned-by", "", "filter by mentioned user")
+	cmd.Flags().StringVar(&sort, "sort", "", "sort order (oldest, recentupdate, ...)")
+	return cmd
+}
+
+// newPolishIssueViewCmd — View an issue
+func newPolishIssueViewCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "view <INDEX>",
+		Short: "View an issue",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			index, err := strconv.ParseInt(args[0], 10, 64)
+			if err != nil { return fmt.Errorf("invalid index: %s", args[0]) }
+			c, owner, repo, err := resolveClient(cmd)
+			if err != nil { return err }
+			res, _, err := c.Repo.IssueGetIssue(context.Background(), owner, repo, index)
+			if err != nil { return err }
+			fmt.Printf("#%d %s\n", res.Number, res.Title)
+			fmt.Printf("State: %s\n", stateStr(res.State))
+			if res.Body != "" {
+				fmt.Printf("\n%s\n", res.Body)
+			}
+			if res.HtmlUrl != "" {
+				fmt.Printf("\nView online at %s\n", res.HtmlUrl)
+			}
+			return nil
+		},
+	}
+	return cmd
+}
+
+// newPolishIssueCommentsCmd — List comments on an issue
+func newPolishIssueCommentsCmd() *cobra.Command {
+	var since string
+	var before string
+	cmd := &cobra.Command{
+		Use:   "comments <INDEX>",
+		Short: "List comments on an issue",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			sinceVal, err := parseOptTime(since)
+			if err != nil { return err }
+			beforeVal, err := parseOptTime(before)
+			if err != nil { return err }
+			index, err := strconv.ParseInt(args[0], 10, 64)
+			if err != nil { return fmt.Errorf("invalid index: %s", args[0]) }
+			c, owner, repo, err := resolveClient(cmd)
+			if err != nil { return err }
+			res, _, err := c.Repo.IssueGetComments(context.Background(), owner, repo, index, timeArg(sinceVal), timeArg(beforeVal))
+			if err != nil { return err }
+			if len(res) == 0 {
+				fmt.Println("no comments")
+				return nil
+			}
+			for _, it := range res {
+				fmt.Printf("[%s] %s\n", timeStr(it.CreatedAt), it.Body)
+			}
+			return nil
+		},
+	}
+	cmd.Flags().StringVar(&since, "since", "", "only comments after (RFC3339)")
+	cmd.Flags().StringVar(&before, "before", "", "only comments before (RFC3339)")
+	return cmd
+}
+
+// newPolishIssueCreateCmd — Create a new issue
+func newPolishIssueCreateCmd() *cobra.Command {
+	var body string
+	var title string
+	cmd := &cobra.Command{
+		Use:   "create",
+		Short: "Create a new issue",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if title == "" { return fmt.Errorf("--title is required") }
+			c, owner, repo, err := resolveClient(cmd)
+			if err != nil { return err }
+			res, _, err := c.Repo.IssueCreateIssue(context.Background(), owner, repo, &forgejo.CreateIssueOption{
+				Body: body,
+				Title: title,
+			})
+			if err != nil { return err }
+			fmt.Printf("Created #%d: %s\n", res.Number, res.Title)
+			return nil
+		},
+	}
+	cmd.Flags().StringVarP(&body, "body", "b", "", "issue body")
+	cmd.Flags().StringVarP(&title, "title", "t", "", "issue title (required)")
+	return cmd
+}
+
+// newPolishIssueCommentCmd — Comment on an issue
+func newPolishIssueCommentCmd() *cobra.Command {
+	var body string
+	cmd := &cobra.Command{
+		Use:   "comment <INDEX>",
+		Short: "Comment on an issue",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if body == "" { return fmt.Errorf("--body is required") }
+			index, err := strconv.ParseInt(args[0], 10, 64)
+			if err != nil { return fmt.Errorf("invalid index: %s", args[0]) }
+			c, owner, repo, err := resolveClient(cmd)
+			if err != nil { return err }
+			_, _, err = c.Repo.IssueCreateComment(context.Background(), owner, repo, index, &forgejo.CreateIssueCommentOption{
+				Body: body,
+			})
+			if err != nil { return err }
+			fmt.Printf("Comment added\n", )
+			return nil
+		},
+	}
+	cmd.Flags().StringVarP(&body, "body", "b", "", "comment body (required)")
+	return cmd
+}
+
+// newPolishIssueCloseCmd — Close an issue
+func newPolishIssueCloseCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "close <INDEX>",
+		Short: "Close an issue",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			index, err := strconv.ParseInt(args[0], 10, 64)
+			if err != nil { return fmt.Errorf("invalid index: %s", args[0]) }
+			c, owner, repo, err := resolveClient(cmd)
+			if err != nil { return err }
+			_, _, err = c.Repo.IssueEditIssue(context.Background(), owner, repo, index, &forgejo.EditIssueOption{
+				State: "closed",
+			})
+			if err != nil { return err }
+			fmt.Printf("Closed #%d\n", index)
+			return nil
+		},
+	}
+	return cmd
+}
+
+// newPolishIssueReopenCmd — Reopen a closed issue
+func newPolishIssueReopenCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "reopen <INDEX>",
+		Short: "Reopen a closed issue",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			index, err := strconv.ParseInt(args[0], 10, 64)
+			if err != nil { return fmt.Errorf("invalid index: %s", args[0]) }
+			c, owner, repo, err := resolveClient(cmd)
+			if err != nil { return err }
+			_, _, err = c.Repo.IssueEditIssue(context.Background(), owner, repo, index, &forgejo.EditIssueOption{
+				State: "open",
+			})
+			if err != nil { return err }
+			fmt.Printf("Reopened #%d\n", index)
+			return nil
+		},
+	}
+	return cmd
+}
+
 // NewPolishedCmds returns the descriptor-driven polished command groups
 // (gen/polish.json). Root registers these once; adding a group is a
 // descriptor edit + regen — no hand-written command file, no root edit.
@@ -316,6 +541,7 @@ func NewPolishedCmds() []*cobra.Command {
 	return []*cobra.Command{
 		newPolishMilestoneCmd(),
 		newPolishReviewCmd(),
+		newPolishIssueCmd(),
 	}
 }
 
