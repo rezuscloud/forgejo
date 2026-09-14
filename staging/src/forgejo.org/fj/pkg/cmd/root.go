@@ -25,9 +25,9 @@ func NewRootCmd() *cobra.Command {
 	root.AddCommand(newActionsCmd())
 	root.AddCommand(newAuthCmd())
 	root.AddCommand(newRepoCmd())
-	root.AddCommand(newIssueCmd())
 	// Descriptor-driven polished groups (gen/polish.json → zz_generated_polished.go).
 	// Wired once; adding a group is a descriptor edit + regen — no root change.
+	// (issue lives here since #116: the hand-written group migrated to the descriptor.)
 	root.AddCommand(NewPolishedCmds()...)
 	root.AddCommand(newPrCmd())
 	root.AddCommand(newReleaseCmd())

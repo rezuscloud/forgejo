@@ -1224,6 +1224,14 @@ func genPolished(spec *SwaggerSpec, groups []PolishGroup) string {
 	b.WriteString("\tif err != nil { return nil, fmt.Errorf(\"invalid time (RFC3339): %s\", s) }\n")
 	b.WriteString("\treturn &t, nil\n")
 	b.WriteString("}\n\n")
+	// timeArg adapts parseOptTime's *time.Time to SDK signatures that take a
+	// value time.Time for a query param (e.g. issueListIssues since/before):
+	// an absent flag becomes the zero time, which the SDK omits from the
+	// query string — same absent-means-unfiltered semantics as the body path.
+	b.WriteString("func timeArg(t *time.Time) time.Time {\n")
+	b.WriteString("\tif t == nil { return time.Time{} }\n")
+	b.WriteString("\treturn *t\n")
+	b.WriteString("}\n\n")
 
 	for _, g := range groups {
 		b.WriteString(genPolishGroup(g, ops, spec))
@@ -1710,9 +1718,10 @@ func genPolishCommand(g PolishGroup, c PolishCommand, ops map[string]polishOpRef
 		case "query":
 			if pb, ok := paramBinds[p.Name]; ok {
 				if pb.kind == "time" {
-					polishFatal("%s: time-typed query params are not supported yet (%s)", where, p.Name)
+					callArgs = append(callArgs, "timeArg("+pb.varName+"Val)")
+				} else {
+					callArgs = append(callArgs, pb.varName)
 				}
-				callArgs = append(callArgs, pb.varName)
 			} else if cv, ok := c.Consts[p.Name]; ok {
 				callArgs = append(callArgs, strconv.FormatInt(int64(cv), 10))
 			} else {

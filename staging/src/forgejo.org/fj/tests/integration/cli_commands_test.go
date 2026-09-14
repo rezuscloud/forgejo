@@ -126,7 +126,8 @@ func contains(t *testing.T, out, want string) {
 	}
 }
 
-// TestCLICommands exercises every hand-written fj subcommand (read + write).
+// TestCLICommands exercises every fj subcommand — hand-written and
+// descriptor-driven polished (gen/polish.json) alike (read + write).
 func TestCLICommands(t *testing.T) {
 	skipIfNoInstance(t)
 	binary := buildFjBinary(t)
@@ -173,7 +174,9 @@ func TestCLICommands(t *testing.T) {
 		contains(t, out, repo)
 	})
 
-	// ---- issue: full lifecycle (create → list → view → comment → close) --
+	// ---- issue: full lifecycle (create → list → view → comment → comments →
+	// close → reopen). Descriptor-driven (gen/polish.json): every polished
+	// endpoint gets a write-path assertion here.
 	t.Run("issue", func(t *testing.T) {
 		out, err := runFj(t, binary, "issue", "create", "-r", ownerRepo,
 			"-t", "fj integration issue", "-b", "created by the integration suite")
@@ -192,23 +195,40 @@ func TestCLICommands(t *testing.T) {
 			t.Fatal(err)
 		}
 		contains(t, out, "fj integration issue")
+		contains(t, out, "State: open")
 
 		if _, err = runFj(t, binary, "issue", "comment", strconv.FormatInt(idx, 10),
 			"-b", "a test comment", "-r", ownerRepo); err != nil {
 			t.Fatal(err)
 		}
-		// --comments must render the thread we just added
-		if out, err = runFj(t, binary, "issue", "view", strconv.FormatInt(idx, 10),
-			"-c", "-r", ownerRepo); err != nil {
+		// issue comments must render the thread we just added
+		if out, err = runFj(t, binary, "issue", "comments", strconv.FormatInt(idx, 10),
+			"-r", ownerRepo); err != nil {
 			t.Fatal(err)
 		}
-		contains(t, out, "Comments")
 		contains(t, out, "a test comment")
 
 		if _, err = runFj(t, binary, "issue", "close", strconv.FormatInt(idx, 10),
 			"-r", ownerRepo); err != nil {
 			t.Fatal(err)
 		}
+		// close must be observable ...
+		if out, err = runFj(t, binary, "issue", "view", strconv.FormatInt(idx, 10),
+			"-r", ownerRepo); err != nil {
+			t.Fatal(err)
+		}
+		contains(t, out, "State: closed")
+		// ... and reopen (#116) must flip it back
+		if out, err = runFj(t, binary, "issue", "reopen", strconv.FormatInt(idx, 10),
+			"-r", ownerRepo); err != nil {
+			t.Fatal(err)
+		}
+		contains(t, out, "Reopened #")
+		if out, err = runFj(t, binary, "issue", "view", strconv.FormatInt(idx, 10),
+			"-r", ownerRepo); err != nil {
+			t.Fatal(err)
+		}
+		contains(t, out, "State: open")
 	})
 
 	// ---- milestone: full lifecycle (create → list → view → edit → close →
