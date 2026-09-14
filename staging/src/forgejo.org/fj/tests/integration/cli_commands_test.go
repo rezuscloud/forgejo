@@ -218,6 +218,12 @@ func TestCLICommands(t *testing.T) {
 			t.Fatal(err)
 		}
 		contains(t, out, "State: closed")
+		// ... via list too — the -s closed filter binding + row state column
+		if out, err = runFj(t, binary, "issue", "list", "-s", "closed",
+			"-r", ownerRepo); err != nil {
+			t.Fatal(err)
+		}
+		contains(t, out, "fj integration issue")
 		// ... and reopen (#116) must flip it back
 		if out, err = runFj(t, binary, "issue", "reopen", strconv.FormatInt(idx, 10),
 			"-r", ownerRepo); err != nil {
