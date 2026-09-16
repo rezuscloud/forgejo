@@ -208,7 +208,11 @@ func newPolishReviewCmd() *cobra.Command {
 	}
 	cmd.AddCommand(newPolishReviewCreateCmd())
 	cmd.AddCommand(newPolishReviewCommentCmd())
+	cmd.AddCommand(newPolishReviewCommentsCmd())
 	cmd.AddCommand(newPolishReviewSubmitCmd())
+	cmd.AddCommand(newPolishReviewReplyCmd())
+	cmd.AddCommand(newPolishReviewResolveCmd())
+	cmd.AddCommand(newPolishReviewUnresolveCmd())
 	return cmd
 }
 
@@ -222,7 +226,6 @@ func newPolishReviewCreateCmd() *cobra.Command {
 		Short: "Create a review on a pull request",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if event == "" { return fmt.Errorf("--event is required") }
 			var eventP *forgejo.ReviewStateType
 			if event != "" { conv := forgejo.ReviewStateType(event); eventP = &conv }
 			index, err := strconv.ParseInt(args[0], 10, 64)
@@ -241,7 +244,7 @@ func newPolishReviewCreateCmd() *cobra.Command {
 	}
 	cmd.Flags().StringVar(&body, "body", "", "review summary comment")
 	cmd.Flags().StringVar(&commitId, "commit-id", "", "SHA the review applies to")
-	cmd.Flags().StringVar(&event, "event", "", "review verdict: APPROVED, REQUEST_CHANGES, or COMMENT")
+	cmd.Flags().StringVar(&event, "event", "", "review verdict: APPROVED, REQUEST_CHANGES, or COMMENT; omit to start a pending review")
 	return cmd
 }
 
@@ -282,6 +285,34 @@ func newPolishReviewCommentCmd() *cobra.Command {
 	return cmd
 }
 
+// newPolishReviewCommentsCmd — List the comments of a review (with resolved markers)
+func newPolishReviewCommentsCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "comments <PR> <REVIEW>",
+		Short: "List the comments of a review (with resolved markers)",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			index, err := strconv.ParseInt(args[0], 10, 64)
+			if err != nil { return fmt.Errorf("invalid index: %s", args[0]) }
+			id, err := strconv.ParseInt(args[1], 10, 64)
+			if err != nil { return fmt.Errorf("invalid id: %s", args[1]) }
+			c, owner, repo, err := resolveClient(cmd)
+			if err != nil { return err }
+			res, _, err := c.Repo.RepoGetPullReviewComments(context.Background(), owner, repo, index, id)
+			if err != nil { return err }
+			if len(res) == 0 {
+				fmt.Println("no comments")
+				return nil
+			}
+			for _, it := range res {
+				fmt.Printf("#%d [%t] %s\n", it.Id, it.Resolved, it.Body)
+			}
+			return nil
+		},
+	}
+	return cmd
+}
+
 // newPolishReviewSubmitCmd — Submit a pending review with a verdict
 func newPolishReviewSubmitCmd() *cobra.Command {
 	var body string
@@ -311,6 +342,77 @@ func newPolishReviewSubmitCmd() *cobra.Command {
 	}
 	cmd.Flags().StringVar(&body, "body", "", "review summary comment")
 	cmd.Flags().StringVar(&event, "event", "", "review verdict: APPROVED, REQUEST_CHANGES, or COMMENT")
+	return cmd
+}
+
+// newPolishReviewReplyCmd — Reply to a review comment thread
+func newPolishReviewReplyCmd() *cobra.Command {
+	var body string
+	cmd := &cobra.Command{
+		Use:   "reply <PR> <COMMENT-ID>",
+		Short: "Reply to a review comment thread",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if body == "" { return fmt.Errorf("--body is required") }
+			index, err := strconv.ParseInt(args[0], 10, 64)
+			if err != nil { return fmt.Errorf("invalid index: %s", args[0]) }
+			id, err := strconv.ParseInt(args[1], 10, 64)
+			if err != nil { return fmt.Errorf("invalid id: %s", args[1]) }
+			c, owner, repo, err := resolveClient(cmd)
+			if err != nil { return err }
+			res, _, err := c.Repo.RepoCreatePullReviewCommentReply(context.Background(), owner, repo, index, id, &forgejo.CreatePullReviewCommentReplyOptions{
+				Body: body,
+			})
+			if err != nil { return err }
+			fmt.Printf("Replied to comment #%d\n", res.Id)
+			return nil
+		},
+	}
+	cmd.Flags().StringVar(&body, "body", "", "reply text")
+	return cmd
+}
+
+// newPolishReviewResolveCmd — Resolve a review comment conversation
+func newPolishReviewResolveCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "resolve <PR> <COMMENT-ID>",
+		Short: "Resolve a review comment conversation",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			index, err := strconv.ParseInt(args[0], 10, 64)
+			if err != nil { return fmt.Errorf("invalid index: %s", args[0]) }
+			id, err := strconv.ParseInt(args[1], 10, 64)
+			if err != nil { return fmt.Errorf("invalid id: %s", args[1]) }
+			c, owner, repo, err := resolveClient(cmd)
+			if err != nil { return err }
+			_, err = c.Repo.RepoCreatePullReviewCommentResolution(context.Background(), owner, repo, index, id)
+			if err != nil { return err }
+			fmt.Printf("Resolved #%d\n", id)
+			return nil
+		},
+	}
+	return cmd
+}
+
+// newPolishReviewUnresolveCmd — Unresolve a review comment conversation
+func newPolishReviewUnresolveCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "unresolve <PR> <COMMENT-ID>",
+		Short: "Unresolve a review comment conversation",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			index, err := strconv.ParseInt(args[0], 10, 64)
+			if err != nil { return fmt.Errorf("invalid index: %s", args[0]) }
+			id, err := strconv.ParseInt(args[1], 10, 64)
+			if err != nil { return fmt.Errorf("invalid id: %s", args[1]) }
+			c, owner, repo, err := resolveClient(cmd)
+			if err != nil { return err }
+			_, err = c.Repo.RepoDeletePullReviewCommentResolution(context.Background(), owner, repo, index, id)
+			if err != nil { return err }
+			fmt.Printf("Unresolved #%d\n", id)
+			return nil
+		},
+	}
 	return cmd
 }
 

@@ -2358,6 +2358,43 @@ func (s *RepoService) RepoCreatePullReviewComment(ctx context.Context, owner str
 	return &result, &Response{Response: resp}, nil
 }
 
+// RepoCreatePullReviewCommentReply — Reply to a pull review comment
+// POST /repos/{owner}/{repo}/pulls/{index}/comments/{id}/replies
+func (s *RepoService) RepoCreatePullReviewCommentReply(ctx context.Context, owner string, repo string, index int64, id int64, body *CreatePullReviewCommentReplyOptions) (*PullReviewComment, *Response, error) {
+	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/pulls/%d/comments/%d/replies", owner, repo, index, id))
+	bodyBytes, err := json.Marshal(body)
+	if err != nil { return nil, nil, fmt.Errorf("marshal: %w", err) }
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(bodyBytes))
+	req.Header.Set("Content-Type", "application/json")
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
+
+	resp, err := s.client.client.Do(req)
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
+
+	var result PullReviewComment
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
+	return &result, &Response{Response: resp}, nil
+}
+
+// RepoCreatePullReviewCommentResolution — Resolve a pull review conversation
+// PUT /repos/{owner}/{repo}/pulls/{index}/comments/{id}/resolutions
+func (s *RepoService) RepoCreatePullReviewCommentResolution(ctx context.Context, owner string, repo string, index int64, id int64) (*Response, error) {
+	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/pulls/%d/comments/%d/resolutions", owner, repo, index, id))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPut, u.String(), nil)
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
+
+	resp, err := s.client.client.Do(req)
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
+
+	return &Response{Response: resp}, nil
+}
+
 // RepoCreatePullReviewRequests — Create review requests for a pull request
 // POST /repos/{owner}/{repo}/pulls/{index}/requested_reviewers
 func (s *RepoService) RepoCreatePullReviewRequests(ctx context.Context, owner string, repo string, index int64, body *PullReviewRequestOptions) ([]PullReview, *Response, error) {
@@ -2706,6 +2743,22 @@ func (s *RepoService) RepoDeletePullReview(ctx context.Context, owner string, re
 // DELETE /repos/{owner}/{repo}/pulls/{index}/reviews/{id}/comments/{comment}
 func (s *RepoService) RepoDeletePullReviewComment(ctx context.Context, owner string, repo string, index int64, id int64, comment int64) (*Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/pulls/%d/reviews/%d/comments/%d", owner, repo, index, id, comment))
+	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
+	if err != nil { return nil, fmt.Errorf("request: %w", err) }
+
+	resp, err := s.client.client.Do(req)
+	if err != nil { return nil, fmt.Errorf("do: %w", err) }
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 400 { return nil, handleError(resp) }
+
+	return &Response{Response: resp}, nil
+}
+
+// RepoDeletePullReviewCommentResolution — Unresolve a pull review conversation
+// DELETE /repos/{owner}/{repo}/pulls/{index}/comments/{id}/resolutions
+func (s *RepoService) RepoDeletePullReviewCommentResolution(ctx context.Context, owner string, repo string, index int64, id int64) (*Response, error) {
+	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/pulls/%d/comments/%d/resolutions", owner, repo, index, id))
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
 	if err != nil { return nil, fmt.Errorf("request: %w", err) }
 

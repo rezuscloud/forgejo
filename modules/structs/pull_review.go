@@ -52,6 +52,7 @@ type PullReviewComment struct {
 	Body     string `json:"body"`
 	Poster   *User  `json:"user"`
 	Resolver *User  `json:"resolver"`
+	Resolved bool   `json:"resolved"`
 	ReviewID int64  `json:"pull_request_review_id"`
 
 	// swagger:strfmt date-time
@@ -94,6 +95,12 @@ type CreatePullReviewComment struct {
 }
 
 type CreatePullReviewCommentOptions CreatePullReviewComment
+
+// CreatePullReviewCommentReplyOptions are options to reply to a pull review comment
+// (the reply inherits the parent comment's file/line anchor)
+type CreatePullReviewCommentReplyOptions struct {
+	Body string `json:"body" binding:"Required"`
+}
 
 // SubmitPullReviewOptions are options to submit a pending pull review
 type SubmitPullReviewOptions struct {

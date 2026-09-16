@@ -557,6 +557,10 @@ type CreatePullReviewCommentOptions struct {
 	Path string `json:"path,omitempty"`
 }
 
+type CreatePullReviewCommentReplyOptions struct {
+	Body string `json:"body,omitempty"`
+}
+
 type CreatePullReviewOptions struct {
 	Body string `json:"body,omitempty"`
 	Comments []*CreatePullReviewComment `json:"comments,omitempty"`
@@ -1563,6 +1567,7 @@ type PullReviewComment struct {
 	Position int `json:"position,omitempty"`
 	PullRequestReviewId int64 `json:"pull_request_review_id,omitempty"`
 	PullRequestUrl string `json:"pull_request_url,omitempty"`
+	Resolved bool `json:"resolved,omitempty"`
 	Resolver *User `json:"resolver,omitempty"`
 	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	User *User `json:"user,omitempty"`

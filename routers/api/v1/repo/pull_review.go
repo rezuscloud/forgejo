@@ -363,6 +363,224 @@ func CreatePullReviewComment(ctx *context.APIContext) {
 	ctx.JSON(http.StatusOK, apiComment)
 }
 
+// CreatePullReviewCommentReply replies to an existing pull review comment.
+// The reply inherits the parent's file/line anchor and thread (review):
+// replies to a submitted review attach to that review; replies inside a
+// pending review attach to the poster's own pending review (same semantics
+// as the web diff view).
+func CreatePullReviewCommentReply(ctx *context.APIContext) {
+	// swagger:operation POST /repos/{owner}/{repo}/pulls/{index}/comments/{id}/replies repository repoCreatePullReviewCommentReply
+	// ---
+	// summary: Reply to a pull review comment
+	// produces:
+	// - application/json
+	// parameters:
+	// - name: owner
+	//   in: path
+	//   description: owner of the repo
+	//   type: string
+	//   required: true
+	// - name: repo
+	//   in: path
+	//   description: name of the repo
+	//   type: string
+	//   required: true
+	// - name: index
+	//   in: path
+	//   description: index of the pull request
+	//   type: integer
+	//   format: int64
+	//   required: true
+	// - name: id
+	//   in: path
+	//   description: id of the comment to reply to
+	//   type: integer
+	//   format: int64
+	//   required: true
+	// - name: body
+	//   in: body
+	//   schema:
+	//     "$ref": "#/definitions/CreatePullReviewCommentReplyOptions"
+	// responses:
+	//   "201":
+	//     "$ref": "#/responses/PullReviewComment"
+	//   "404":
+	//     "$ref": "#/responses/notFound"
+	//   "422":
+	//     "$ref": "#/responses/validationError"
+
+	opts := web.GetForm(ctx).(*api.CreatePullReviewCommentReplyOptions)
+
+	parent := ctx.Comment()
+	if parent.Type != issues_model.CommentTypeCode {
+		ctx.Error(http.StatusUnprocessableEntity, "notACodeComment", "comment is not a pull review comment")
+		return
+	}
+	issue := parent.Issue
+	if !issue.IsPull || issue.Index != ctx.ParamsInt64("index") {
+		ctx.NotFound()
+		return
+	}
+
+	parentReview, err := issues_model.GetReviewByID(ctx, parent.ReviewID)
+	if err != nil {
+		ctx.InternalServerError(err)
+		return
+	}
+	if parentReview.IssueID != issue.ID {
+		ctx.NotFound()
+		return
+	}
+
+	comment, err := pull_service.CreateCodeComment(ctx,
+		ctx.Doer(),
+		ctx.Repo().GitRepo,
+		issue,
+		parent.Line,
+		parent.ExtraLinesCount,
+		opts.Body,
+		parent.TreePath,
+		parentReview.Type == issues_model.ReviewTypePending,
+		parent.ReviewID,
+		parent.OldRef,
+		parent.CommitSHA,
+		nil,
+	)
+	if err != nil {
+		ctx.InternalServerError(err)
+		return
+	}
+
+	replyReview, err := issues_model.GetReviewByID(ctx, comment.ReviewID)
+	if err != nil {
+		ctx.InternalServerError(err)
+		return
+	}
+	if err = replyReview.LoadIssue(ctx); err != nil {
+		ctx.InternalServerError(err)
+		return
+	}
+	replyReview.Issue.Repo = ctx.Repo().Repository
+
+	apiComment, err := convert.ToPullReviewComment(ctx, replyReview, comment, ctx.Doer())
+	if err != nil {
+		ctx.InternalServerError(err)
+		return
+	}
+	ctx.JSON(http.StatusCreated, apiComment)
+}
+
+// CreatePullReviewCommentResolution resolves a pull review conversation
+func CreatePullReviewCommentResolution(ctx *context.APIContext) {
+	// swagger:operation PUT /repos/{owner}/{repo}/pulls/{index}/comments/{id}/resolutions repository repoCreatePullReviewCommentResolution
+	// ---
+	// summary: Resolve a pull review conversation
+	// parameters:
+	// - name: owner
+	//   in: path
+	//   description: owner of the repo
+	//   type: string
+	//   required: true
+	// - name: repo
+	//   in: path
+	//   description: name of the repo
+	//   type: string
+	//   required: true
+	// - name: index
+	//   in: path
+	//   description: index of the pull request
+	//   type: integer
+	//   format: int64
+	//   required: true
+	// - name: id
+	//   in: path
+	//   description: id of the (root) comment of the conversation
+	//   type: integer
+	//   format: int64
+	//   required: true
+	// responses:
+	//   "204":
+	//     "$ref": "#/responses/empty"
+	//   "403":
+	//     "$ref": "#/responses/forbidden"
+	//   "404":
+	//     "$ref": "#/responses/notFound"
+	//   "422":
+	//     "$ref": "#/responses/validationError"
+
+	resolvePullReviewConversation(ctx, true)
+}
+
+// DeletePullReviewCommentResolution unresolves a pull review conversation
+func DeletePullReviewCommentResolution(ctx *context.APIContext) {
+	// swagger:operation DELETE /repos/{owner}/{repo}/pulls/{index}/comments/{id}/resolutions repository repoDeletePullReviewCommentResolution
+	// ---
+	// summary: Unresolve a pull review conversation
+	// parameters:
+	// - name: owner
+	//   in: path
+	//   description: owner of the repo
+	//   type: string
+	//   required: true
+	// - name: repo
+	//   in: path
+	//   description: name of the repo
+	//   type: string
+	//   required: true
+	// - name: index
+	//   in: path
+	//   description: index of the pull request
+	//   type: integer
+	//   format: int64
+	//   required: true
+	// - name: id
+	//   in: path
+	//   description: id of the (root) comment of the conversation
+	//   type: integer
+	//   format: int64
+	//   required: true
+	// responses:
+	//   "204":
+	//     "$ref": "#/responses/empty"
+	//   "403":
+	//     "$ref": "#/responses/forbidden"
+	//   "404":
+	//     "$ref": "#/responses/notFound"
+	//   "422":
+	//     "$ref": "#/responses/validationError"
+
+	resolvePullReviewConversation(ctx, false)
+}
+
+func resolvePullReviewConversation(ctx *context.APIContext, resolve bool) {
+	comment := ctx.Comment()
+	if comment.Type != issues_model.CommentTypeCode {
+		ctx.Error(http.StatusUnprocessableEntity, "notACodeComment", "comment is not a pull review comment")
+		return
+	}
+	issue := comment.Issue
+	if !issue.IsPull || issue.Index != ctx.ParamsInt64("index") {
+		ctx.NotFound()
+		return
+	}
+
+	permResult, err := issues_model.CanMarkConversation(ctx, issue, ctx.Doer())
+	if err != nil {
+		ctx.InternalServerError(err)
+		return
+	}
+	if !permResult {
+		ctx.Error(http.StatusForbidden, "CanMarkConversation", "only the PR poster, official reviewers or users with write access may resolve conversations")
+		return
+	}
+
+	if err := issues_model.MarkConversation(ctx, comment, ctx.Doer(), resolve); err != nil {
+		ctx.InternalServerError(err)
+		return
+	}
+	ctx.Status(http.StatusNoContent)
+}
+
 // DeletePullReview delete a specific review from a pull request
 func DeletePullReview(ctx *context.APIContext) {
 	// swagger:operation DELETE /repos/{owner}/{repo}/pulls/{index}/reviews/{id} repository repoDeletePullReview

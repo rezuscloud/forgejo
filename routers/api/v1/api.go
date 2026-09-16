@@ -1009,6 +1009,14 @@ func Routes() *web.Route {
 						m.Combo("/requested_reviewers", reqToken()).
 							Delete(bind(api.PullReviewRequestOptions{}), repo.DeleteReviewRequests).
 							Post(bind(api.PullReviewRequestOptions{}), repo.CreateReviewRequests)
+						// GitHub-shaped review-thread operations: reply to a review
+						// comment and resolve/unresolve a conversation (#115).
+						m.Group("/comments/{id}", func() {
+							m.Post("/replies", reqToken(), mustNotBeArchived(), bind(api.CreatePullReviewCommentReplyOptions{}), repo.CreatePullReviewCommentReply)
+							m.Combo("/resolutions").
+								Put(reqToken(), repo.CreatePullReviewCommentResolution).
+								Delete(reqToken(), repo.DeletePullReviewCommentResolution)
+						}, commentAssignment("id"), reqValidCommentID())
 					})
 					m.Get("/{base}/*", repo.GetPullRequestByBaseHead)
 				}, mustAllowPulls(), reqRepoReader(unit.TypeCode), context.ReferencesGitRepo())
