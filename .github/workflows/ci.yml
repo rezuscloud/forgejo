@@ -23,6 +23,13 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        # Full history + tags: the server image build derives its version
+        # from `git describe` (FORGEJO_VERSION) — a shallow, tagless
+        # checkout yields a bare-SHA version that migration parsing
+        # rejects ("Malformed version"), like dev-build's checkout.
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
       - uses: actions/setup-go@v5
         with:
@@ -46,21 +53,7 @@ jobs:
         # The integration suite must exercise THIS tree — the fork carries
         # API endpoints upstream has not (e.g. #115 review-thread
         # reply/resolve), which no stock codeberg image can serve.
-        # RELEASE_VERSION is derived from the fork's release-line tags:
-        # shallow checkouts have no tags, and a bare-SHA version string
-        # breaks migration version parsing ("Malformed version").
-        env:
-          BASE_REF: ${{ github.event.pull_request.base.ref || github.ref_name }}
-        run: |
-          set -euo pipefail
-          TAG_PREFIX="v${BASE_REF#rezus/forgejo-}.0"
-          VER=$(git ls-remote --tags origin "refs/tags/${TAG_PREFIX}.*-rezus.*" \
-            | awk -F/ '{print $NF}' \
-            | grep -E "^${TAG_PREFIX}\.[0-9]+-rezus\.[0-9]+$" \
-            | sort -V | tail -1 || true)
-          [ -z "$VER" ] && VER="${TAG_PREFIX}.0-ci"
-          echo "RELEASE_VERSION=${VER#v}-ci.${GITHUB_SHA:0:8}"
-          docker build --build-arg RELEASE_VERSION="${VER#v}-ci.${GITHUB_SHA:0:8}" -t forgejo-ci:pr .
+        run: docker build -t forgejo-ci:pr .
 
       - name: Start Forgejo container
         run: |
