@@ -15000,6 +15000,176 @@
         }
       }
     },
+    "/repos/{owner}/{repo}/pulls/{index}/comments/{id}/replies": {
+      "post": {
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "repository"
+        ],
+        "summary": "Reply to a pull review comment",
+        "operationId": "repoCreatePullReviewCommentReply",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "owner of the repo",
+            "name": "owner",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "name of the repo",
+            "name": "repo",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "description": "index of the pull request",
+            "name": "index",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "description": "id of the comment to reply to",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/CreatePullReviewCommentReplyOptions"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "$ref": "#/responses/PullReviewComment"
+          },
+          "404": {
+            "$ref": "#/responses/notFound"
+          },
+          "422": {
+            "$ref": "#/responses/validationError"
+          }
+        }
+      }
+    },
+    "/repos/{owner}/{repo}/pulls/{index}/comments/{id}/resolutions": {
+      "put": {
+        "tags": [
+          "repository"
+        ],
+        "summary": "Resolve a pull review conversation",
+        "operationId": "repoCreatePullReviewCommentResolution",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "owner of the repo",
+            "name": "owner",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "name of the repo",
+            "name": "repo",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "description": "index of the pull request",
+            "name": "index",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "description": "id of the (root) comment of the conversation",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/responses/empty"
+          },
+          "403": {
+            "$ref": "#/responses/forbidden"
+          },
+          "404": {
+            "$ref": "#/responses/notFound"
+          },
+          "422": {
+            "$ref": "#/responses/validationError"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "repository"
+        ],
+        "summary": "Unresolve a pull review conversation",
+        "operationId": "repoDeletePullReviewCommentResolution",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "owner of the repo",
+            "name": "owner",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "name of the repo",
+            "name": "repo",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "description": "index of the pull request",
+            "name": "index",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "description": "id of the (root) comment of the conversation",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/responses/empty"
+          },
+          "403": {
+            "$ref": "#/responses/forbidden"
+          },
+          "404": {
+            "$ref": "#/responses/notFound"
+          },
+          "422": {
+            "$ref": "#/responses/validationError"
+          }
+        }
+      }
+    },
     "/repos/{owner}/{repo}/pulls/{index}/commits": {
       "get": {
         "produces": [
@@ -25139,6 +25309,20 @@
     "CreatePullReviewCommentOptions": {
       "$ref": "#/definitions/CreatePullReviewComment"
     },
+    "CreatePullReviewCommentReplyOptions": {
+      "description": "CreatePullReviewCommentReplyOptions are options to reply to a pull review comment",
+      "type": "object",
+      "required": [
+        "body"
+      ],
+      "properties": {
+        "body": {
+          "type": "string",
+          "x-go-name": "Body"
+        }
+      },
+      "x-go-package": "forgejo.org/modules/structs"
+    },
     "CreatePullReviewOptions": {
       "description": "CreatePullReviewOptions are options to create a pull review",
       "type": "object",
@@ -29071,6 +29255,11 @@
         "pull_request_url": {
           "type": "string",
           "x-go-name": "HTMLPullURL"
+        },
+        "resolved": {
+          "description": "true if the conversation is resolved",
+          "type": "boolean",
+          "x-go-name": "Resolved"
         },
         "resolver": {
           "$ref": "#/definitions/User"

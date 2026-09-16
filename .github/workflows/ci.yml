@@ -42,13 +42,19 @@ jobs:
           echo "$OUT"
           echo "$OUT" | grep -qx "forgejo-runner version ${UPSTREAM}-smoke"
 
+      - name: Build Forgejo server image from this checkout
+        # The integration suite must exercise THIS tree — the fork carries
+        # API endpoints upstream has not (e.g. #115 review-thread
+        # reply/resolve), which no stock codeberg image can serve.
+        run: docker build -t forgejo-ci:pr .
+
       - name: Start Forgejo container
         run: |
           set -euo pipefail
           docker run -d --name forgejo -p 3000:3000 \
             -e FORGEJO__security__INSTALL_LOCK=true \
             -e FORGEJO__server__LOCAL_ROOT_URL=http://localhost:3000/ \
-            codeberg.org/forgejo/forgejo:16.0.3
+            forgejo-ci:pr
           echo "::group::Waiting for Forgejo to become healthy"
           for i in $(seq 1 90); do
             if curl -sf http://localhost:3000/api/v1/version >/dev/null 2>&1; then

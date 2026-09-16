@@ -223,8 +223,7 @@
             },
             "event": {
               "flag": "event",
-              "help": "review verdict: APPROVED, REQUEST_CHANGES, or COMMENT",
-              "required": true
+              "help": "review verdict: APPROVED, REQUEST_CHANGES, or COMMENT; omit to start a pending review"
             },
             "commit_id": {
               "flag": "commit-id",
@@ -284,6 +283,30 @@
           ]
         },
         {
+          "name": "comments",
+          "short": "List the comments of a review (with resolved markers)",
+          "op": "repoGetPullReviewComments",
+          "args": [
+            {
+              "name": "index",
+              "use": "<PR>"
+            },
+            {
+              "name": "id",
+              "use": "<REVIEW>"
+            }
+          ],
+          "row": {
+            "format": "#%d [%t] %s\n",
+            "columns": [
+              "Id",
+              "Resolved",
+              "Body"
+            ]
+          },
+          "empty": "no comments"
+        },
+        {
           "name": "submit",
           "short": "Submit a pending review with a verdict",
           "op": "repoSubmitPullReview",
@@ -313,6 +336,82 @@
               "format": "review #%d submitted\n",
               "columns": [
                 "Id"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "reply",
+          "short": "Reply to a review comment thread",
+          "op": "repoCreatePullReviewCommentReply",
+          "args": [
+            {
+              "name": "index",
+              "use": "<PR>"
+            },
+            {
+              "name": "id",
+              "use": "<COMMENT-ID>"
+            }
+          ],
+          "body": {
+            "body": {
+              "flag": "body",
+              "help": "reply text",
+              "required": true
+            }
+          },
+          "lines": [
+            {
+              "format": "Replied to comment #%d\n",
+              "columns": [
+                "Id"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "resolve",
+          "short": "Resolve a review comment conversation",
+          "op": "repoCreatePullReviewCommentResolution",
+          "args": [
+            {
+              "name": "index",
+              "use": "<PR>"
+            },
+            {
+              "name": "id",
+              "use": "<COMMENT-ID>"
+            }
+          ],
+          "lines": [
+            {
+              "format": "Resolved #%d\n",
+              "columns": [
+                "id"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "unresolve",
+          "short": "Unresolve a review comment conversation",
+          "op": "repoDeletePullReviewCommentResolution",
+          "args": [
+            {
+              "name": "index",
+              "use": "<PR>"
+            },
+            {
+              "name": "id",
+              "use": "<COMMENT-ID>"
+            }
+          ],
+          "lines": [
+            {
+              "format": "Unresolved #%d\n",
+              "columns": [
+                "id"
               ]
             }
           ]

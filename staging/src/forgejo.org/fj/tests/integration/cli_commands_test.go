@@ -313,6 +313,69 @@ func TestCLICommands(t *testing.T) {
 		}
 	})
 
+	// ---- review: pending → comment → submit → reply → resolve (#115) ----
+	t.Run("review", func(t *testing.T) {
+		createFileOnBranch(t, repo, "review.txt", "", "review-branch", "hello")
+		out, err := runFj(t, binary, "pr", "create", "-r", ownerRepo,
+			"-t", "fj integration review PR", "--head", "review-branch", "--base", "main")
+		if err != nil {
+			t.Fatal(err)
+		}
+		idx := extractID(t, out)
+
+		// no event => pending review (API semantics: CreatePullReview with empty event)
+		if out, err = runFj(t, binary, "review", "create", strconv.FormatInt(idx, 10),
+			"-r", ownerRepo, "--body", "adversarial pass"); err != nil {
+			t.Fatal(err)
+		}
+		contains(t, out, "review #")
+		reviewID := extractID(t, out)
+
+		if out, err = runFj(t, binary, "review", "comment", strconv.FormatInt(idx, 10),
+			strconv.FormatInt(reviewID, 10), "-r", ownerRepo,
+			"--body", "finding: loosen the coupling", "--path", "review.txt", "--new-position", "1"); err != nil {
+			t.Fatal(err)
+		}
+		commentID := extractID(t, out)
+
+		if out, err = runFj(t, binary, "review", "submit", strconv.FormatInt(idx, 10),
+			strconv.FormatInt(reviewID, 10), "-r", ownerRepo, "--event", "COMMENT",
+			"--body", "verdict: findings tracked in threads"); err != nil {
+			t.Fatal(err)
+		}
+		contains(t, out, fmt.Sprintf("review #%d submitted", reviewID))
+
+		// reply lands in the same thread (#115)
+		if out, err = runFj(t, binary, "review", "reply", strconv.FormatInt(idx, 10),
+			strconv.FormatInt(commentID, 10), "-r", ownerRepo, "--body", "fix: decoupled in abc123"); err != nil {
+			t.Fatal(err)
+		}
+		contains(t, out, "Replied to comment #")
+
+		// resolve / unresolve the conversation (#115) — observable via comments listing
+		if out, err = runFj(t, binary, "review", "resolve", strconv.FormatInt(idx, 10),
+			strconv.FormatInt(commentID, 10), "-r", ownerRepo); err != nil {
+			t.Fatal(err)
+		}
+		contains(t, out, fmt.Sprintf("Resolved #%d", commentID))
+		if out, err = runFj(t, binary, "review", "comments", strconv.FormatInt(idx, 10),
+			strconv.FormatInt(reviewID, 10), "-r", ownerRepo); err != nil {
+			t.Fatal(err)
+		}
+		contains(t, out, fmt.Sprintf("#%d [true]", commentID))
+
+		if out, err = runFj(t, binary, "review", "unresolve", strconv.FormatInt(idx, 10),
+			strconv.FormatInt(commentID, 10), "-r", ownerRepo); err != nil {
+			t.Fatal(err)
+		}
+		contains(t, out, fmt.Sprintf("Unresolved #%d", commentID))
+		if out, err = runFj(t, binary, "review", "comments", strconv.FormatInt(idx, 10),
+			strconv.FormatInt(reviewID, 10), "-r", ownerRepo); err != nil {
+			t.Fatal(err)
+		}
+		contains(t, out, fmt.Sprintf("#%d [false]", commentID))
+	})
+
 	// ---- release: create → list → view → delete -----------------------
 	t.Run("release", func(t *testing.T) {
 		out, err := runFj(t, binary, "release", "create", "-r", ownerRepo,

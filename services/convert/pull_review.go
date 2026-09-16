@@ -80,11 +80,17 @@ func ToPullReviewList(ctx context.Context, rl []*issues_model.Review, doer *user
 
 // ToPullReviewCommentList convert the CodeComments of an review to it's api format
 func ToPullReviewComment(ctx context.Context, review *issues_model.Review, comment *issues_model.Comment, doer *user_model.User) (*api.PullReviewComment, error) {
+	// ResolveDoer is xorm:"-": it must be loaded explicitly for the
+	// resolver/resolved fields to be populated (otherwise always nil).
+	if err := (issues_model.CommentList{comment}).LoadResolveDoers(ctx); err != nil {
+		return nil, err
+	}
 	apiComment := &api.PullReviewComment{
 		ID:              comment.ID,
 		Body:            comment.Content,
 		Poster:          ToUser(ctx, comment.Poster, doer),
 		Resolver:        ToUser(ctx, comment.ResolveDoer, doer),
+		Resolved:        comment.ResolveDoer != nil,
 		ReviewID:        review.ID,
 		Created:         comment.CreatedUnix.AsTime(),
 		Updated:         comment.UpdatedUnix.AsTime(),

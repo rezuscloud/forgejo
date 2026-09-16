@@ -810,3 +810,128 @@ func reviewsCountCheck(t *testing.T, name string, issueID, reviewerID int64, exp
 		}, approvalCount)
 	})
 }
+
+func TestAPIPullReviewCommentReplyResolve(t *testing.T) {
+	defer tests.PrepareTestEnv(t)()
+	pullIssue := unittest.AssertExistsAndLoadBean(t, &issues_model.Issue{ID: 3})
+	require.NoError(t, pullIssue.LoadAttributes(db.DefaultContext))
+	repo := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: pullIssue.RepoID})
+
+	// user2 owns repo1 → write access (may resolve); poster is user1.
+	// Scope "all": the 422 case also posts a plain issue comment (write:issue).
+	session := loginUser(t, "user2")
+	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeAll)
+
+	var review api.PullReview
+	{
+		req := NewRequestWithJSON(t, http.MethodPost, fmt.Sprintf("/api/v1/repos/%s/pulls/%d/reviews", repo.FullName(), pullIssue.Index), &api.CreatePullReviewOptions{
+			Body:  "adversarial pass",
+			Event: api.ReviewStateComment,
+		}).AddTokenAuth(token)
+		resp := MakeRequest(t, req, http.StatusOK)
+		DecodeJSON(t, resp, &review)
+	}
+
+	var rootComment api.PullReviewComment
+	{
+		req := NewRequestWithJSON(t, http.MethodPost, fmt.Sprintf("/api/v1/repos/%s/pulls/%d/reviews/%d/comments", repo.FullName(), pullIssue.Index, review.ID), &api.CreatePullReviewCommentOptions{
+			Path:       "README.md",
+			Body:       "finding: loosen the coupling",
+			OldLineNum: 1,
+		}).AddTokenAuth(token)
+		resp := MakeRequest(t, req, http.StatusOK)
+		DecodeJSON(t, resp, &rootComment)
+		assert.False(t, rootComment.Resolved)
+		assert.Nil(t, rootComment.Resolver)
+	}
+
+	// reply lands in the same thread and inherits the anchor (#115)
+	var reply api.PullReviewComment
+	{
+		req := NewRequestWithJSON(t, http.MethodPost, fmt.Sprintf("/api/v1/repos/%s/pulls/%d/comments/%d/replies", repo.FullName(), pullIssue.Index, rootComment.ID), &api.CreatePullReviewCommentReplyOptions{
+			Body: "fix: decoupled in abc123",
+		}).AddTokenAuth(token)
+		resp := MakeRequest(t, req, http.StatusCreated)
+		DecodeJSON(t, resp, &reply)
+		assert.Equal(t, rootComment.ReviewID, reply.ReviewID)
+		assert.Equal(t, rootComment.Path, reply.Path)
+		assert.EqualValues(t, rootComment.LineNum, reply.LineNum)
+		assert.EqualValues(t, rootComment.OldLineNum, reply.OldLineNum)
+	}
+
+	// the review thread now holds both comments
+	{
+		req := NewRequestf(t, http.MethodGet, "/api/v1/repos/%s/pulls/%d/reviews/%d/comments", repo.FullName(), pullIssue.Index, review.ID).
+			AddTokenAuth(token)
+		resp := MakeRequest(t, req, http.StatusOK)
+		var comments []*api.PullReviewComment
+		DecodeJSON(t, resp, &comments)
+		require.Len(t, comments, 2)
+	}
+
+	// resolve → read back resolver + resolved; idempotent (#115)
+	{
+		req := NewRequestf(t, http.MethodPut, "/api/v1/repos/%s/pulls/%d/comments/%d/resolutions", repo.FullName(), pullIssue.Index, rootComment.ID).
+			AddTokenAuth(token)
+		MakeRequest(t, req, http.StatusNoContent)
+		MakeRequest(t, req, http.StatusNoContent) // idempotent
+	}
+	{
+		req := NewRequestf(t, http.MethodGet, "/api/v1/repos/%s/pulls/%d/reviews/%d/comments/%d", repo.FullName(), pullIssue.Index, review.ID, rootComment.ID).
+			AddTokenAuth(token)
+		resp := MakeRequest(t, req, http.StatusOK)
+		var comment api.PullReviewComment
+		DecodeJSON(t, resp, &comment)
+		assert.True(t, comment.Resolved)
+		require.NotNil(t, comment.Resolver)
+		assert.Equal(t, "user2", comment.Resolver.UserName)
+	}
+
+	// unresolve → cleared (#115)
+	{
+		req := NewRequestf(t, http.MethodDelete, "/api/v1/repos/%s/pulls/%d/comments/%d/resolutions", repo.FullName(), pullIssue.Index, rootComment.ID).
+			AddTokenAuth(token)
+		MakeRequest(t, req, http.StatusNoContent)
+	}
+	{
+		req := NewRequestf(t, http.MethodGet, "/api/v1/repos/%s/pulls/%d/reviews/%d/comments/%d", repo.FullName(), pullIssue.Index, review.ID, rootComment.ID).
+			AddTokenAuth(token)
+		resp := MakeRequest(t, req, http.StatusOK)
+		var comment api.PullReviewComment
+		DecodeJSON(t, resp, &comment)
+		assert.False(t, comment.Resolved)
+		assert.Nil(t, comment.Resolver)
+	}
+
+	// a read-only user may not resolve (CanMarkConversation: poster/write/official)
+	{
+		readOnlySession := loginUser(t, "user8")
+		readOnlyToken := getTokenForLoggedInUser(t, readOnlySession, auth_model.AccessTokenScopeWriteRepository)
+		req := NewRequestf(t, http.MethodPut, "/api/v1/repos/%s/pulls/%d/comments/%d/resolutions", repo.FullName(), pullIssue.Index, rootComment.ID).
+			AddTokenAuth(readOnlyToken)
+		MakeRequest(t, req, http.StatusForbidden)
+	}
+
+	// a plain (non-review) PR comment is not a reply target → 422
+	{
+		req := NewRequestWithJSON(t, http.MethodPost, fmt.Sprintf("/api/v1/repos/%s/issues/%d/comments", repo.FullName(), pullIssue.Index), &api.CreateIssueCommentOption{
+			Body: "plain comment",
+		}).AddTokenAuth(token)
+		resp := MakeRequest(t, req, http.StatusCreated)
+		var plain api.Comment
+		DecodeJSON(t, resp, &plain)
+
+		req = NewRequestWithJSON(t, http.MethodPost, fmt.Sprintf("/api/v1/repos/%s/pulls/%d/comments/%d/replies", repo.FullName(), pullIssue.Index, plain.ID), &api.CreatePullReviewCommentReplyOptions{
+			Body: "should fail",
+		}).AddTokenAuth(token)
+		MakeRequest(t, req, http.StatusUnprocessableEntity)
+	}
+
+	// comment from another PR → 404 (no cross-PR hijack)
+	{
+		req := NewRequestWithJSON(t, http.MethodPost, fmt.Sprintf("/api/v1/repos/%s/pulls/%d/comments/%d/replies", repo.FullName(), pullIssue.Index+1000, rootComment.ID), &api.CreatePullReviewCommentReplyOptions{
+			Body: "should fail",
+		}).AddTokenAuth(token)
+		MakeRequest(t, req, http.StatusNotFound)
+	}
+}
