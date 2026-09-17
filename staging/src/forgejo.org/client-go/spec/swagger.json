@@ -15958,6 +15958,9 @@
           "200": {
             "$ref": "#/responses/PullReviewComment"
           },
+          "201": {
+            "$ref": "#/responses/PullReviewComment"
+          },
           "404": {
             "$ref": "#/responses/notFound"
           },
@@ -25307,7 +25310,7 @@
       "x-go-package": "forgejo.org/modules/structs"
     },
     "CreatePullReviewCommentOptions": {
-      "description": "CreatePullReviewCommentOptions are options to add a comment to a pull review. Enriched by hand: the server type is an alias (CreatePullReviewComment), so swaggo reflection emits an empty schema and upstream can never produce these properties — see rezuscloud/forgejo#109.",
+      "description": "CreatePullReviewCommentOptions are options to add a single comment to a\npull request review. Unlike CreatePullReviewComment it can create a\nthreaded reply via in_reply_to (the single-comment endpoint only; review\ncreation always anchors fresh comments).",
       "type": "object",
       "properties": {
         "body": {
@@ -25315,21 +25318,31 @@
           "x-go-name": "Body"
         },
         "extra_lines_count": {
+          "description": "number of additional lines after the commented line (0 = single line comment)",
           "type": "integer",
           "format": "int64",
           "x-go-name": "ExtraLinesCount"
         },
+        "in_reply_to": {
+          "description": "id of the review comment to reply to: the comment joins the parent's\nthread and inherits its file/line anchor, so path and positions must\nbe unset",
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "InReplyTo"
+        },
         "new_position": {
+          "description": "if comment to new file line or 0",
           "type": "integer",
           "format": "int64",
           "x-go-name": "NewLineNum"
         },
         "old_position": {
+          "description": "if comment to old file line or 0",
           "type": "integer",
           "format": "int64",
           "x-go-name": "OldLineNum"
         },
         "path": {
+          "description": "the tree path",
           "type": "string",
           "x-go-name": "Path"
         }
@@ -29248,6 +29261,12 @@
           "type": "integer",
           "format": "int64",
           "x-go-name": "ID"
+        },
+        "in_reply_to": {
+          "description": "id of the first comment of the thread this comment belongs to; 0 when\nthis comment is itself the thread head. Derived from the thread, not\nstored.",
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "InReplyTo"
         },
         "original_commit_id": {
           "type": "string",

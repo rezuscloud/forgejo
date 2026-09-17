@@ -309,12 +309,46 @@ func CreatePullReviewComment(ctx *context.APIContext) {
 	// responses:
 	//   "200":
 	//     "$ref": "#/responses/PullReviewComment"
+	//   "201":
+	//     "$ref": "#/responses/PullReviewComment"
 	//   "404":
 	//     "$ref": "#/responses/notFound"
 	//   "422":
 	//     "$ref": "#/responses/validationError"
 
 	opts := web.GetForm(ctx).(*api.CreatePullReviewCommentOptions)
+
+	if opts.InReplyTo != 0 {
+		// GitHub-shaped reply: the comment joins the parent's thread and
+		// inherits its anchor — anchor fields must not be set alongside.
+		if opts.Path != "" || opts.OldLineNum != 0 || opts.NewLineNum != 0 || opts.ExtraLinesCount != 0 {
+			ctx.Error(http.StatusUnprocessableEntity, "inReplyToWithAnchor", "in_reply_to cannot be combined with path, old_position, new_position or extra_lines_count")
+			return
+		}
+		if opts.Body == "" {
+			ctx.Error(http.StatusUnprocessableEntity, "emptyReplyBody", "body is required when replying via in_reply_to")
+			return
+		}
+		parent, err := issues_model.GetCommentByID(ctx, opts.InReplyTo)
+		if err != nil {
+			if issues_model.IsErrCommentNotExist(err) {
+				ctx.NotFound()
+			} else {
+				ctx.InternalServerError(err)
+			}
+			return
+		}
+		if err := parent.LoadIssue(ctx); err != nil {
+			ctx.InternalServerError(err)
+			return
+		}
+		if parent.Issue.RepoID != ctx.Repo().Repository.ID {
+			ctx.NotFound()
+			return
+		}
+		createPullReviewCommentReply(ctx, parent, opts.Body)
+		return
+	}
 
 	review, pr, statusSet := prepareSingleReview(ctx)
 	if statusSet {
@@ -410,8 +444,14 @@ func CreatePullReviewCommentReply(ctx *context.APIContext) {
 	//     "$ref": "#/responses/validationError"
 
 	opts := web.GetForm(ctx).(*api.CreatePullReviewCommentReplyOptions)
+	createPullReviewCommentReply(ctx, ctx.Comment(), opts.Body)
+}
 
-	parent := ctx.Comment()
+// createPullReviewCommentReply places a reply on the parent comment's thread,
+// inheriting its file/line anchor (pull_service.CreateCodeComment with the
+// parent's review id — same semantics as the web diff view). Shared by the
+// /replies endpoint and the in_reply_to field of repoCreatePullReviewComment.
+func createPullReviewCommentReply(ctx *context.APIContext, parent *issues_model.Comment, body string) {
 	if parent.Type != issues_model.CommentTypeCode {
 		ctx.Error(http.StatusUnprocessableEntity, "notACodeComment", "comment is not a pull review comment")
 		return
@@ -438,7 +478,7 @@ func CreatePullReviewCommentReply(ctx *context.APIContext) {
 		issue,
 		parent.Line,
 		parent.ExtraLinesCount,
-		opts.Body,
+		body,
 		parent.TreePath,
 		parentReview.Type == issues_model.ReviewTypePending,
 		parent.ReviewID,

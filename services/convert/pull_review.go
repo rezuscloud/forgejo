@@ -78,11 +78,38 @@ func ToPullReviewList(ctx context.Context, rl []*issues_model.Review, doer *user
 	return result, nil
 }
 
+// codeConversationHeadID returns the id of the first comment of the thread the
+// given code comment belongs to: all code comments of the same review sharing
+// the comment's (tree path, line) anchor, ordered by (created_unix, id). A
+// thread is implicit in the data model — replies are code comments sharing the
+// parent's anchor and review — so in_reply_to is derived, not stored. Returns
+// 0 when the comment is itself the thread head.
+func codeConversationHeadID(ctx context.Context, comment *issues_model.Comment) (int64, error) {
+	comments, err := issues_model.FindComments(ctx, &issues_model.FindCommentsOptions{
+		Type:     issues_model.CommentTypeCode,
+		IssueID:  comment.IssueID,
+		ReviewID: comment.ReviewID,
+		TreePath: comment.TreePath,
+		Line:     comment.Line,
+	})
+	if err != nil {
+		return 0, err
+	}
+	if len(comments) == 0 || comments[0].ID == comment.ID {
+		return 0, nil
+	}
+	return comments[0].ID, nil
+}
+
 // ToPullReviewCommentList convert the CodeComments of an review to it's api format
 func ToPullReviewComment(ctx context.Context, review *issues_model.Review, comment *issues_model.Comment, doer *user_model.User) (*api.PullReviewComment, error) {
 	// ResolveDoer is xorm:"-": it must be loaded explicitly for the
 	// resolver/resolved fields to be populated (otherwise always nil).
 	if err := (issues_model.CommentList{comment}).LoadResolveDoers(ctx); err != nil {
+		return nil, err
+	}
+	inReplyTo, err := codeConversationHeadID(ctx, comment)
+	if err != nil {
 		return nil, err
 	}
 	apiComment := &api.PullReviewComment{
@@ -92,6 +119,7 @@ func ToPullReviewComment(ctx context.Context, review *issues_model.Review, comme
 		Resolver:        ToUser(ctx, comment.ResolveDoer, doer),
 		Resolved:        comment.ResolveDoer != nil,
 		ReviewID:        review.ID,
+		InReplyTo:       inReplyTo,
 		Created:         comment.CreatedUnix.AsTime(),
 		Updated:         comment.UpdatedUnix.AsTime(),
 		Path:            comment.TreePath,

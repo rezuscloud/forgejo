@@ -52,8 +52,13 @@ type PullReviewComment struct {
 	Body     string `json:"body"`
 	Poster   *User  `json:"user"`
 	Resolver *User  `json:"resolver"`
+	// true if the conversation is resolved
 	Resolved bool   `json:"resolved"`
 	ReviewID int64  `json:"pull_request_review_id"`
+	// id of the first comment of the thread this comment belongs to; 0 when
+	// this comment is itself the thread head. Derived from the thread, not
+	// stored.
+	InReplyTo int64 `json:"in_reply_to"`
 
 	// swagger:strfmt date-time
 	Created time.Time `json:"created_at"`
@@ -94,7 +99,25 @@ type CreatePullReviewComment struct {
 	ExtraLinesCount int64 `json:"extra_lines_count"`
 }
 
-type CreatePullReviewCommentOptions CreatePullReviewComment
+// CreatePullReviewCommentOptions are options to add a single comment to a
+// pull request review. Unlike CreatePullReviewComment it can create a
+// threaded reply via in_reply_to (the single-comment endpoint only; review
+// creation always anchors fresh comments).
+type CreatePullReviewCommentOptions struct {
+	// the tree path
+	Path string `json:"path"`
+	Body string `json:"body"`
+	// if comment to old file line or 0
+	OldLineNum int64 `json:"old_position"`
+	// if comment to new file line or 0
+	NewLineNum int64 `json:"new_position"`
+	// number of additional lines after the commented line (0 = single line comment)
+	ExtraLinesCount int64 `json:"extra_lines_count"`
+	// id of the review comment to reply to: the comment joins the parent's
+	// thread and inherits its file/line anchor, so path and positions must
+	// be unset
+	InReplyTo int64 `json:"in_reply_to"`
+}
 
 // CreatePullReviewCommentReplyOptions are options to reply to a pull review comment
 // (the reply inherits the parent comment's file/line anchor)

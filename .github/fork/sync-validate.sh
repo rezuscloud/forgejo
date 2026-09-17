@@ -26,6 +26,17 @@ FJ_DIR="$(pwd)/staging/src/forgejo.org/fj"
 SIGNATURES=(
   "go.mod|forgejo.org/client-go => ./staging/src/forgejo.org/client-go"
   "go.mod|forgejo.org/fj => ./staging/src/forgejo.org/fj"
+  # review-thread API delta (#115/#118, #119): reply + resolve + in_reply_to
+  "modules/structs/pull_review.go|CreatePullReviewCommentReplyOptions"
+  "modules/structs/pull_review.go|InReplyTo int64"
+  "routers/api/v1/api.go|m.Post(\"/replies\", reqToken(), mustNotBeArchived(), bind(api.CreatePullReviewCommentReplyOptions{})"
+  "routers/api/v1/api.go|/resolutions"
+  "routers/api/v1/repo/pull_review.go|createPullReviewCommentReply"
+  "routers/api/v1/repo/pull_review.go|CreatePullReviewCommentResolution"
+  "services/convert/pull_review.go|codeConversationHeadID"
+  "services/convert/pull_review.go|LoadResolveDoers"
+  "templates/swagger/v1_json.tmpl|\"in_reply_to\""
+  "tests/integration/api_pull_review_test.go|TestAPIPullReviewCommentReplyResolve"
 )
 
 echo "== [1/4] SDK regen (only if swagger changed) =="

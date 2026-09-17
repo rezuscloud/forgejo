@@ -6951,6 +6951,58 @@ actions, etc.) instead.`,
 		_ = mc.MarkFlagRequired("id")
 		svcCmd.AddCommand(mc)
 		}
+		{ // POST /repos/{owner}/{repo}/pulls/{index}/comments/{id}/replies -> Repo.RepoCreatePullReviewCommentReply
+		mc := &cobra.Command{Use: "create-pull-review-comment-reply", Short: "Reply to a pull review comment"}
+		var repocreatepullreviewcommentreply_owner string
+		mc.Flags().StringVar(&repocreatepullreviewcommentreply_owner, "owner", "", "owner")
+		var repocreatepullreviewcommentreply_repo string
+		mc.Flags().StringVar(&repocreatepullreviewcommentreply_repo, "repo", "", "repo")
+		var repocreatepullreviewcommentreply_index int64
+		mc.Flags().Int64Var(&repocreatepullreviewcommentreply_index, "index", 0, "index")
+		var repocreatepullreviewcommentreply_id int64
+		mc.Flags().Int64Var(&repocreatepullreviewcommentreply_id, "id", 0, "id")
+		var repocreatepullreviewcommentreply_body string
+		mc.Flags().StringVar(&repocreatepullreviewcommentreply_body, "body", "", "body")
+		mc.RunE = func(cmd *cobra.Command, args []string) error {
+			cli, e := resolveHostClient(cmd, "")
+			if e != nil { return e }
+			var bodyVal forgejo.CreatePullReviewCommentReplyOptions
+			if repocreatepullreviewcommentreply_body != "" { json.Unmarshal([]byte(repocreatepullreviewcommentreply_body), &bodyVal) }
+			res, _, err := cli.Repo.RepoCreatePullReviewCommentReply(context.Background(), repocreatepullreviewcommentreply_owner, repocreatepullreviewcommentreply_repo, repocreatepullreviewcommentreply_index, repocreatepullreviewcommentreply_id, &bodyVal)
+			if err != nil { return err }
+			j, _ := json.MarshalIndent(res, "", "  ")
+			fmt.Println(string(j))
+			return nil
+		}
+		_ = mc.MarkFlagRequired("owner")
+		_ = mc.MarkFlagRequired("repo")
+		_ = mc.MarkFlagRequired("index")
+		_ = mc.MarkFlagRequired("id")
+		svcCmd.AddCommand(mc)
+		}
+		{ // PUT /repos/{owner}/{repo}/pulls/{index}/comments/{id}/resolutions -> Repo.RepoCreatePullReviewCommentResolution
+		mc := &cobra.Command{Use: "create-pull-review-comment-resolution", Short: "Resolve a pull review conversation"}
+		var repocreatepullreviewcommentresolution_owner string
+		mc.Flags().StringVar(&repocreatepullreviewcommentresolution_owner, "owner", "", "owner")
+		var repocreatepullreviewcommentresolution_repo string
+		mc.Flags().StringVar(&repocreatepullreviewcommentresolution_repo, "repo", "", "repo")
+		var repocreatepullreviewcommentresolution_index int64
+		mc.Flags().Int64Var(&repocreatepullreviewcommentresolution_index, "index", 0, "index")
+		var repocreatepullreviewcommentresolution_id int64
+		mc.Flags().Int64Var(&repocreatepullreviewcommentresolution_id, "id", 0, "id")
+		mc.RunE = func(cmd *cobra.Command, args []string) error {
+			cli, e := resolveHostClient(cmd, "")
+			if e != nil { return e }
+			_, err := cli.Repo.RepoCreatePullReviewCommentResolution(context.Background(), repocreatepullreviewcommentresolution_owner, repocreatepullreviewcommentresolution_repo, repocreatepullreviewcommentresolution_index, repocreatepullreviewcommentresolution_id)
+			if err != nil { return err }
+			return nil
+		}
+		_ = mc.MarkFlagRequired("owner")
+		_ = mc.MarkFlagRequired("repo")
+		_ = mc.MarkFlagRequired("index")
+		_ = mc.MarkFlagRequired("id")
+		svcCmd.AddCommand(mc)
+		}
 		{ // POST /repos/{owner}/{repo}/pulls/{index}/requested_reviewers -> Repo.RepoCreatePullReviewRequests
 		mc := &cobra.Command{Use: "create-pull-review-requests", Short: "Create review requests for a pull request"}
 		var repocreatepullreviewrequests_owner string
@@ -7385,6 +7437,29 @@ actions, etc.) instead.`,
 		_ = mc.MarkFlagRequired("index")
 		_ = mc.MarkFlagRequired("id")
 		_ = mc.MarkFlagRequired("comment")
+		svcCmd.AddCommand(mc)
+		}
+		{ // DELETE /repos/{owner}/{repo}/pulls/{index}/comments/{id}/resolutions -> Repo.RepoDeletePullReviewCommentResolution
+		mc := &cobra.Command{Use: "delete-pull-review-comment-resolution", Short: "Unresolve a pull review conversation"}
+		var repodeletepullreviewcommentresolution_owner string
+		mc.Flags().StringVar(&repodeletepullreviewcommentresolution_owner, "owner", "", "owner")
+		var repodeletepullreviewcommentresolution_repo string
+		mc.Flags().StringVar(&repodeletepullreviewcommentresolution_repo, "repo", "", "repo")
+		var repodeletepullreviewcommentresolution_index int64
+		mc.Flags().Int64Var(&repodeletepullreviewcommentresolution_index, "index", 0, "index")
+		var repodeletepullreviewcommentresolution_id int64
+		mc.Flags().Int64Var(&repodeletepullreviewcommentresolution_id, "id", 0, "id")
+		mc.RunE = func(cmd *cobra.Command, args []string) error {
+			cli, e := resolveHostClient(cmd, "")
+			if e != nil { return e }
+			_, err := cli.Repo.RepoDeletePullReviewCommentResolution(context.Background(), repodeletepullreviewcommentresolution_owner, repodeletepullreviewcommentresolution_repo, repodeletepullreviewcommentresolution_index, repodeletepullreviewcommentresolution_id)
+			if err != nil { return err }
+			return nil
+		}
+		_ = mc.MarkFlagRequired("owner")
+		_ = mc.MarkFlagRequired("repo")
+		_ = mc.MarkFlagRequired("index")
+		_ = mc.MarkFlagRequired("id")
 		svcCmd.AddCommand(mc)
 		}
 		{ // DELETE /repos/{owner}/{repo}/pulls/{index}/requested_reviewers -> Repo.RepoDeletePullReviewRequests
