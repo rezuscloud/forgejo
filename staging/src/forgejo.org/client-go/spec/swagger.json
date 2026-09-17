@@ -15027,19 +15027,19 @@
           },
           {
             "type": "integer",
+            "format": "int64",
             "description": "index of the pull request",
             "name": "index",
             "in": "path",
-            "required": true,
-            "format": "int64"
+            "required": true
           },
           {
             "type": "integer",
+            "format": "int64",
             "description": "id of the comment to reply to",
             "name": "id",
             "in": "path",
-            "required": true,
-            "format": "int64"
+            "required": true
           },
           {
             "name": "body",
@@ -15086,19 +15086,19 @@
           },
           {
             "type": "integer",
+            "format": "int64",
             "description": "index of the pull request",
             "name": "index",
             "in": "path",
-            "required": true,
-            "format": "int64"
+            "required": true
           },
           {
             "type": "integer",
+            "format": "int64",
             "description": "id of the (root) comment of the conversation",
             "name": "id",
             "in": "path",
-            "required": true,
-            "format": "int64"
+            "required": true
           }
         ],
         "responses": {
@@ -15139,19 +15139,19 @@
           },
           {
             "type": "integer",
+            "format": "int64",
             "description": "index of the pull request",
             "name": "index",
             "in": "path",
-            "required": true,
-            "format": "int64"
+            "required": true
           },
           {
             "type": "integer",
+            "format": "int64",
             "description": "id of the (root) comment of the conversation",
             "name": "id",
             "in": "path",
-            "required": true,
-            "format": "int64"
+            "required": true
           }
         ],
         "responses": {
@@ -27858,6 +27858,11 @@
     "IssueMeta": {
       "description": "IssueMeta basic issue information",
       "type": "object",
+      "required": [
+        "index",
+        "owner",
+        "repo"
+      ],
       "properties": {
         "index": {
           "type": "integer",
@@ -28240,7 +28245,9 @@
             "gogs",
             "onedev",
             "gitbucket",
-            "codebase"
+            "codebase",
+            "forgejo",
+            "pagure"
           ],
           "x-go-name": "Service"
         },

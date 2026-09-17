@@ -43,19 +43,11 @@ echo "== [1/4] SDK regen (only if swagger changed) =="
 if [ -f "$SWAGGER_TEMPLATE" ]; then
   if ! git diff --quiet "$MERGE_BASE" "$HEAD_SHA" -- "$SWAGGER_TEMPLATE" 2>/dev/null; then
     echo "swagger changed — regenerating SDK + CLI + tests"
-    cat > /tmp/strip.go << 'EOF'
-package main
-import ("encoding/json";"fmt";"os";"regexp")
-func main(){
- b,_:=os.ReadFile(os.Args[1])
- s:=regexp.MustCompile(`{{[^}]+}}`).ReplaceAllString(string(b),"")
- var v interface{}; json.Unmarshal([]byte(s),&v)
- out,_:=json.MarshalIndent(v,"","  ")
- os.WriteFile(os.Args[2],out,0644)
- fmt.Println("stripped")
-}
-EOF
-    go run /tmp/strip.go "$SWAGGER_TEMPLATE" "$SDK_DIR/spec/swagger.json"
+    # order-stable strip (.github/fork/specstrip): preserves the committed
+    # spec's key order/escaping/version so an unchanged template re-strips
+    # to a byte-identical spec (the old sorted-key remarshal churned every
+    # line and dropped info.version)
+    go run ./.github/fork/specstrip -out "$SDK_DIR/spec/swagger.json" "$SWAGGER_TEMPLATE"
     (cd "$SDK_DIR" && go run ./gen -spec spec/swagger.json -out . \
       -cli-out "$FJ_DIR/pkg/cmd/" -test-out "$FJ_DIR/tests/integration/" \
       -polish-out "$FJ_DIR/pkg/cmd/")
