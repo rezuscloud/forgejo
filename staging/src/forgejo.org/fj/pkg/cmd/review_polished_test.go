@@ -29,7 +29,7 @@ func TestPolishedReviewSurface(t *testing.T) {
 		wantFlgs []string
 		required []string
 	}{
-		{"create", []string{"body", "event", "commit-id"}, []string{"event"}},
+		{"create", []string{"body", "event", "commit-id"}, nil}, // event optional since #118: omit = pending review
 		{"comment", []string{"body", "path", "old-position", "new-position"}, []string{"body", "path"}},
 		{"submit", []string{"body", "event"}, []string{"event"}},
 	}

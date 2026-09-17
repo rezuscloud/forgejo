@@ -859,7 +859,12 @@ func TestAPIPullReviewCommentReplyResolve(t *testing.T) {
 		assert.EqualValues(t, rootComment.OldLineNum, reply.OldLineNum)
 	}
 
-	// the review thread now holds both comments
+	// in_reply_to is derived from the thread: the head reports 0, replies
+	// point at the head (#119)
+	assert.Zero(t, rootComment.InReplyTo)
+	assert.Equal(t, rootComment.ID, reply.InReplyTo)
+
+	// the review thread now holds both comments, linked via in_reply_to (#119)
 	{
 		req := NewRequestf(t, http.MethodGet, "/api/v1/repos/%s/pulls/%d/reviews/%d/comments", repo.FullName(), pullIssue.Index, review.ID).
 			AddTokenAuth(token)
@@ -867,6 +872,9 @@ func TestAPIPullReviewCommentReplyResolve(t *testing.T) {
 		var comments []*api.PullReviewComment
 		DecodeJSON(t, resp, &comments)
 		require.Len(t, comments, 2)
+		byID := map[int64]*api.PullReviewComment{comments[0].ID: comments[0], comments[1].ID: comments[1]}
+		assert.Zero(t, byID[rootComment.ID].InReplyTo)
+		assert.Equal(t, rootComment.ID, byID[reply.ID].InReplyTo)
 	}
 
 	// resolve → read back resolver + resolved; idempotent (#115)
@@ -934,4 +942,122 @@ func TestAPIPullReviewCommentReplyResolve(t *testing.T) {
 		}).AddTokenAuth(token)
 		MakeRequest(t, req, http.StatusNotFound)
 	}
+}
+
+func TestAPIPullReviewCommentInReplyToBinding(t *testing.T) {
+	defer tests.PrepareTestEnv(t)()
+	pullIssue := unittest.AssertExistsAndLoadBean(t, &issues_model.Issue{ID: 3})
+	require.NoError(t, pullIssue.LoadAttributes(db.DefaultContext))
+	repo := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: pullIssue.RepoID})
+
+	// user2 owns repo1 → write access. Scope "all": the 422 cases also touch
+	// plain issue comments (write:issue).
+	session := loginUser(t, "user2")
+	token := getTokenForLoggedInUser(t, session, auth_model.AccessTokenScopeAll)
+
+	var review api.PullReview
+	{
+		req := NewRequestWithJSON(t, http.MethodPost, fmt.Sprintf("/api/v1/repos/%s/pulls/%d/reviews", repo.FullName(), pullIssue.Index), &api.CreatePullReviewOptions{
+			Body:  "in_reply_to binding",
+			Event: api.ReviewStateComment,
+		}).AddTokenAuth(token)
+		resp := MakeRequest(t, req, http.StatusOK)
+		DecodeJSON(t, resp, &review)
+	}
+
+	var rootComment api.PullReviewComment
+	{
+		req := NewRequestWithJSON(t, http.MethodPost, fmt.Sprintf("/api/v1/repos/%s/pulls/%d/reviews/%d/comments", repo.FullName(), pullIssue.Index, review.ID), &api.CreatePullReviewCommentOptions{
+			Path:       "README.md",
+			Body:       "finding: anchored root of the thread",
+			OldLineNum: 2,
+		}).AddTokenAuth(token)
+		resp := MakeRequest(t, req, http.StatusOK)
+		DecodeJSON(t, resp, &rootComment)
+	}
+
+	// GitHub-shaped reply: in_reply_to threads instead of forking (#119);
+	// replies answer with 201 Created like the /replies endpoint
+	var reply api.PullReviewComment
+	{
+		req := NewRequestWithJSON(t, http.MethodPost, fmt.Sprintf("/api/v1/repos/%s/pulls/%d/reviews/%d/comments", repo.FullName(), pullIssue.Index, review.ID), &api.CreatePullReviewCommentOptions{
+			Body:      "reply via in_reply_to",
+			InReplyTo: rootComment.ID,
+		}).AddTokenAuth(token)
+		resp := MakeRequest(t, req, http.StatusCreated)
+		DecodeJSON(t, resp, &reply)
+		assert.Equal(t, rootComment.ReviewID, reply.ReviewID)
+		assert.Equal(t, rootComment.Path, reply.Path)
+		assert.EqualValues(t, rootComment.LineNum, reply.LineNum)
+		assert.EqualValues(t, rootComment.OldLineNum, reply.OldLineNum)
+		assert.Equal(t, rootComment.ID, reply.InReplyTo)
+	}
+
+	// a second (pending) review in the path does not hijack the thread: the
+	// reply lands on the parent's review
+	var pendingReview api.PullReview
+	{
+		req := NewRequestWithJSON(t, http.MethodPost, fmt.Sprintf("/api/v1/repos/%s/pulls/%d/reviews", repo.FullName(), pullIssue.Index), &api.CreatePullReviewOptions{Body: "pending draft"}).
+			AddTokenAuth(token)
+		resp := MakeRequest(t, req, http.StatusOK)
+		DecodeJSON(t, resp, &pendingReview)
+	}
+	{
+		req := NewRequestWithJSON(t, http.MethodPost, fmt.Sprintf("/api/v1/repos/%s/pulls/%d/reviews/%d/comments", repo.FullName(), pullIssue.Index, pendingReview.ID), &api.CreatePullReviewCommentOptions{
+			Body:      "reply from another review context",
+			InReplyTo: rootComment.ID,
+		}).AddTokenAuth(token)
+		resp := MakeRequest(t, req, http.StatusCreated)
+		var reply2 api.PullReviewComment
+		DecodeJSON(t, resp, &reply2)
+		assert.Equal(t, rootComment.ReviewID, reply2.ReviewID)
+		assert.Equal(t, rootComment.ID, reply2.InReplyTo)
+	}
+
+	// in_reply_to combined with anchor fields → 422
+	{
+		req := NewRequestWithJSON(t, http.MethodPost, fmt.Sprintf("/api/v1/repos/%s/pulls/%d/reviews/%d/comments", repo.FullName(), pullIssue.Index, review.ID), &api.CreatePullReviewCommentOptions{
+			Path:      "README.md",
+			Body:      "ambiguous",
+			InReplyTo: rootComment.ID,
+		}).AddTokenAuth(token)
+		MakeRequest(t, req, http.StatusUnprocessableEntity)
+	}
+
+	// in_reply_to with empty body → 422
+	{
+		req := NewRequestWithJSON(t, http.MethodPost, fmt.Sprintf("/api/v1/repos/%s/pulls/%d/reviews/%d/comments", repo.FullName(), pullIssue.Index, review.ID), &api.CreatePullReviewCommentOptions{
+			InReplyTo: rootComment.ID,
+		}).AddTokenAuth(token)
+		MakeRequest(t, req, http.StatusUnprocessableEntity)
+	}
+
+	// nonexistent in_reply_to → 404
+	{
+		req := NewRequestWithJSON(t, http.MethodPost, fmt.Sprintf("/api/v1/repos/%s/pulls/%d/reviews/%d/comments", repo.FullName(), pullIssue.Index, review.ID), &api.CreatePullReviewCommentOptions{
+			Body:      "dangling parent",
+			InReplyTo: rootComment.ID + 100000,
+		}).AddTokenAuth(token)
+		MakeRequest(t, req, http.StatusNotFound)
+	}
+
+	// non-code comment target → 422
+	{
+		req := NewRequestWithJSON(t, http.MethodPost, fmt.Sprintf("/api/v1/repos/%s/issues/%d/comments", repo.FullName(), pullIssue.Index), &api.CreateIssueCommentOption{
+			Body: "plain comment",
+		}).AddTokenAuth(token)
+		resp := MakeRequest(t, req, http.StatusCreated)
+		var plain api.Comment
+		DecodeJSON(t, resp, &plain)
+
+		req = NewRequestWithJSON(t, http.MethodPost, fmt.Sprintf("/api/v1/repos/%s/pulls/%d/reviews/%d/comments", repo.FullName(), pullIssue.Index, review.ID), &api.CreatePullReviewCommentOptions{
+			Body:      "should fail",
+			InReplyTo: plain.ID,
+		}).AddTokenAuth(token)
+		MakeRequest(t, req, http.StatusUnprocessableEntity)
+	}
+
+	// review creation with comments has no in_reply_to surface — the review
+	// comments array keeps fresh anchoring only (compile-level: the field
+	// lives on CreatePullReviewCommentOptions, not CreatePullReviewComment)
 }

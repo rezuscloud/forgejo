@@ -552,6 +552,7 @@ type CreatePullReviewComment struct {
 type CreatePullReviewCommentOptions struct {
 	Body string `json:"body,omitempty"`
 	ExtraLinesCount int64 `json:"extra_lines_count,omitempty"`
+	InReplyTo int64 `json:"in_reply_to,omitempty"`
 	NewPosition int64 `json:"new_position,omitempty"`
 	OldPosition int64 `json:"old_position,omitempty"`
 	Path string `json:"path,omitempty"`
@@ -1561,6 +1562,7 @@ type PullReviewComment struct {
 	ExtraLinesCount int64 `json:"extra_lines_count,omitempty"`
 	HtmlUrl string `json:"html_url,omitempty"`
 	Id int64 `json:"id,omitempty"`
+	InReplyTo int64 `json:"in_reply_to,omitempty"`
 	OriginalCommitId string `json:"original_commit_id,omitempty"`
 	OriginalPosition int `json:"original_position,omitempty"`
 	Path string `json:"path,omitempty"`

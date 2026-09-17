@@ -3726,7 +3726,7 @@ func TestGenerated_Org(t *testing.T) {
 	})
 }
 
-// TestGenerated_Repo tests all 264 auto-generated repo commands.
+// TestGenerated_Repo tests all 267 auto-generated repo commands.
 func TestGenerated_Repo(t *testing.T) {
 	skipIfNoInstance(t)
 	binary := buildFjBinary(t)
@@ -5817,6 +5817,36 @@ func TestGenerated_Repo(t *testing.T) {
 			return
 		}
 	})
+	t.Run("repoCreatePullReviewCommentReply", func(t *testing.T) {
+		args := []string{"api", "repo", "create-pull-review-comment-reply",
+			"--owner", testUser(),
+			"--repo", testRepo,
+			"--index", "1",
+			"--id", "1",
+		}
+		out, err := runFj(t, binary, args...)
+		if err != nil {
+			// Write commands: accept any HTTP error (404/403/409/422)
+			if isAcceptableError(out) { t.Skip("endpoint exists, write skipped (no body)") }
+			t.Errorf("%v\n%s", err, out)
+			return
+		}
+	})
+	t.Run("repoCreatePullReviewCommentResolution", func(t *testing.T) {
+		args := []string{"api", "repo", "create-pull-review-comment-resolution",
+			"--owner", testUser(),
+			"--repo", testRepo,
+			"--index", "1",
+			"--id", "1",
+		}
+		out, err := runFj(t, binary, args...)
+		if err != nil {
+			// Write commands: accept any HTTP error (404/403/409/422)
+			if isAcceptableError(out) { t.Skip("endpoint exists, write skipped (no body)") }
+			t.Errorf("%v\n%s", err, out)
+			return
+		}
+	})
 	t.Run("repoCreatePullReviewRequests", func(t *testing.T) {
 		args := []string{"api", "repo", "create-pull-review-requests",
 			"--owner", testUser(),
@@ -6085,6 +6115,21 @@ func TestGenerated_Repo(t *testing.T) {
 			"--index", "1",
 			"--id", "1",
 			"--comment", "1",
+		}
+		out, err := runFj(t, binary, args...)
+		if err != nil {
+			// Write commands: accept any HTTP error (404/403/409/422)
+			if isAcceptableError(out) { t.Skip("endpoint exists, write skipped (no body)") }
+			t.Errorf("%v\n%s", err, out)
+			return
+		}
+	})
+	t.Run("repoDeletePullReviewCommentResolution", func(t *testing.T) {
+		args := []string{"api", "repo", "delete-pull-review-comment-resolution",
+			"--owner", testUser(),
+			"--repo", testRepo,
+			"--index", "1",
+			"--id", "1",
 		}
 		out, err := runFj(t, binary, args...)
 		if err != nil {
