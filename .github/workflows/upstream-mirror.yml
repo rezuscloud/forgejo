@@ -1,0 +1,46 @@
+# Upstream mirror — the trigger signal for event-driven fork-maintenance
+# (harmostes#192).
+#
+# Keeps refs/heads/v16.0/forgejo in this repo tracking Codeberg's
+# v16.0/forgejo. When the branch moves, GitHub fires a push webhook to
+# harmostes (HMAC-verified), which dispatches the fork-maintenance sync
+# (the mapping engine still fetches Codeberg itself for the merge — this
+# branch is a movement SIGNAL, not the sync transport).
+#
+# When upstream is unchanged, `git push` reports "Everything up-to-date",
+# GitHub fires NO push event, and harmostes dispatches nothing. A weekly
+# scheduled no-op run on the harmostes side (dead-man's switch) bounds
+# drift if this action ever breaks silently.
+#
+# Runs on GitHub free-tier runners (public repo) — zero cluster compute.
+name: upstream-mirror
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: upstream-mirror
+  cancel-in-progress: true
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Fetch upstream release line
+        run: |
+          git remote add upstream https://codeberg.org/forgejo/forgejo
+          git fetch upstream +refs/heads/v16.0/forgejo:refs/remotes/upstream/v16.0/forgejo --no-tags
+
+      - name: Push mirror branch (no-op when upstream is static)
+        run: |
+          git push --force origin refs/remotes/upstream/v16.0/forgejo:refs/heads/v16.0/forgejo
