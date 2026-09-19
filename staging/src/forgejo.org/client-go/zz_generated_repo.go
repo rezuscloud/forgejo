@@ -94,6 +94,7 @@ func (s *RepoService) DispatchWorkflow(ctx context.Context, owner string, repo s
 
 	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
+	if resp.StatusCode == http.StatusNoContent { return nil, &Response{Response: resp}, nil }
 	var result DispatchWorkflowRun
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
@@ -324,6 +325,24 @@ func (s *RepoService) ListActionTasks(ctx context.Context, owner string, repo st
 	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
 	var result ActionTaskResponse
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
+	return &result, &Response{Response: resp}, nil
+}
+
+// ListActionWorkflows — List a repository's Action workflows
+// GET /repos/{owner}/{repo}/actions/workflows
+func (s *RepoService) ListActionWorkflows(ctx context.Context, owner string, repo string) (*ListActionWorkflowsResponse, *Response, error) {
+	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/workflows", owner, repo))
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
+
+	resp, err := s.client.client.Do(req)
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
+
+	var result ListActionWorkflowsResponse
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
 }
@@ -1011,6 +1030,7 @@ func (s *RepoService) IssueEditComment(ctx context.Context, owner string, repo s
 
 	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
+	if resp.StatusCode == http.StatusNoContent { return nil, &Response{Response: resp}, nil }
 	var result Comment
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
@@ -1032,6 +1052,7 @@ func (s *RepoService) IssueEditCommentDeprecated(ctx context.Context, owner stri
 
 	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
+	if resp.StatusCode == http.StatusNoContent { return nil, &Response{Response: resp}, nil }
 	var result Comment
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil
@@ -1176,6 +1197,7 @@ func (s *RepoService) IssueGetComment(ctx context.Context, owner string, repo st
 
 	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
 
+	if resp.StatusCode == http.StatusNoContent { return nil, &Response{Response: resp}, nil }
 	var result Comment
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
 	return &result, &Response{Response: resp}, nil

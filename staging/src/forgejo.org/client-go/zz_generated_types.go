@@ -152,6 +152,14 @@ type ActionVariable struct {
 	RepoId int64 `json:"repo_id,omitempty"`
 }
 
+type ActionWorkflow struct {
+	Filename string `json:"filename,omitempty"`
+	HtmlUrl string `json:"html_url,omitempty"`
+	Name string `json:"name,omitempty"`
+	Path string `json:"path,omitempty"`
+	State string `json:"state,omitempty"`
+}
+
 type Activity struct {
 	ActUser *User `json:"act_user,omitempty"`
 	ActUserId int64 `json:"act_user_id,omitempty"`
@@ -1240,6 +1248,11 @@ type LicensesTemplateListEntry struct {
 type ListActionRunResponse struct {
 	TotalCount int64 `json:"total_count,omitempty"`
 	WorkflowRuns []*ActionRun `json:"workflow_runs,omitempty"`
+}
+
+type ListActionWorkflowsResponse struct {
+	TotalCount int64 `json:"total_count,omitempty"`
+	Workflows []*ActionWorkflow `json:"workflows,omitempty"`
 }
 
 type MarkdownOption struct {

@@ -183,6 +183,7 @@ type MD struct {
 	Params  []Param
 	RetTy   string
 	HasRet  bool
+	Has204  bool // the spec declares a 204 (empty) success response alongside the return type
 }
 
 func groupByService(spec *SwaggerSpec) map[string][]MD {
@@ -192,9 +193,10 @@ func groupByService(spec *SwaggerSpec) map[string][]MD {
 			hm = strings.ToUpper(hm)
 			if hm == "PARAMETERS" || op.OperationID == "" { continue }
 			rt, hr := resolveRet(&op, spec)
+			_, has204 := op.Responses["204"]
 			svcs[classify(path)] = append(svcs[classify(path)], MD{
 				OpID: op.OperationID, Method: hm, Path: path,
-				Summary: op.Summary, Params: op.Parameters, RetTy: rt, HasRet: hr,
+				Summary: op.Summary, Params: op.Parameters, RetTy: rt, HasRet: hr, Has204: has204,
 			})
 		}
 	}
@@ -339,6 +341,13 @@ func genMethod(svc string, m MD, spec *SwaggerSpec) string {
 	b.WriteString(fmt.Sprintf("\tif err != nil { return %snil, fmt.Errorf(\"do: %%w\", err) }\n", rp()))
 	b.WriteString("\tdefer resp.Body.Close()\n\n")
 	b.WriteString(fmt.Sprintf("\tif resp.StatusCode >= 400 { return %snil, handleError(resp) }\n\n", rp()))
+
+	// #114: an operation whose spec declares a 204 alongside an object/array
+	// success response (e.g. DispatchWorkflow's return_run_info=false) gets a
+	// no-content short-circuit — decoding an empty body EOF-errors otherwise.
+	if m.Has204 && m.HasRet && m.RetTy != "" {
+		b.WriteString(fmt.Sprintf("\tif resp.StatusCode == http.StatusNoContent { return %s&Response{Response: resp}, nil }\n", rp()))
+	}
 
 	if m.HasRet && m.RetTy != "" {
 		if strings.HasPrefix(m.RetTy, "[]") {
