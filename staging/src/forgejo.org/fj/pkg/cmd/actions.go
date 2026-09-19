@@ -20,6 +20,7 @@ func newActionsCmd() *cobra.Command {
 	cmd.AddCommand(newActionsLogsCmd())
 	cmd.AddCommand(newActionsTasksCmd())
 	cmd.AddCommand(newActionsDispatchCmd())
+	cmd.AddCommand(newActionsWorkflowsCmd())
 	cmd.AddCommand(newActionsRunsCmd())
 	cmd.AddCommand(newActionsVariablesCmd())
 	cmd.AddCommand(newActionsSecretsCmd())
@@ -173,6 +174,33 @@ func newActionsDispatchCmd() *cobra.Command {
 	}
 	cmd.Flags().StringArrayVarP(&inputs, "input", "I", nil, "workflow input (key=value, repeatable)")
 	return cmd
+}
+
+// #114: the dispatch API keys on the workflow FILENAME, which had no
+// discovery surface — this lists it alongside the display name.
+func newActionsWorkflowsCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "workflows",
+		Short: "List the repo's Action workflows (the filename is what dispatch takes)",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			c, owner, repo, err := resolveClient(cmd)
+			if err != nil {
+				return err
+			}
+			res, _, err := c.Repo.ListActionWorkflows(context.Background(), owner, repo)
+			if err != nil {
+				return err
+			}
+			if res.TotalCount == 0 {
+				fmt.Println("no workflows")
+				return nil
+			}
+			for _, w := range res.Workflows {
+				fmt.Printf("%s\t%s\t%s\n", w.Filename, w.Name, w.State)
+			}
+			return nil
+		},
+	}
 }
 
 func newActionsRunsCmd() *cobra.Command {

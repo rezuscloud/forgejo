@@ -7056,6 +7056,39 @@
         }
       }
     },
+    "/repos/{owner}/{repo}/actions/workflows": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "repository"
+        ],
+        "summary": "List a repository's Action workflows",
+        "operationId": "ListActionWorkflows",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "owner of the repo",
+            "name": "owner",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "name of the repo",
+            "name": "repo",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/ListActionWorkflowsResponse"
+          }
+        }
+      }
+    },
     "/repos/{owner}/{repo}/actions/workflows/{workflowfilename}/dispatches": {
       "post": {
         "consumes": [
@@ -25992,6 +26025,59 @@
       },
       "x-go-package": "forgejo.org/modules/structs"
     },
+    "ActionWorkflow": {
+      "description": "ActionWorkflow represents a workflow file discoverable in a repository",
+      "type": "object",
+      "properties": {
+        "filename": {
+          "type": "string",
+          "x-go-name": "Filename",
+          "description": "the workflow file name — the key DispatchWorkflow takes"
+        },
+        "name": {
+          "type": "string",
+          "x-go-name": "Name",
+          "description": "the workflow's `name:` field (falls back to the filename)"
+        },
+        "path": {
+          "type": "string",
+          "x-go-name": "Path",
+          "description": "the workflow file's path in the repository"
+        },
+        "state": {
+          "type": "string",
+          "x-go-name": "State",
+          "description": "workflows are always active in Forgejo (GitHub-compat field)"
+        },
+        "html_url": {
+          "type": "string",
+          "x-go-name": "HTMLURL",
+          "description": "the Actions web URL filtered to this workflow"
+        }
+      },
+      "x-go-package": "forgejo.org/modules/structs"
+    },
+    "ListActionWorkflowsResponse": {
+      "description": "ListActionWorkflowsResponse is a paginated-shaped list of a repository's workflows",
+      "type": "object",
+      "properties": {
+        "total_count": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "TotalCount",
+          "description": "total number of workflows"
+        },
+        "workflows": {
+          "type": "array",
+          "x-go-name": "Workflows",
+          "items": {
+            "$ref": "#/definitions/ActionWorkflow"
+          },
+          "description": "the workflows at the default branch"
+        }
+      },
+      "x-go-package": "forgejo.org/modules/structs"
+    },
     "DispatchWorkflowOption": {
       "description": "DispatchWorkflowOption options when dispatching a workflow",
       "type": "object",
@@ -31764,6 +31850,12 @@
           "format": "int64",
           "description": "The total number of deploy keys"
         }
+      }
+    },
+    "ListActionWorkflowsResponse": {
+      "description": "ListActionWorkflowsResponse",
+      "schema": {
+        "$ref": "#/definitions/ListActionWorkflowsResponse"
       }
     },
     "DispatchWorkflowRun": {

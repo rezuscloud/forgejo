@@ -27,3 +27,24 @@ type DispatchWorkflowRun struct {
 	// the jobs name
 	Jobs []string `json:"jobs"`
 }
+// ActionWorkflow represents a workflow file discoverable in a repository
+// swagger:model
+type ActionWorkflow struct {
+	// the workflow file name — the key DispatchWorkflow takes
+	Filename string `json:"filename"`
+	// the workflow's `name:` field (falls back to the filename)
+	Name string `json:"name"`
+	// the workflow file's path in the repository
+	Path string `json:"path"`
+	// workflows are always active in Forgejo (GitHub-compat field)
+	State string `json:"state"`
+	// the Actions web URL filtered to this workflow
+	HTMLURL string `json:"html_url"`
+}
+
+// ListActionWorkflowsResponse is a paginated-shaped list of a repository's workflows
+// swagger:model
+type ListActionWorkflowsResponse struct {
+	TotalCount int64             `json:"total_count"`
+	Workflows  []*ActionWorkflow `json:"workflows"`
+}

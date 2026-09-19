@@ -517,6 +517,57 @@ func TestCLICommands(t *testing.T) {
 		}
 	})
 
+	// ---- actions workflows + dispatch (#114): the filename the dispatch API
+	// keys on gets a discovery endpoint; a missing workflow/ref maps to 404
+	// (was: bare error -> 500) and the 204 dispatch response no longer
+	// EOF-errors the SDK decode.
+	t.Run("actions workflows+dispatch", func(t *testing.T) {
+		const wfContent = `name: cli-probe
+on:
+  workflow_dispatch:
+jobs:
+  probe:
+    runs-on: [no-such-runner]
+    steps:
+      - run: echo hi
+`
+		createFileOnBranch(t, repo, ".forgejo/workflows/cli-probe.yml", "main", "", wfContent)
+
+		// list: the new discovery endpoint via the CLI
+		out, err := runFj(t, binary, "actions", "workflows", "-r", ownerRepo)
+		if err != nil {
+			t.Fatal(err)
+		}
+		contains(t, out, "cli-probe.yml")
+		contains(t, out, "cli-probe") // the workflow's display name
+
+		// raw shape: 200 + total_count
+		status, body := apiJSON(t, "GET", "/repos/"+ownerRepo+"/actions/workflows", nil)
+		if status != 200 {
+			t.Fatalf("GET workflows status %d: %s", status, body)
+		}
+		contains(t, body, `"total_count":1`)
+
+		// dispatch the real workflow: 204 empty body must not error the CLI
+		if _, err := runFj(t, binary, "actions", "dispatch", "cli-probe.yml", "main", "-r", ownerRepo); err != nil {
+			t.Fatal(err)
+		}
+
+		// missing workflow: 404 (was 500 + a bare "workflow not found")
+		status, body = apiJSON(t, "POST", "/repos/"+ownerRepo+"/actions/workflows/missing.yml/dispatches",
+			map[string]interface{}{"ref": "main"})
+		if status != 404 {
+			t.Fatalf("dispatch missing workflow status %d (want 404): %s", status, body)
+		}
+
+		// missing ref: 404 too (was 500 via ExpandRef's bare error)
+		status, body = apiJSON(t, "POST", "/repos/"+ownerRepo+"/actions/workflows/cli-probe.yml/dispatches",
+			map[string]interface{}{"ref": "no-such-ref"})
+		if status != 404 {
+			t.Fatalf("dispatch missing ref status %d (want 404): %s", status, body)
+		}
+	})
+
 	// ---- repo clone: needs git + auth; verify it at least shells out --
 	// (best-effort — skip if git is unavailable rather than fail the suite)
 	t.Run("repo/clone", func(t *testing.T) {

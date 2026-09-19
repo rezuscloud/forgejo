@@ -900,6 +900,7 @@ func Routes() *web.Route {
 					})
 
 					m.Group("/workflows", func() {
+						m.Get("", repo.ListActionWorkflows)
 						m.Group("/{workflowfilename}", func() {
 							m.Post("/dispatches", reqToken(), reqRepoWriter(unit.TypeActions), mustNotBeArchived(), bind(api.DispatchWorkflowOption{}), repo.DispatchWorkflow)
 						})

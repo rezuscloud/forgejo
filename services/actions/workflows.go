@@ -207,7 +207,9 @@ func (entry *Workflow) Dispatch(ctx context.Context, inputGetter InputValueGette
 func GetWorkflowFromCommit(gitRepo *git.Repository, ref, workflowID string) (*Workflow, error) {
 	ref, err := gitRepo.ExpandRef(ref)
 	if err != nil {
-		return nil, err
+		// #114: an unexpandable ref is a not-exist condition — the API layer
+		// maps util.ErrNotExist to 404; a bare error surfaced as a 500 there.
+		return nil, util.NewNotExistErrorf("ref %q not found", ref)
 	}
 
 	commit, err := gitRepo.GetCommit(ref)
@@ -228,7 +230,7 @@ func GetWorkflowFromCommit(gitRepo *git.Repository, ref, workflowID string) (*Wo
 		}
 	}
 	if workflowEntry == nil {
-		return nil, errors.New("workflow not found")
+		return nil, util.NewNotExistErrorf("workflow %q not found", workflowID)
 	}
 
 	return &Workflow{

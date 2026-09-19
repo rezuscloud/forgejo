@@ -5,11 +5,14 @@
 package repo
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"net/http"
 
 	actions_model "forgejo.org/models/actions"
+	act_model "code.forgejo.org/forgejo/runner/v12/act/model"
+	"forgejo.org/modules/actions"
 	"forgejo.org/models/db"
 	secret_model "forgejo.org/models/secret"
 	"forgejo.org/modules/optional"
@@ -863,6 +866,64 @@ func DispatchWorkflow(ctx *context.APIContext) {
 	} else {
 		ctx.Status(http.StatusNoContent)
 	}
+}
+
+// ListActionWorkflows returns the workflow files discoverable at the
+// repository's default branch — the discovery surface for DispatchWorkflow
+// (#114: the filename the dispatch API takes was not listable anywhere).
+func ListActionWorkflows(ctx *context.APIContext) {
+	// swagger:operation GET /repos/{owner}/{repo}/actions/workflows repository ListActionWorkflows
+	// ---
+	// summary: List a repository's Action workflows
+	// produces:
+	// - application/json
+	// parameters:
+	// - name: owner
+	//   in: path
+	//   description: owner of the repo
+	//   type: string
+	//   required: true
+	// - name: repo
+	//   in: path
+	//   description: name of the repo
+	//   type: string
+	//   required: true
+	// responses:
+	//   "200":
+	//     "$ref": "#/responses/ListActionWorkflowsResponse"
+
+	commit, err := ctx.Repo().GitRepo.GetCommit(ctx.Repo().Repository.DefaultBranch)
+	if err != nil {
+		ctx.Error(http.StatusInternalServerError, "GetCommit", err)
+		return
+	}
+	workflowDirectory, entries, err := actions.ListWorkflows(commit)
+	if err != nil {
+		ctx.Error(http.StatusInternalServerError, "ListWorkflows", err)
+		return
+	}
+
+	workflows := make([]*api.ActionWorkflow, 0, len(entries))
+	for _, entry := range entries {
+		filename := entry.Name()
+		name := filename
+		if content, err := actions.GetContentFromEntry(entry); err == nil {
+			if wf, err := act_model.ReadWorkflow(bytes.NewReader(content), false); err == nil && wf.Name != "" {
+				name = wf.Name
+			}
+		}
+		workflows = append(workflows, &api.ActionWorkflow{
+			Filename: filename,
+			Name:     name,
+			Path:     workflowDirectory + "/" + filename,
+			State:    "active",
+			HTMLURL:  ctx.Repo().Repository.HTMLURL() + "/actions?workflow=" + filename,
+		})
+	}
+	ctx.JSON(http.StatusOK, &api.ListActionWorkflowsResponse{
+		TotalCount: int64(len(workflows)),
+		Workflows:  workflows,
+	})
 }
 
 // ListActionRuns return a filtered list of ActionRun
