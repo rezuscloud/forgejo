@@ -316,10 +316,14 @@ jobs:
         with: { name: repo-map, path: dist-rig }
       - name: CLI checksums
         # sha256 over every fj archive (tar.gz + zip) — the release ships six
-        # binaries across three OSes; checksums make them verifiable.
-        run: cd dist-cli && sha256sum fj-* > checksums.txt && cat checksums.txt
-      - name: Runner checksums
-        run: cd dist-runner && sha256sum forgejo-runner-*.tar.gz > checksums.txt && cat checksums.txt
+        # binaries across three OSes; checksums make them verifiable. Both
+        # groups land in ONE merged asset: GitHub release assets are a flat
+        # namespace, so two same-named files overwrite each other — that is
+        # exactly how the runner file silently replaced the fj entries since
+        # rezus.3 (#125).
+        run: cd dist-cli && sha256sum fj-* > ../checksums.txt && cat ../checksums.txt
+      - name: Runner checksums (appended into the merged asset)
+        run: cd dist-runner && sha256sum forgejo-runner-*.tar.gz >> ../checksums.txt && cat ../checksums.txt
       - name: Create GitHub release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
@@ -328,10 +332,9 @@ jobs:
             dist/${{ needs.prepare.outputs.chart_archive }}
             dist-cli/fj-*.tar.gz
             dist-cli/fj-*.zip
-            dist-cli/checksums.txt
+            checksums.txt
             dist-runner/forgejo-runner-*.tar.gz
             dist-runner/forgejo-runner-*.tar.gz.sha256
-            dist-runner/checksums.txt
             dist-rig/repo-map.json
           generate_release_notes: true
           body: |
@@ -340,7 +343,7 @@ jobs:
             All artifacts share the same version:
             - server image: `${{ needs.prepare.outputs.image_repository }}:${{ needs.prepare.outputs.release_version }}` (+ `-rootless`)
             - fj CLI (Client Version matches the release): `fj-{linux,darwin}-{amd64,arm64}.tar.gz`, `fj-windows-{amd64,arm64}.zip` — all listed in `checksums.txt`
-            - forgejo-runner binaries (vendored at `runner/`, stamped `${{ needs.prepare.outputs.runner_version }}`): `forgejo-runner-darwin-{amd64,arm64}.tar.gz` — listed in the runner `checksums.txt` (linux fleet uses the upstream OCI image)
+            - forgejo-runner binaries (vendored at `runner/`, stamped `${{ needs.prepare.outputs.runner_version }}`): `forgejo-runner-darwin-{amd64,arm64}.tar.gz` — also listed in `checksums.txt` (linux fleet uses the upstream OCI image)
             - OCI Helm chart: `${{ needs.prepare.outputs.chart_repository }}/forgejo:${{ needs.prepare.outputs.chart_version }}` (appVersion = release version)
             - Repository Intelligence Graph (RIG): `repo-map.json` (deterministic architecture graph for the wiki C4D2 workflow)
 
