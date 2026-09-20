@@ -46,6 +46,14 @@ func buildFjBinary(t *testing.T) string {
 // runFj executes the fj binary with the given args and returns stdout.
 func runFj(t *testing.T, binaryPath string, args ...string) (string, error) {
 	t.Helper()
+	out, _, err := runFjFull(t, binaryPath, args...)
+	return out, err
+}
+
+// runFjFull is runFj plus stderr — for tests that assert on the error
+// surface (fj prints handler errors to stderr, not stdout).
+func runFjFull(t *testing.T, binaryPath string, args ...string) (string, string, error) {
+	t.Helper()
 	fullArgs := append([]string{"--host", testURL()}, args...)
 	cmd := exec.Command(binaryPath, fullArgs...)
 	cmd.Env = append(os.Environ(), "FORGEJO_TOKEN="+testToken())
@@ -56,7 +64,7 @@ func runFj(t *testing.T, binaryPath string, args ...string) (string, error) {
 	if err != nil {
 		t.Logf("fj %v\nstdout: %s\nstderr: %s", args, stdout.String(), stderr.String())
 	}
-	return stdout.String(), err
+	return stdout.String(), stderr.String(), err
 }
 
 // TestCLIApiVersion tests `fj version` against the live server.

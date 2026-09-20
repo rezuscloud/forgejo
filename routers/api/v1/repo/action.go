@@ -10,9 +10,8 @@ import (
 	"fmt"
 	"net/http"
 
-	actions_model "forgejo.org/models/actions"
 	act_model "code.forgejo.org/forgejo/runner/v12/act/model"
-	"forgejo.org/modules/actions"
+	actions_model "forgejo.org/models/actions"
 	"forgejo.org/models/db"
 	secret_model "forgejo.org/models/secret"
 	"forgejo.org/modules/actions"

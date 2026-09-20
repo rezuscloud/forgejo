@@ -3223,12 +3223,31 @@ func (s *RepoService) RepoGet(ctx context.Context, owner string, repo string) (*
 	return &result, &Response{Response: resp}, nil
 }
 
+// RepoGetActionJob — Get a single workflow run job, including its step list
+// GET /repos/{owner}/{repo}/actions/jobs/{job_id}
+func (s *RepoService) RepoGetActionJob(ctx context.Context, owner string, repo string, jobId int64) (*ActionRunJob, *Response, error) {
+	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/jobs/%d", owner, repo, jobId))
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
+
+	resp, err := s.client.client.Do(req)
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
+
+	var result ActionRunJob
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
+	return &result, &Response{Response: resp}, nil
+}
+
 // RepoGetActionJobLogs — Download the plaintext logs of an action job
 // GET /repos/{owner}/{repo}/actions/jobs/{job_id}/logs
-func (s *RepoService) RepoGetActionJobLogs(ctx context.Context, owner string, repo string, jobId int64, attempt int64) (string, *Response, error) {
+func (s *RepoService) RepoGetActionJobLogs(ctx context.Context, owner string, repo string, jobId int64, attempt int64, step int) (string, *Response, error) {
 	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/jobs/%d/logs", owner, repo, jobId))
 	qry := u.Query()
 	if attempt != 0 { qry.Set("attempt", fmt.Sprintf("%v", attempt)) }
+	if step != 0 { qry.Set("step", fmt.Sprintf("%v", step)) }
 	u.RawQuery = qry.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil { return "", nil, fmt.Errorf("request: %w", err) }

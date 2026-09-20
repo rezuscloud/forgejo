@@ -4424,6 +4424,25 @@ actions, etc.) instead.`,
 		_ = mc.MarkFlagRequired("repo")
 		svcCmd.AddCommand(mc)
 		}
+		{ // GET /repos/{owner}/{repo}/actions/workflows -> Repo.ListActionWorkflows
+		mc := &cobra.Command{Use: "list-action-workflows", Short: "List a repository's Action workflows"}
+		var listactionworkflows_owner string
+		mc.Flags().StringVar(&listactionworkflows_owner, "owner", "", "owner")
+		var listactionworkflows_repo string
+		mc.Flags().StringVar(&listactionworkflows_repo, "repo", "", "repo")
+		mc.RunE = func(cmd *cobra.Command, args []string) error {
+			cli, e := resolveHostClient(cmd, "")
+			if e != nil { return e }
+			res, _, err := cli.Repo.ListActionWorkflows(context.Background(), listactionworkflows_owner, listactionworkflows_repo)
+			if err != nil { return err }
+			j, _ := json.MarshalIndent(res, "", "  ")
+			fmt.Println(string(j))
+			return nil
+		}
+		_ = mc.MarkFlagRequired("owner")
+		_ = mc.MarkFlagRequired("repo")
+		svcCmd.AddCommand(mc)
+		}
 		{ // POST /repos/{owner}/{repo}/transfer/accept -> Repo.AcceptRepoTransfer
 		mc := &cobra.Command{Use: "accept-repo-transfer", Short: "Accept a repo transfer"}
 		var acceptrepotransfer_owner string
@@ -8003,6 +8022,28 @@ actions, etc.) instead.`,
 		_ = mc.MarkFlagRequired("repo")
 		svcCmd.AddCommand(mc)
 		}
+		{ // GET /repos/{owner}/{repo}/actions/jobs/{job_id} -> Repo.RepoGetActionJob
+		mc := &cobra.Command{Use: "get-action-job", Short: "Get a single workflow run job, including its step list"}
+		var repogetactionjob_owner string
+		mc.Flags().StringVar(&repogetactionjob_owner, "owner", "", "owner")
+		var repogetactionjob_repo string
+		mc.Flags().StringVar(&repogetactionjob_repo, "repo", "", "repo")
+		var repogetactionjob_jobId int64
+		mc.Flags().Int64Var(&repogetactionjob_jobId, "job-id", 0, "job-id")
+		mc.RunE = func(cmd *cobra.Command, args []string) error {
+			cli, e := resolveHostClient(cmd, "")
+			if e != nil { return e }
+			res, _, err := cli.Repo.RepoGetActionJob(context.Background(), repogetactionjob_owner, repogetactionjob_repo, repogetactionjob_jobId)
+			if err != nil { return err }
+			j, _ := json.MarshalIndent(res, "", "  ")
+			fmt.Println(string(j))
+			return nil
+		}
+		_ = mc.MarkFlagRequired("owner")
+		_ = mc.MarkFlagRequired("repo")
+		_ = mc.MarkFlagRequired("job-id")
+		svcCmd.AddCommand(mc)
+		}
 		{ // GET /repos/{owner}/{repo}/actions/jobs/{job_id}/logs -> Repo.RepoGetActionJobLogs
 		mc := &cobra.Command{Use: "get-action-job-logs", Short: "Download the plaintext logs of an action job"}
 		var repogetactionjoblogs_owner string
@@ -8013,10 +8054,12 @@ actions, etc.) instead.`,
 		mc.Flags().Int64Var(&repogetactionjoblogs_jobId, "job-id", 0, "job-id")
 		var repogetactionjoblogs_attempt int64
 		mc.Flags().Int64Var(&repogetactionjoblogs_attempt, "attempt", 0, "attempt")
+		var repogetactionjoblogs_step int
+		mc.Flags().IntVar(&repogetactionjoblogs_step, "step", 0, "step")
 		mc.RunE = func(cmd *cobra.Command, args []string) error {
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
-			res, _, err := cli.Repo.RepoGetActionJobLogs(context.Background(), repogetactionjoblogs_owner, repogetactionjoblogs_repo, repogetactionjoblogs_jobId, repogetactionjoblogs_attempt)
+			res, _, err := cli.Repo.RepoGetActionJobLogs(context.Background(), repogetactionjoblogs_owner, repogetactionjoblogs_repo, repogetactionjoblogs_jobId, repogetactionjoblogs_attempt, repogetactionjoblogs_step)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
 			fmt.Println(string(j))

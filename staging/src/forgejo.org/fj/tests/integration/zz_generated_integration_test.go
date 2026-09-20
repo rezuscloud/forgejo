@@ -3726,7 +3726,7 @@ func TestGenerated_Org(t *testing.T) {
 	})
 }
 
-// TestGenerated_Repo tests all 267 auto-generated repo commands.
+// TestGenerated_Repo tests all 269 auto-generated repo commands.
 func TestGenerated_Repo(t *testing.T) {
 	skipIfNoInstance(t)
 	binary := buildFjBinary(t)
@@ -4042,6 +4042,27 @@ func TestGenerated_Repo(t *testing.T) {
 			"--page", "1",
 			"--limit", "1",
 			"--status", "1",
+		}
+		out, err := runFj(t, binary, args...)
+		if err != nil {
+			// GET: 404/403 means resource doesn't exist — still proves the command works
+			if isAcceptableError(out) { t.Skip("resource not found (command works)") }
+			t.Errorf("%v\n%s", err, out)
+			return
+		}
+		// Verify valid JSON output
+		trimmed := bytes.TrimSpace([]byte(out))
+		if len(trimmed) > 0 {
+			var v interface{}
+			if e := json.Unmarshal(trimmed, &v); e != nil {
+				t.Errorf("invalid JSON: %v\n%s", e, string(trimmed[:min(len(trimmed),200)]))
+			}
+		}
+	})
+	t.Run("ListActionWorkflows", func(t *testing.T) {
+		args := []string{"api", "repo", "list-action-workflows",
+			"--owner", testUser(),
+			"--repo", testRepo,
 		}
 		out, err := runFj(t, binary, args...)
 		if err != nil {
@@ -6489,12 +6510,35 @@ func TestGenerated_Repo(t *testing.T) {
 			}
 		}
 	})
+	t.Run("repoGetActionJob", func(t *testing.T) {
+		args := []string{"api", "repo", "get-action-job",
+			"--owner", testUser(),
+			"--repo", testRepo,
+			"--job-id", "1",
+		}
+		out, err := runFj(t, binary, args...)
+		if err != nil {
+			// GET: 404/403 means resource doesn't exist — still proves the command works
+			if isAcceptableError(out) { t.Skip("resource not found (command works)") }
+			t.Errorf("%v\n%s", err, out)
+			return
+		}
+		// Verify valid JSON output
+		trimmed := bytes.TrimSpace([]byte(out))
+		if len(trimmed) > 0 {
+			var v interface{}
+			if e := json.Unmarshal(trimmed, &v); e != nil {
+				t.Errorf("invalid JSON: %v\n%s", e, string(trimmed[:min(len(trimmed),200)]))
+			}
+		}
+	})
 	t.Run("repoGetActionJobLogs", func(t *testing.T) {
 		args := []string{"api", "repo", "get-action-job-logs",
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--job-id", "1",
 			"--attempt", "1",
+			"--step", "1",
 		}
 		out, err := runFj(t, binary, args...)
 		if err != nil {
