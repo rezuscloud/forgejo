@@ -64,6 +64,15 @@ echo "== [3/4] build the delta (staging modules + root cmd) =="
 (cd "$FJ_DIR" && go build ./...)
 go build -o /dev/null ./cmd/fj   # -o /dev/null: a root-level ./fj binary collides with the fj module path
 
+echo "== [3.5/4] behavioral gate: feature unit tests (harmostes#564 contract) =="
+# Signatures prove the delta's TEXT survived the merge; this proves the
+# FEATURES still work. Hermetic unit tests only (no server) — the container
+# integration suite runs post-push in ci.yml; this runs PRE-push, blocking
+# the direct mapping-row push. Explicit -timeout: a hung test must fail the
+# gate, not stall the sync. Add the package here when a feature gains tests.
+(cd "$SDK_DIR" && go test -timeout=120s ./...)
+(cd "$FJ_DIR" && go test -timeout=120s ./pkg/...)
+
 echo "== [4/4] delta signatures intact =="
 FAILED=0
 for sig in "${SIGNATURES[@]}"; do
