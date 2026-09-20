@@ -16,6 +16,7 @@ func newActionsCmd() *cobra.Command {
 		Use:   "actions",
 		Short: "Manage repository actions",
 	}
+	cmd.AddCommand(newActionsJobCmd())
 	cmd.AddCommand(newActionsJobsCmd())
 	cmd.AddCommand(newActionsLogsCmd())
 	cmd.AddCommand(newActionsTasksCmd())
@@ -58,9 +59,38 @@ func newActionsJobsCmd() *cobra.Command {
 	}
 }
 
+func newActionsJobCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "job <ID>",
+		Short: "View a single action job, including its steps",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			jobID, err := strconv.ParseInt(args[0], 10, 64)
+			if err != nil {
+				return fmt.Errorf("invalid job id %q: %w", args[0], err)
+			}
+			c, owner, repo, err := resolveClient(cmd)
+			if err != nil {
+				return err
+			}
+			job, _, err := c.Repo.RepoGetActionJob(context.Background(), owner, repo, jobID)
+			if err != nil {
+				return err
+			}
+			fmt.Printf("#%d %s [%s] run:#%d attempt:%d\n", job.Id, job.Name, job.Status, job.RunId, job.Attempt)
+			for _, s := range job.Steps {
+				fmt.Printf("  %d [%s] %s\n", s.Number, s.Status, s.Name)
+			}
+			return nil
+		},
+	}
+}
+
 func newActionsLogsCmd() *cobra.Command {
 	var jobID int64
 	var runID int64
+	var attempt int64
+	var step int
 	var outFile string
 	cmd := &cobra.Command{
 		Use:   "logs",
@@ -71,7 +101,7 @@ func newActionsLogsCmd() *cobra.Command {
 				return err
 			}
 			if jobID != 0 {
-				logs, _, err := c.Repo.RepoGetActionJobLogs(context.Background(), owner, repo, jobID, 0)
+				logs, _, err := c.Repo.RepoGetActionJobLogs(context.Background(), owner, repo, jobID, attempt, step)
 				if err != nil {
 					return err
 				}
@@ -98,6 +128,8 @@ func newActionsLogsCmd() *cobra.Command {
 	}
 	cmd.Flags().Int64Var(&jobID, "job", 0, "print a single job's logs (plain text)")
 	cmd.Flags().Int64Var(&runID, "run", 0, "download all jobs' logs for a run (zip)")
+	cmd.Flags().Int64Var(&attempt, "attempt", 0, "with --job: fetch a specific historical attempt (default: latest)")
+	cmd.Flags().IntVar(&step, "step", 0, "with --job: narrow to one step (number from `fj actions job`; omit for all steps)")
 	cmd.Flags().StringVar(&outFile, "out", "", "output file for --run (default: run-<id>-logs.zip)")
 	return cmd
 }
@@ -355,5 +387,3 @@ func newActionsSecretsCmd() *cobra.Command {
 	})
 	return cmd
 }
-
-

@@ -486,6 +486,18 @@ func TestCLICommands(t *testing.T) {
 			t.Fatal(err)
 		}
 
+		// job metadata endpoint (#126 backport): flag binding + not-found error
+		// surface. A real job needs a runner, which the harness lacks — a
+		// missing job must fail SERVER-SIDE (handler 404 message on stderr),
+		// never at flag parsing, proving the command reaches the endpoint.
+		out, errOut, err := runFjFull(t, binary, "actions", "job", "999999", "-r", ownerRepo)
+		if err == nil {
+			t.Fatalf("expected not-found error for nonexistent job, got output: %s", out)
+		}
+		if strings.Contains(errOut, "unknown flag") || strings.Contains(errOut, "invalid argument") {
+			t.Fatalf("command failed at flag parsing, not at the endpoint: %s", errOut)
+		}
+
 		// variables CRUD
 		if _, err := runFj(t, binary, "actions", "variables", "create",
 			"VAR_TEST", "v1", "-r", ownerRepo); err != nil {

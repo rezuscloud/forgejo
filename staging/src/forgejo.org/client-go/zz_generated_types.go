@@ -108,7 +108,16 @@ type ActionRunJob struct {
 	RunId int64 `json:"run_id,omitempty"`
 	RunsOn []string `json:"runs_on,omitempty"`
 	Status string `json:"status,omitempty"`
+	Steps []*ActionRunJobStep `json:"steps,omitempty"`
 	TaskId int64 `json:"task_id,omitempty"`
+}
+
+type ActionRunJobStep struct {
+	Name string `json:"name,omitempty"`
+	Number int64 `json:"number,omitempty"`
+	Started *time.Time `json:"started,omitempty"`
+	Status string `json:"status,omitempty"`
+	Stopped *time.Time `json:"stopped,omitempty"`
 }
 
 type ActionRunner struct {
