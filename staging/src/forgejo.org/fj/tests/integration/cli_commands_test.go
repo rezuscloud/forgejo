@@ -516,6 +516,26 @@ func TestCLICommands(t *testing.T) {
 		} else {
 			contains(t, out, org)
 		}
+
+		// the friendly create surface (#105): --username maps into the body
+		// field the raw api command's --organization blob could never reach
+		created := fmt.Sprintf("org-fj-%d", time.Now().UnixNano())
+		if out, err := runFj(t, binary, "org", "create", "--username", created,
+			"--full-name", "fj integration", "--visibility", "limited"); err != nil {
+			t.Fatal(err)
+		} else {
+			contains(t, out, created)
+			contains(t, out, "limited")
+		}
+		if out, err := runFj(t, binary, "org", "view", created); err != nil {
+			t.Fatal(err)
+		} else {
+			contains(t, out, "fj integration")
+		}
+		// missing --username fails before any request
+		if _, err := runFj(t, binary, "org", "create"); err == nil {
+			t.Fatal("expected org create without --username to fail")
+		}
 	})
 
 	// ---- wiki: seed a page via API, then list / view ------------------
