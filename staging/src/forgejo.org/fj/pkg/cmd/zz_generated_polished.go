@@ -429,6 +429,7 @@ func newPolishIssueCmd() *cobra.Command {
 	cmd.AddCommand(newPolishIssueCommentCmd())
 	cmd.AddCommand(newPolishIssueCloseCmd())
 	cmd.AddCommand(newPolishIssueReopenCmd())
+	cmd.AddCommand(newIssueLabelCmd())
 	return cmd
 }
 

@@ -1010,6 +1010,11 @@ type PolishGroup struct {
 	Alias    string          `json:"alias,omitempty"`
 	Short    string          `json:"short"`
 	Commands []PolishCommand `json:"commands"`
+	// Extra names hand-written cobra constructors (in pkg/cmd) that the
+	// generated group mounts after its descriptor commands — the seam for
+	// multi-operation commands (orchestration over several API ops) that a
+	// single-op descriptor cannot express.
+	Extra []string `json:"extra,omitempty"`
 }
 
 type PolishCommand struct {
@@ -1304,6 +1309,9 @@ func genPolishGroup(g PolishGroup, ops map[string]polishOpRef, spec *SwaggerSpec
 	for _, c := range g.Commands {
 		defs.WriteString(genPolishCommand(g, c, ops, spec))
 		b.WriteString(fmt.Sprintf("\tcmd.AddCommand(newPolish%s%sCmd())\n", pc(g.Name), pc(c.Name)))
+	}
+	for _, ctor := range g.Extra {
+		b.WriteString(fmt.Sprintf("\tcmd.AddCommand(%s())\n", ctor))
 	}
 	b.WriteString("\treturn cmd\n}\n\n")
 	b.WriteString(defs.String())
