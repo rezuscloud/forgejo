@@ -637,6 +637,72 @@ func newPolishIssueReopenCmd() *cobra.Command {
 	return cmd
 }
 
+func newPolishStatusCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "status",
+		Short: "View commit statuses (combined CI state and raw records)",
+	}
+	cmd.AddCommand(newPolishStatusViewCmd())
+	cmd.AddCommand(newPolishStatusListCmd())
+	return cmd
+}
+
+// newPolishStatusViewCmd — Combined commit status for a ref or SHA (normalized per-context states)
+func newPolishStatusViewCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "view <REF>",
+		Short: "Combined commit status for a ref or SHA (normalized per-context states)",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ref := args[0]
+			c, owner, repo, err := resolveClient(cmd)
+			if err != nil { return err }
+			res, _, err := c.Repo.RepoGetCombinedStatusByRef(context.Background(), owner, repo, ref, 1, 100)
+			if err != nil { return err }
+			fmt.Printf("Overall: %s %s\n", statusSymbol(commitStateStr(res.State)), commitStateStr(res.State))
+			fmt.Printf("Head: %s\n", res.Sha)
+			fmt.Printf("Contexts: %d\n", res.TotalCount)
+			if len(res.Statuses) == 0 {
+				fmt.Println("no statuses reported")
+			}
+			for _, it := range res.Statuses {
+				fmt.Printf("  %s %-9s %s\n", statusSymbol(commitStateStr(it.Status)), commitStateStr(it.Status), it.Context)
+			}
+			return nil
+		},
+	}
+	return cmd
+}
+
+// newPolishStatusListCmd — Raw commit status records for a SHA, newest first
+func newPolishStatusListCmd() *cobra.Command {
+	var sort string
+	var state string
+	cmd := &cobra.Command{
+		Use:   "list <SHA>",
+		Short: "Raw commit status records for a SHA, newest first",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			sha := args[0]
+			c, owner, repo, err := resolveClient(cmd)
+			if err != nil { return err }
+			res, _, err := c.Repo.RepoListStatuses(context.Background(), owner, repo, sha, sort, state, 1, 100)
+			if err != nil { return err }
+			if len(res) == 0 {
+				fmt.Println("no status records")
+				return nil
+			}
+			for _, it := range res {
+				fmt.Printf("%s %-9s %-55s %s %s\n", statusSymbol(commitStateStr(it.Status)), commitStateStr(it.Status), it.Context, timeStr(it.CreatedAt), it.Description)
+			}
+			return nil
+		},
+	}
+	cmd.Flags().StringVar(&sort, "sort", "", "sort order (oldestupdate/recentupdate/leastindex/highestindex/leastupdate/default)")
+	cmd.Flags().StringVar(&state, "state", "", "filter by state (pending/success/error/failure/warning)")
+	return cmd
+}
+
 // NewPolishedCmds returns the descriptor-driven polished command groups
 // (gen/polish.json). Root registers these once; adding a group is a
 // descriptor edit + regen — no hand-written command file, no root edit.
@@ -645,6 +711,7 @@ func NewPolishedCmds() []*cobra.Command {
 		newPolishMilestoneCmd(),
 		newPolishReviewCmd(),
 		newPolishIssueCmd(),
+		newPolishStatusCmd(),
 	}
 }
 

@@ -380,6 +380,103 @@ func TestCLICommands(t *testing.T) {
 		}
 	})
 
+	// ---- status: combined + raw commit-status views. The per-entry JSON
+	// field is `status` (not GitHub's `state`) — the polished view normalizes
+	// it to a rendered STATE column so GitHub-schema reflexes cannot misread
+	// it (the #132 incident class). Descriptor-driven via `entries` (#135).
+	t.Run("status", func(t *testing.T) {
+		// resolve the seed repo's current head (earlier subtests merged PRs)
+		code, body := apiJSON(t, "GET", "/repos/"+ownerRepo+"/branches/main", nil)
+		if code >= 300 {
+			t.Fatalf("get main branch: %d %s", code, body)
+		}
+		var br struct {
+			Commit struct {
+				ID string `json:"id"`
+			} `json:"commit"`
+		}
+		if err := json.Unmarshal([]byte(body), &br); err != nil {
+			t.Fatal(err)
+		}
+		sha := br.Commit.ID
+
+		post := func(context, state string) {
+			t.Helper()
+			code, out := apiJSON(t, "POST", "/repos/"+ownerRepo+"/statuses/"+sha, map[string]interface{}{
+				"state":       state,
+				"context":     context,
+				"description": "seed " + context + " " + state,
+			})
+			if code >= 300 {
+				t.Fatalf("seed status %s=%s: %d %s", context, state, code, out)
+			}
+		}
+		post("ci/seed-superseded", "failure")
+		post("ci/seed-superseded", "success") // latest record per context wins
+		post("ci/seed-pending", "pending")
+
+		// view by sha: normalized overall + per-context states
+		out, err := runFj(t, binary, "status", "view", sha, "-r", ownerRepo)
+		if err != nil {
+			t.Fatal(err)
+		}
+		contains(t, out, "Overall:")
+		contains(t, out, "pending") // combined state: one pending context
+		contains(t, out, "ci/seed-superseded")
+		contains(t, out, "success") // per-entry state rendered — the raw JSON field is `status`
+		if strings.Contains(out, "failure") {
+			t.Errorf("superseded failure leaked into the combined view:\n%s", out)
+		}
+
+		// view by branch ref resolves the same head
+		if out, err = runFj(t, binary, "status", "view", "main", "-r", ownerRepo); err != nil {
+			t.Fatal(err)
+		}
+		contains(t, out, "Overall:")
+		contains(t, out, "ci/seed-pending")
+
+		// list: raw records with descriptions rendered; ordering asserted via
+		// the deterministic index sort (created_unix ties break arbitrarily —
+		// the records post within the same second)
+		if out, err = runFj(t, binary, "status", "list", sha, "-r", ownerRepo); err != nil {
+			t.Fatal(err)
+		}
+		contains(t, out, "seed ci/seed-pending pending")
+		contains(t, out, "seed ci/seed-superseded success")
+		contains(t, out, "seed ci/seed-superseded failure")
+		if out, err = runFj(t, binary, "status", "list", sha, "-r", ownerRepo,
+			"--sort", "leastindex"); err != nil {
+			t.Fatal(err)
+		}
+		pendingAt := strings.Index(out, "ci/seed-pending")
+		successAt := strings.Index(out, "seed ci/seed-superseded success")
+		failureAt := strings.Index(out, "seed ci/seed-superseded failure")
+		if pendingAt < 0 || successAt < 0 || failureAt < 0 {
+			t.Fatalf("status list missing records:\n%s", out)
+		}
+		if !(pendingAt < successAt && successAt < failureAt) {
+			t.Errorf("status list --sort leastindex not newest-posted-first (pending@%d success@%d failure@%d):\n%s",
+				pendingAt, successAt, failureAt, out)
+		}
+
+		// state filter: only matching records
+		if out, err = runFj(t, binary, "status", "list", sha, "-r", ownerRepo,
+			"--state", "pending"); err != nil {
+			t.Fatal(err)
+		}
+		contains(t, out, "ci/seed-pending")
+		if strings.Contains(out, "ci/seed-superseded") {
+			t.Errorf("--state pending leaked non-pending records:\n%s", out)
+		}
+
+		// empty head: a fresh branch commit with no statuses
+		createFileOnBranch(t, repo, "status-empty.txt", "", "status-empty-branch", "x")
+		if out, err = runFj(t, binary, "status", "view", "status-empty-branch", "-r", ownerRepo); err != nil {
+			t.Fatal(err)
+		}
+		contains(t, out, "no statuses reported")
+	})
+
 	// ---- review: pending → comment → submit → reply → resolve (#115) ----
 	t.Run("review", func(t *testing.T) {
 		createFileOnBranch(t, repo, "review.txt", "", "review-branch", "hello")
