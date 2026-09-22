@@ -238,16 +238,19 @@ func TestCLICommands(t *testing.T) {
 
 		// labels (#104): names resolve server-side — add / list / remove / set
 		// through the polished issue group's extra command.
+		idxs := strconv.FormatInt(idx, 10)
+		// label creation rides the generated api surface; its --repo path
+		// param shadows the root -r shorthand, so owner/repo go as full flags
+		split := strings.SplitN(ownerRepo, "/", 2)
 		for _, lbl := range []string{
 			`{"name":"area/cli","color":"#00aabb"}`,
 			`{"name":"area/api","color":"#aa00bb"}`,
 		} {
 			if _, err = runFj(t, binary, "api", "repo", "issue-create-label",
-				"-r", ownerRepo, "--body", lbl); err != nil {
+				"--owner", split[0], "--repo", split[1], "--body", lbl); err != nil {
 				t.Fatal(err)
 			}
 		}
-		idxs := strconv.FormatInt(idx, 10)
 		if out, err = runFj(t, binary, "issue", "label", idxs,
 			"-r", ownerRepo, "--add", "area/cli, area/api"); err != nil {
 			t.Fatal(err)
