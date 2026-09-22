@@ -52,8 +52,20 @@ verification surface. --set cannot be combined with --add/--remove.`,
 				}
 			}
 			for _, name := range splitLabelNames(remove) {
+				ident := name
+				if strings.Contains(name, "/") {
+					// The remove identifier travels in the URL path — a name with a
+					// slash (e.g. forgejo exclusive labels, scope/name) can never
+					// match the single-segment route. Resolve it to its numeric id
+					// via the repo label list; the identifier route accepts ids.
+					id, err := labelIDByName(c, owner, repo, name)
+					if err != nil {
+						return fmt.Errorf("remove label %q: %w", name, err)
+					}
+					ident = strconv.FormatInt(id, 10)
+				}
 				if _, err := c.Repo.IssueRemoveLabel(context.Background(), owner, repo, index,
-					name, &forgejo.DeleteLabelsOption{}); err != nil {
+					ident, &forgejo.DeleteLabelsOption{}); err != nil {
 					return fmt.Errorf("remove label %q: %w", name, err)
 				}
 			}
@@ -82,6 +94,19 @@ verification surface. --set cannot be combined with --add/--remove.`,
 	cmd.Flags().StringVar(&remove, "remove", "", "labels to delete (comma-separated names)")
 	cmd.Flags().StringVar(&set, "set", "", "replace the label set with exactly these names")
 	return cmd
+}
+
+func labelIDByName(c *forgejo.Client, owner, repo, name string) (int64, error) {
+	labels, _, err := c.Repo.IssueListLabels(context.Background(), owner, repo, "", 1, 100)
+	if err != nil {
+		return 0, err
+	}
+	for _, l := range labels {
+		if l.Name == name {
+			return l.Id, nil
+		}
+	}
+	return 0, fmt.Errorf("label %q not found in repo", name)
 }
 
 func splitLabelNames(csv string) []string {
