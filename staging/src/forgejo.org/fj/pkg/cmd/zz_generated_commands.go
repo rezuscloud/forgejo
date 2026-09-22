@@ -189,7 +189,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.ForgeLike
-			if activitypubrepositoryinbox_body != "" { json.Unmarshal([]byte(activitypubrepositoryinbox_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(activitypubrepositoryinbox_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.ForgeLike: %w", e)
+			}
 			_, err := cli.ActivityPub.ActivitypubRepositoryInbox(context.Background(), activitypubrepositoryinbox_repositoryId, &bodyVal)
 			if err != nil { return err }
 			return nil
@@ -276,7 +278,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateHookOption
-			if admincreatehook_body != "" { json.Unmarshal([]byte(admincreatehook_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(admincreatehook_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.CreateHookOption: %w", e)
+			}
 			res, _, err := cli.Admin.AdminCreateHook(context.Background(), &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -295,7 +299,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateOrgOption
-			if admincreateorg_organization != "" { json.Unmarshal([]byte(admincreateorg_organization), &bodyVal) }
+			if e := json.Unmarshal([]byte(admincreateorg_organization), &bodyVal); e != nil {
+				return fmt.Errorf("flag --organization: expected a JSON object for forgejo.CreateOrgOption: %w", e)
+			}
 			res, _, err := cli.Admin.AdminCreateOrg(context.Background(), admincreateorg_username, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -315,7 +321,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateKeyOption
-			if admincreatepublickey_key != "" { json.Unmarshal([]byte(admincreatepublickey_key), &bodyVal) }
+			if e := json.Unmarshal([]byte(admincreatepublickey_key), &bodyVal); e != nil {
+				return fmt.Errorf("flag --key: expected a JSON object for forgejo.CreateKeyOption: %w", e)
+			}
 			res, _, err := cli.Admin.AdminCreatePublicKey(context.Background(), admincreatepublickey_username, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -333,7 +341,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateQuotaGroupOptions
-			if admincreatequotagroup_group != "" { json.Unmarshal([]byte(admincreatequotagroup_group), &bodyVal) }
+			if e := json.Unmarshal([]byte(admincreatequotagroup_group), &bodyVal); e != nil {
+				return fmt.Errorf("flag --group: expected a JSON object for forgejo.CreateQuotaGroupOptions: %w", e)
+			}
 			res, _, err := cli.Admin.AdminCreateQuotaGroup(context.Background(), &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -350,7 +360,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateQuotaRuleOptions
-			if admincreatequotarule_rule != "" { json.Unmarshal([]byte(admincreatequotarule_rule), &bodyVal) }
+			if e := json.Unmarshal([]byte(admincreatequotarule_rule), &bodyVal); e != nil {
+				return fmt.Errorf("flag --rule: expected a JSON object for forgejo.CreateQuotaRuleOptions: %w", e)
+			}
 			res, _, err := cli.Admin.AdminCreateQuotaRule(context.Background(), &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -369,7 +381,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateRepoOption
-			if admincreaterepo_repository != "" { json.Unmarshal([]byte(admincreaterepo_repository), &bodyVal) }
+			if e := json.Unmarshal([]byte(admincreaterepo_repository), &bodyVal); e != nil {
+				return fmt.Errorf("flag --repository: expected a JSON object for forgejo.CreateRepoOption: %w", e)
+			}
 			res, _, err := cli.Admin.AdminCreateRepo(context.Background(), admincreaterepo_username, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -387,7 +401,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateUserOption
-			if admincreateuser_body != "" { json.Unmarshal([]byte(admincreateuser_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(admincreateuser_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.CreateUserOption: %w", e)
+			}
 			res, _, err := cli.Admin.AdminCreateUser(context.Background(), &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -406,7 +422,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateAccessTokenOption
-			if admincreateuseraccesstoken_body != "" { json.Unmarshal([]byte(admincreateuseraccesstoken_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(admincreateuseraccesstoken_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.CreateAccessTokenOption: %w", e)
+			}
 			res, _, err := cli.Admin.AdminCreateUserAccessToken(context.Background(), admincreateuseraccesstoken_username, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -551,7 +569,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.DeleteEmailOption
-			if admindeleteuseremails_body != "" { json.Unmarshal([]byte(admindeleteuseremails_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(admindeleteuseremails_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.DeleteEmailOption: %w", e)
+			}
 			_, err := cli.Admin.AdminDeleteUserEmails(context.Background(), admindeleteuseremails_username, &bodyVal)
 			if err != nil { return err }
 			return nil
@@ -586,7 +606,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.EditHookOption
-			if adminedithook_body != "" { json.Unmarshal([]byte(adminedithook_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(adminedithook_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.EditHookOption: %w", e)
+			}
 			res, _, err := cli.Admin.AdminEditHook(context.Background(), adminedithook_id, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -606,7 +628,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.EditQuotaRuleOptions
-			if admineditquotarule_rule != "" { json.Unmarshal([]byte(admineditquotarule_rule), &bodyVal) }
+			if e := json.Unmarshal([]byte(admineditquotarule_rule), &bodyVal); e != nil {
+				return fmt.Errorf("flag --rule: expected a JSON object for forgejo.EditQuotaRuleOptions: %w", e)
+			}
 			res, _, err := cli.Admin.AdminEditQuotaRule(context.Background(), admineditquotarule_quotarule, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -626,7 +650,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.EditUserOption
-			if adminedituser_body != "" { json.Unmarshal([]byte(adminedituser_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(adminedituser_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.EditUserOption: %w", e)
+			}
 			res, _, err := cli.Admin.AdminEditUser(context.Background(), adminedituser_username, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -930,7 +956,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.RenameUserOption
-			if adminrenameuser_body != "" { json.Unmarshal([]byte(adminrenameuser_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(adminrenameuser_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.RenameUserOption: %w", e)
+			}
 			_, err := cli.Admin.AdminRenameUser(context.Background(), adminrenameuser_username, &bodyVal)
 			if err != nil { return err }
 			return nil
@@ -1013,7 +1041,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.SetUserQuotaGroupsOptions
-			if adminsetuserquotagroups_groups != "" { json.Unmarshal([]byte(adminsetuserquotagroups_groups), &bodyVal) }
+			if e := json.Unmarshal([]byte(adminsetuserquotagroups_groups), &bodyVal); e != nil {
+				return fmt.Errorf("flag --groups: expected a JSON object for forgejo.SetUserQuotaGroupsOptions: %w", e)
+			}
 			_, err := cli.Admin.AdminSetUserQuotaGroups(context.Background(), adminsetuserquotagroups_username, &bodyVal)
 			if err != nil { return err }
 			return nil
@@ -1101,7 +1131,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.RegisterRunnerOptions
-			if registeradminrunner_body != "" { json.Unmarshal([]byte(registeradminrunner_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(registeradminrunner_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.RegisterRunnerOptions: %w", e)
+			}
 			res, _, err := cli.Admin.RegisterAdminRunner(context.Background(), &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -1122,7 +1154,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateRepoOption
-			if createcurrentuserrepo_body != "" { json.Unmarshal([]byte(createcurrentuserrepo_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(createcurrentuserrepo_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.CreateRepoOption: %w", e)
+			}
 			res, _, err := cli.Misc.CreateCurrentUserRepo(context.Background(), &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -1141,7 +1175,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateRepoOption
-			if createorgrepodeprecated_body != "" { json.Unmarshal([]byte(createorgrepodeprecated_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(createorgrepodeprecated_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.CreateRepoOption: %w", e)
+			}
 			res, _, err := cli.Misc.CreateOrgRepoDeprecated(context.Background(), createorgrepodeprecated_org, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -1161,7 +1197,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateVariableOption
-			if createuservariable_body != "" { json.Unmarshal([]byte(createuservariable_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(createuservariable_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.CreateVariableOption: %w", e)
+			}
 			_, err := cli.Misc.CreateUserVariable(context.Background(), createuservariable_variablename, &bodyVal)
 			if err != nil { return err }
 			return nil
@@ -1706,7 +1744,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.EditTeamOption
-			if orgeditteam_body != "" { json.Unmarshal([]byte(orgeditteam_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(orgeditteam_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.EditTeamOption: %w", e)
+			}
 			res, _, err := cli.Misc.OrgEditTeam(context.Background(), orgeditteam_id, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -1905,7 +1945,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.RegisterRunnerOptions
-			if registeruserrunner_body != "" { json.Unmarshal([]byte(registeruserrunner_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(registeruserrunner_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.RegisterRunnerOptions: %w", e)
+			}
 			res, _, err := cli.Misc.RegisterUserRunner(context.Background(), &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -1922,7 +1964,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.MarkdownOption
-			if rendermarkdown_body != "" { json.Unmarshal([]byte(rendermarkdown_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(rendermarkdown_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.MarkdownOption: %w", e)
+			}
 			res, _, err := cli.Misc.RenderMarkdown(context.Background(), &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -1939,7 +1983,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal string
-			if rendermarkdownraw_body != "" { json.Unmarshal([]byte(rendermarkdownraw_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(rendermarkdownraw_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for string: %w", e)
+			}
 			res, _, err := cli.Misc.RenderMarkdownRaw(context.Background(), bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -1956,7 +2002,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.MarkupOption
-			if rendermarkup_body != "" { json.Unmarshal([]byte(rendermarkup_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(rendermarkup_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.MarkupOption: %w", e)
+			}
 			res, _, err := cli.Misc.RenderMarkup(context.Background(), &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -2030,7 +2078,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateOrUpdateSecretOption
-			if updateusersecret_body != "" { json.Unmarshal([]byte(updateusersecret_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(updateusersecret_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.CreateOrUpdateSecretOption: %w", e)
+			}
 			_, err := cli.Misc.UpdateUserSecret(context.Background(), updateusersecret_secretname, &bodyVal)
 			if err != nil { return err }
 			return nil
@@ -2046,7 +2096,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.UserSettingsOptions
-			if updateusersettings_body != "" { json.Unmarshal([]byte(updateusersettings_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(updateusersettings_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.UserSettingsOptions: %w", e)
+			}
 			res, _, err := cli.Misc.UpdateUserSettings(context.Background(), &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -2065,7 +2117,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.UpdateVariableOption
-			if updateuservariable_body != "" { json.Unmarshal([]byte(updateuservariable_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(updateuservariable_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.UpdateVariableOption: %w", e)
+			}
 			_, err := cli.Misc.UpdateUserVariable(context.Background(), updateuservariable_variablename, &bodyVal)
 			if err != nil { return err }
 			return nil
@@ -2081,7 +2135,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateEmailOption
-			if useraddemail_body != "" { json.Unmarshal([]byte(useraddemail_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(useraddemail_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.CreateEmailOption: %w", e)
+			}
 			res, _, err := cli.Misc.UserAddEmail(context.Background(), &bodyVal)
 			if err != nil { return err }
 			if res != nil {
@@ -2129,7 +2185,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateHookOption
-			if usercreatehook_body != "" { json.Unmarshal([]byte(usercreatehook_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(usercreatehook_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.CreateHookOption: %w", e)
+			}
 			res, _, err := cli.Misc.UserCreateHook(context.Background(), &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -2146,7 +2204,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateOAuth2ApplicationOptions
-			if usercreateoauth2application_body != "" { json.Unmarshal([]byte(usercreateoauth2application_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(usercreateoauth2application_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.CreateOAuth2ApplicationOptions: %w", e)
+			}
 			res, _, err := cli.Misc.UserCreateOAuth2Application(context.Background(), &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -2163,7 +2223,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.APRemoteFollowOption
-			if usercurrentactivitypubfollow_body != "" { json.Unmarshal([]byte(usercurrentactivitypubfollow_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(usercurrentactivitypubfollow_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.APRemoteFollowOption: %w", e)
+			}
 			_, err := cli.Misc.UserCurrentActivityPubFollow(context.Background(), &bodyVal)
 			if err != nil { return err }
 			return nil
@@ -2437,7 +2499,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateGPGKeyOption
-			if usercurrentpostgpgkey_form != "" { json.Unmarshal([]byte(usercurrentpostgpgkey_form), &bodyVal) }
+			if e := json.Unmarshal([]byte(usercurrentpostgpgkey_form), &bodyVal); e != nil {
+				return fmt.Errorf("flag --form: expected a JSON object for forgejo.CreateGPGKeyOption: %w", e)
+			}
 			res, _, err := cli.Misc.UserCurrentPostGPGKey(context.Background(), &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -2454,7 +2518,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateKeyOption
-			if usercurrentpostkey_body != "" { json.Unmarshal([]byte(usercurrentpostkey_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(usercurrentpostkey_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.CreateKeyOption: %w", e)
+			}
 			res, _, err := cli.Misc.UserCurrentPostKey(context.Background(), &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -2536,7 +2602,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.DeleteEmailOption
-			if userdeleteemail_body != "" { json.Unmarshal([]byte(userdeleteemail_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(userdeleteemail_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.DeleteEmailOption: %w", e)
+			}
 			_, err := cli.Misc.UserDeleteEmail(context.Background(), &bodyVal)
 			if err != nil { return err }
 			return nil
@@ -2581,7 +2649,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.EditHookOption
-			if useredithook_body != "" { json.Unmarshal([]byte(useredithook_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(useredithook_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.EditHookOption: %w", e)
+			}
 			res, _, err := cli.Misc.UserEditHook(context.Background(), useredithook_id, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -2862,7 +2932,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.UpdateUserAvatarOption
-			if userupdateavatar_body != "" { json.Unmarshal([]byte(userupdateavatar_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(userupdateavatar_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.UpdateUserAvatarOption: %w", e)
+			}
 			_, err := cli.Misc.UserUpdateAvatar(context.Background(), &bodyVal)
 			if err != nil { return err }
 			return nil
@@ -2879,7 +2951,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateOAuth2ApplicationOptions
-			if userupdateoauth2application_body != "" { json.Unmarshal([]byte(userupdateoauth2application_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(userupdateoauth2application_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.CreateOAuth2ApplicationOptions: %w", e)
+			}
 			res, _, err := cli.Misc.UserUpdateOAuth2Application(context.Background(), userupdateoauth2application_id, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -2897,7 +2971,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.VerifyGPGKeyOption
-			if userverifygpgkey_body != "" { json.Unmarshal([]byte(userverifygpgkey_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(userverifygpgkey_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.VerifyGPGKeyOption: %w", e)
+			}
 			res, _, err := cli.Misc.UserVerifyGPGKey(context.Background(), &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -3017,7 +3093,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateRepoOption
-			if createorgrepo_body != "" { json.Unmarshal([]byte(createorgrepo_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(createorgrepo_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.CreateRepoOption: %w", e)
+			}
 			res, _, err := cli.Org.CreateOrgRepo(context.Background(), createorgrepo_org, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -3039,7 +3117,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateVariableOption
-			if createorgvariable_body != "" { json.Unmarshal([]byte(createorgvariable_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(createorgvariable_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.CreateVariableOption: %w", e)
+			}
 			_, err := cli.Org.CreateOrgVariable(context.Background(), createorgvariable_org, createorgvariable_variablename, &bodyVal)
 			if err != nil { return err }
 			return nil
@@ -3243,7 +3323,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateOrgOption
-			if orgcreate_organization != "" { json.Unmarshal([]byte(orgcreate_organization), &bodyVal) }
+			if e := json.Unmarshal([]byte(orgcreate_organization), &bodyVal); e != nil {
+				return fmt.Errorf("flag --organization: expected a JSON object for forgejo.CreateOrgOption: %w", e)
+			}
 			res, _, err := cli.Org.OrgCreate(context.Background(), &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -3262,7 +3344,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateHookOption
-			if orgcreatehook_body != "" { json.Unmarshal([]byte(orgcreatehook_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(orgcreatehook_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.CreateHookOption: %w", e)
+			}
 			res, _, err := cli.Org.OrgCreateHook(context.Background(), orgcreatehook_org, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -3282,7 +3366,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateLabelOption
-			if orgcreatelabel_body != "" { json.Unmarshal([]byte(orgcreatelabel_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(orgcreatelabel_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.CreateLabelOption: %w", e)
+			}
 			res, _, err := cli.Org.OrgCreateLabel(context.Background(), orgcreatelabel_org, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -3302,7 +3388,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateTeamOption
-			if orgcreateteam_body != "" { json.Unmarshal([]byte(orgcreateteam_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(orgcreateteam_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.CreateTeamOption: %w", e)
+			}
 			res, _, err := cli.Org.OrgCreateTeam(context.Background(), orgcreateteam_org, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -3401,7 +3489,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.EditOrgOption
-			if orgedit_body != "" { json.Unmarshal([]byte(orgedit_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(orgedit_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.EditOrgOption: %w", e)
+			}
 			res, _, err := cli.Org.OrgEdit(context.Background(), orgedit_org, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -3423,7 +3513,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.EditHookOption
-			if orgedithook_body != "" { json.Unmarshal([]byte(orgedithook_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(orgedithook_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.EditHookOption: %w", e)
+			}
 			res, _, err := cli.Org.OrgEditHook(context.Background(), orgedithook_org, orgedithook_id, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -3446,7 +3538,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.EditLabelOption
-			if orgeditlabel_body != "" { json.Unmarshal([]byte(orgeditlabel_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(orgeditlabel_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.EditLabelOption: %w", e)
+			}
 			res, _, err := cli.Org.OrgEditLabel(context.Background(), orgeditlabel_org, orgeditlabel_id, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -3922,7 +4016,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.UpdateUserAvatarOption
-			if orgupdateavatar_body != "" { json.Unmarshal([]byte(orgupdateavatar_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(orgupdateavatar_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.UpdateUserAvatarOption: %w", e)
+			}
 			_, err := cli.Org.OrgUpdateAvatar(context.Background(), orgupdateavatar_org, &bodyVal)
 			if err != nil { return err }
 			return nil
@@ -3940,7 +4036,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.RegisterRunnerOptions
-			if registerorgrunner_body != "" { json.Unmarshal([]byte(registerorgrunner_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(registerorgrunner_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.RegisterRunnerOptions: %w", e)
+			}
 			res, _, err := cli.Org.RegisterOrgRunner(context.Background(), registerorgrunner_org, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -3960,7 +4058,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.RenameOrgOption
-			if renameorg_body != "" { json.Unmarshal([]byte(renameorg_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(renameorg_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.RenameOrgOption: %w", e)
+			}
 			_, err := cli.Org.RenameOrg(context.Background(), renameorg_org, &bodyVal)
 			if err != nil { return err }
 			return nil
@@ -4004,7 +4104,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateOrUpdateSecretOption
-			if updateorgsecret_body != "" { json.Unmarshal([]byte(updateorgsecret_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(updateorgsecret_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.CreateOrUpdateSecretOption: %w", e)
+			}
 			_, err := cli.Org.UpdateOrgSecret(context.Background(), updateorgsecret_org, updateorgsecret_secretname, &bodyVal)
 			if err != nil { return err }
 			return nil
@@ -4025,7 +4127,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.UpdateVariableOption
-			if updateorgvariable_body != "" { json.Unmarshal([]byte(updateorgvariable_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(updateorgvariable_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.UpdateVariableOption: %w", e)
+			}
 			_, err := cli.Org.UpdateOrgVariable(context.Background(), updateorgvariable_org, updateorgvariable_variablename, &bodyVal)
 			if err != nil { return err }
 			return nil
@@ -4134,7 +4238,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.DispatchWorkflowOption
-			if dispatchworkflow_body != "" { json.Unmarshal([]byte(dispatchworkflow_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(dispatchworkflow_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.DispatchWorkflowOption: %w", e)
+			}
 			res, _, err := cli.Repo.DispatchWorkflow(context.Background(), dispatchworkflow_owner, dispatchworkflow_repo, dispatchworkflow_workflowfilename, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -4472,7 +4578,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateForkOption
-			if createfork_body != "" { json.Unmarshal([]byte(createfork_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(createfork_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.CreateForkOption: %w", e)
+			}
 			_, err := cli.Repo.CreateFork(context.Background(), createfork_owner, createfork_repo, &bodyVal)
 			if err != nil { return err }
 			return nil
@@ -4495,7 +4603,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateVariableOption
-			if createrepovariable_body != "" { json.Unmarshal([]byte(createrepovariable_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(createrepovariable_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.CreateVariableOption: %w", e)
+			}
 			_, err := cli.Repo.CreateRepoVariable(context.Background(), createrepovariable_owner, createrepovariable_repo, createrepovariable_variablename, &bodyVal)
 			if err != nil { return err }
 			return nil
@@ -4577,7 +4687,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.GenerateRepoOption
-			if generaterepo_body != "" { json.Unmarshal([]byte(generaterepo_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(generaterepo_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.GenerateRepoOption: %w", e)
+			}
 			res, _, err := cli.Repo.GenerateRepo(context.Background(), generaterepo_templateOwner, generaterepo_templateRepo, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -4698,7 +4810,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.IssueLabelsOption
-			if issueaddlabel_body != "" { json.Unmarshal([]byte(issueaddlabel_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(issueaddlabel_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.IssueLabelsOption: %w", e)
+			}
 			res, _, err := cli.Repo.IssueAddLabel(context.Background(), issueaddlabel_owner, issueaddlabel_repo, issueaddlabel_index, &bodyVal)
 			if err != nil { return err }
 			if res != nil {
@@ -4749,7 +4863,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.AddTimeOption
-			if issueaddtime_body != "" { json.Unmarshal([]byte(issueaddtime_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(issueaddtime_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.AddTimeOption: %w", e)
+			}
 			res, _, err := cli.Repo.IssueAddTime(context.Background(), issueaddtime_owner, issueaddtime_repo, issueaddtime_index, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -4797,7 +4913,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.DeleteLabelsOption
-			if issueclearlabels_body != "" { json.Unmarshal([]byte(issueclearlabels_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(issueclearlabels_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.DeleteLabelsOption: %w", e)
+			}
 			_, err := cli.Repo.IssueClearLabels(context.Background(), issueclearlabels_owner, issueclearlabels_repo, issueclearlabels_index, &bodyVal)
 			if err != nil { return err }
 			return nil
@@ -4821,7 +4939,15 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateIssueCommentOption
-			if issuecreatecomment_body != "" { json.Unmarshal([]byte(issuecreatecomment_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(issuecreatecomment_body), &bodyVal); e != nil {
+				w, werr := json.Marshal(map[string]string{"body": issuecreatecomment_body})
+				if werr != nil {
+					return werr
+				}
+				if e2 := json.Unmarshal(w, &bodyVal); e2 != nil {
+					return fmt.Errorf("flag --body: not a JSON object for forgejo.CreateIssueCommentOption and not plain text (%v / %v)", e, e2)
+				}
+			}
 			res, _, err := cli.Repo.IssueCreateComment(context.Background(), issuecreatecomment_owner, issuecreatecomment_repo, issuecreatecomment_index, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -4845,7 +4971,15 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateIssueOption
-			if issuecreateissue_body != "" { json.Unmarshal([]byte(issuecreateissue_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(issuecreateissue_body), &bodyVal); e != nil {
+				w, werr := json.Marshal(map[string]string{"body": issuecreateissue_body})
+				if werr != nil {
+					return werr
+				}
+				if e2 := json.Unmarshal(w, &bodyVal); e2 != nil {
+					return fmt.Errorf("flag --body: not a JSON object for forgejo.CreateIssueOption and not plain text (%v / %v)", e, e2)
+				}
+			}
 			res, _, err := cli.Repo.IssueCreateIssue(context.Background(), issuecreateissue_owner, issuecreateissue_repo, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -4896,7 +5030,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.IssueMeta
-			if issuecreateissueblocking_body != "" { json.Unmarshal([]byte(issuecreateissueblocking_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(issuecreateissueblocking_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.IssueMeta: %w", e)
+			}
 			res, _, err := cli.Repo.IssueCreateIssueBlocking(context.Background(), issuecreateissueblocking_owner, issuecreateissueblocking_repo, issuecreateissueblocking_index, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -4948,7 +5084,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.IssueMeta
-			if issuecreateissuedependencies_body != "" { json.Unmarshal([]byte(issuecreateissuedependencies_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(issuecreateissuedependencies_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.IssueMeta: %w", e)
+			}
 			res, _, err := cli.Repo.IssueCreateIssueDependencies(context.Background(), issuecreateissuedependencies_owner, issuecreateissuedependencies_repo, issuecreateissuedependencies_index, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -4972,7 +5110,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateLabelOption
-			if issuecreatelabel_body != "" { json.Unmarshal([]byte(issuecreatelabel_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(issuecreatelabel_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.CreateLabelOption: %w", e)
+			}
 			res, _, err := cli.Repo.IssueCreateLabel(context.Background(), issuecreatelabel_owner, issuecreatelabel_repo, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -4995,7 +5135,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateMilestoneOption
-			if issuecreatemilestone_body != "" { json.Unmarshal([]byte(issuecreatemilestone_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(issuecreatemilestone_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.CreateMilestoneOption: %w", e)
+			}
 			res, _, err := cli.Repo.IssueCreateMilestone(context.Background(), issuecreatemilestone_owner, issuecreatemilestone_repo, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -5083,7 +5225,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.EditReactionOption
-			if issuedeletecommentreaction_content != "" { json.Unmarshal([]byte(issuedeletecommentreaction_content), &bodyVal) }
+			if e := json.Unmarshal([]byte(issuedeletecommentreaction_content), &bodyVal); e != nil {
+				return fmt.Errorf("flag --content: expected a JSON object for forgejo.EditReactionOption: %w", e)
+			}
 			_, err := cli.Repo.IssueDeleteCommentReaction(context.Background(), issuedeletecommentreaction_owner, issuedeletecommentreaction_repo, issuedeletecommentreaction_id, &bodyVal)
 			if err != nil { return err }
 			return nil
@@ -5153,7 +5297,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.EditReactionOption
-			if issuedeleteissuereaction_content != "" { json.Unmarshal([]byte(issuedeleteissuereaction_content), &bodyVal) }
+			if e := json.Unmarshal([]byte(issuedeleteissuereaction_content), &bodyVal); e != nil {
+				return fmt.Errorf("flag --content: expected a JSON object for forgejo.EditReactionOption: %w", e)
+			}
 			_, err := cli.Repo.IssueDeleteIssueReaction(context.Background(), issuedeleteissuereaction_owner, issuedeleteissuereaction_repo, issuedeleteissuereaction_index, &bodyVal)
 			if err != nil { return err }
 			return nil
@@ -5283,7 +5429,15 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.EditIssueCommentOption
-			if issueeditcomment_body != "" { json.Unmarshal([]byte(issueeditcomment_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(issueeditcomment_body), &bodyVal); e != nil {
+				w, werr := json.Marshal(map[string]string{"body": issueeditcomment_body})
+				if werr != nil {
+					return werr
+				}
+				if e2 := json.Unmarshal(w, &bodyVal); e2 != nil {
+					return fmt.Errorf("flag --body: not a JSON object for forgejo.EditIssueCommentOption and not plain text (%v / %v)", e, e2)
+				}
+			}
 			res, _, err := cli.Repo.IssueEditComment(context.Background(), issueeditcomment_owner, issueeditcomment_repo, issueeditcomment_id, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -5311,7 +5465,15 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.EditIssueCommentOption
-			if issueeditcommentdeprecated_body != "" { json.Unmarshal([]byte(issueeditcommentdeprecated_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(issueeditcommentdeprecated_body), &bodyVal); e != nil {
+				w, werr := json.Marshal(map[string]string{"body": issueeditcommentdeprecated_body})
+				if werr != nil {
+					return werr
+				}
+				if e2 := json.Unmarshal(w, &bodyVal); e2 != nil {
+					return fmt.Errorf("flag --body: not a JSON object for forgejo.EditIssueCommentOption and not plain text (%v / %v)", e, e2)
+				}
+			}
 			res, _, err := cli.Repo.IssueEditCommentDeprecated(context.Background(), issueeditcommentdeprecated_owner, issueeditcommentdeprecated_repo, issueeditcommentdeprecated_index, issueeditcommentdeprecated_id, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -5338,7 +5500,15 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.EditIssueOption
-			if issueeditissue_body != "" { json.Unmarshal([]byte(issueeditissue_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(issueeditissue_body), &bodyVal); e != nil {
+				w, werr := json.Marshal(map[string]string{"body": issueeditissue_body})
+				if werr != nil {
+					return werr
+				}
+				if e2 := json.Unmarshal(w, &bodyVal); e2 != nil {
+					return fmt.Errorf("flag --body: not a JSON object for forgejo.EditIssueOption and not plain text (%v / %v)", e, e2)
+				}
+			}
 			res, _, err := cli.Repo.IssueEditIssue(context.Background(), issueeditissue_owner, issueeditissue_repo, issueeditissue_index, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -5366,7 +5536,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.EditAttachmentOptions
-			if issueeditissueattachment_body != "" { json.Unmarshal([]byte(issueeditissueattachment_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(issueeditissueattachment_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.EditAttachmentOptions: %w", e)
+			}
 			res, _, err := cli.Repo.IssueEditIssueAttachment(context.Background(), issueeditissueattachment_owner, issueeditissueattachment_repo, issueeditissueattachment_index, issueeditissueattachment_attachmentId, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -5395,7 +5567,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.EditAttachmentOptions
-			if issueeditissuecommentattachment_body != "" { json.Unmarshal([]byte(issueeditissuecommentattachment_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(issueeditissuecommentattachment_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.EditAttachmentOptions: %w", e)
+			}
 			res, _, err := cli.Repo.IssueEditIssueCommentAttachment(context.Background(), issueeditissuecommentattachment_owner, issueeditissuecommentattachment_repo, issueeditissuecommentattachment_id, issueeditissuecommentattachment_attachmentId, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -5422,7 +5596,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.EditDeadlineOption
-			if issueeditissuedeadline_body != "" { json.Unmarshal([]byte(issueeditissuedeadline_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(issueeditissuedeadline_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.EditDeadlineOption: %w", e)
+			}
 			res, _, err := cli.Repo.IssueEditIssueDeadline(context.Background(), issueeditissuedeadline_owner, issueeditissuedeadline_repo, issueeditissuedeadline_index, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -5448,7 +5624,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.EditLabelOption
-			if issueeditlabel_body != "" { json.Unmarshal([]byte(issueeditlabel_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(issueeditlabel_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.EditLabelOption: %w", e)
+			}
 			res, _, err := cli.Repo.IssueEditLabel(context.Background(), issueeditlabel_owner, issueeditlabel_repo, issueeditlabel_id, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -5474,7 +5652,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.EditMilestoneOption
-			if issueeditmilestone_body != "" { json.Unmarshal([]byte(issueeditmilestone_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(issueeditmilestone_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.EditMilestoneOption: %w", e)
+			}
 			res, _, err := cli.Repo.IssueEditMilestone(context.Background(), issueeditmilestone_owner, issueeditmilestone_repo, issueeditmilestone_id, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -6010,7 +6190,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.EditReactionOption
-			if issuepostcommentreaction_content != "" { json.Unmarshal([]byte(issuepostcommentreaction_content), &bodyVal) }
+			if e := json.Unmarshal([]byte(issuepostcommentreaction_content), &bodyVal); e != nil {
+				return fmt.Errorf("flag --content: expected a JSON object for forgejo.EditReactionOption: %w", e)
+			}
 			res, _, err := cli.Repo.IssuePostCommentReaction(context.Background(), issuepostcommentreaction_owner, issuepostcommentreaction_repo, issuepostcommentreaction_id, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -6036,7 +6218,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.EditReactionOption
-			if issuepostissuereaction_content != "" { json.Unmarshal([]byte(issuepostissuereaction_content), &bodyVal) }
+			if e := json.Unmarshal([]byte(issuepostissuereaction_content), &bodyVal); e != nil {
+				return fmt.Errorf("flag --content: expected a JSON object for forgejo.EditReactionOption: %w", e)
+			}
 			res, _, err := cli.Repo.IssuePostIssueReaction(context.Background(), issuepostissuereaction_owner, issuepostissuereaction_repo, issuepostissuereaction_index, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -6062,7 +6246,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.IssueMeta
-			if issueremoveissueblocking_body != "" { json.Unmarshal([]byte(issueremoveissueblocking_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(issueremoveissueblocking_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.IssueMeta: %w", e)
+			}
 			res, _, err := cli.Repo.IssueRemoveIssueBlocking(context.Background(), issueremoveissueblocking_owner, issueremoveissueblocking_repo, issueremoveissueblocking_index, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -6088,7 +6274,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.IssueMeta
-			if issueremoveissuedependencies_body != "" { json.Unmarshal([]byte(issueremoveissuedependencies_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(issueremoveissuedependencies_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.IssueMeta: %w", e)
+			}
 			res, _, err := cli.Repo.IssueRemoveIssueDependencies(context.Background(), issueremoveissuedependencies_owner, issueremoveissuedependencies_repo, issueremoveissuedependencies_index, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -6116,7 +6304,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.DeleteLabelsOption
-			if issueremovelabel_body != "" { json.Unmarshal([]byte(issueremovelabel_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(issueremovelabel_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.DeleteLabelsOption: %w", e)
+			}
 			_, err := cli.Repo.IssueRemoveLabel(context.Background(), issueremovelabel_owner, issueremovelabel_repo, issueremovelabel_index, issueremovelabel_identifier, &bodyVal)
 			if err != nil { return err }
 			return nil
@@ -6141,7 +6331,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.IssueLabelsOption
-			if issuereplacelabels_body != "" { json.Unmarshal([]byte(issuereplacelabels_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(issuereplacelabels_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.IssueLabelsOption: %w", e)
+			}
 			res, _, err := cli.Repo.IssueReplaceLabels(context.Background(), issuereplacelabels_owner, issuereplacelabels_repo, issuereplacelabels_index, &bodyVal)
 			if err != nil { return err }
 			if res != nil {
@@ -6468,7 +6660,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.RegisterRunnerOptions
-			if registerreporunner_body != "" { json.Unmarshal([]byte(registerreporunner_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(registerreporunner_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.RegisterRunnerOptions: %w", e)
+			}
 			res, _, err := cli.Repo.RegisterRepoRunner(context.Background(), registerreporunner_owner, registerreporunner_repo, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -6512,7 +6706,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.AddCollaboratorOption
-			if repoaddcollaborator_body != "" { json.Unmarshal([]byte(repoaddcollaborator_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repoaddcollaborator_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.AddCollaboratorOption: %w", e)
+			}
 			_, err := cli.Repo.RepoAddCollaborator(context.Background(), repoaddcollaborator_owner, repoaddcollaborator_repo, repoaddcollaborator_collaborator, &bodyVal)
 			if err != nil { return err }
 			return nil
@@ -6554,7 +6750,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreatePushMirrorOption
-			if repoaddpushmirror_body != "" { json.Unmarshal([]byte(repoaddpushmirror_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repoaddpushmirror_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.CreatePushMirrorOption: %w", e)
+			}
 			res, _, err := cli.Repo.RepoAddPushMirror(context.Background(), repoaddpushmirror_owner, repoaddpushmirror_repo, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -6617,7 +6815,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.UpdateFileOptions
-			if repoapplydiffpatch_body != "" { json.Unmarshal([]byte(repoapplydiffpatch_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repoapplydiffpatch_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.UpdateFileOptions: %w", e)
+			}
 			res, _, err := cli.Repo.RepoApplyDiffPatch(context.Background(), repoapplydiffpatch_owner, repoapplydiffpatch_repo, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -6660,7 +6860,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.ChangeFilesOptions
-			if repochangefiles_body != "" { json.Unmarshal([]byte(repochangefiles_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repochangefiles_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.ChangeFilesOptions: %w", e)
+			}
 			res, _, err := cli.Repo.RepoChangeFiles(context.Background(), repochangefiles_owner, repochangefiles_repo, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -6786,7 +6988,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateBranchRepoOption
-			if repocreatebranch_body != "" { json.Unmarshal([]byte(repocreatebranch_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repocreatebranch_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.CreateBranchRepoOption: %w", e)
+			}
 			res, _, err := cli.Repo.RepoCreateBranch(context.Background(), repocreatebranch_owner, repocreatebranch_repo, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -6809,7 +7013,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateBranchProtectionOption
-			if repocreatebranchprotection_body != "" { json.Unmarshal([]byte(repocreatebranchprotection_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repocreatebranchprotection_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.CreateBranchProtectionOption: %w", e)
+			}
 			res, _, err := cli.Repo.RepoCreateBranchProtection(context.Background(), repocreatebranchprotection_owner, repocreatebranchprotection_repo, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -6834,7 +7040,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateFileOptions
-			if repocreatefile_body != "" { json.Unmarshal([]byte(repocreatefile_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repocreatefile_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.CreateFileOptions: %w", e)
+			}
 			res, _, err := cli.Repo.RepoCreateFile(context.Background(), repocreatefile_owner, repocreatefile_repo, repocreatefile_filepath, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -6858,7 +7066,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateHookOption
-			if repocreatehook_body != "" { json.Unmarshal([]byte(repocreatehook_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repocreatehook_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.CreateHookOption: %w", e)
+			}
 			res, _, err := cli.Repo.RepoCreateHook(context.Background(), repocreatehook_owner, repocreatehook_repo, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -6881,7 +7091,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateKeyOption
-			if repocreatekey_body != "" { json.Unmarshal([]byte(repocreatekey_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repocreatekey_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.CreateKeyOption: %w", e)
+			}
 			res, _, err := cli.Repo.RepoCreateKey(context.Background(), repocreatekey_owner, repocreatekey_repo, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -6904,7 +7116,15 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreatePullRequestOption
-			if repocreatepullrequest_body != "" { json.Unmarshal([]byte(repocreatepullrequest_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repocreatepullrequest_body), &bodyVal); e != nil {
+				w, werr := json.Marshal(map[string]string{"body": repocreatepullrequest_body})
+				if werr != nil {
+					return werr
+				}
+				if e2 := json.Unmarshal(w, &bodyVal); e2 != nil {
+					return fmt.Errorf("flag --body: not a JSON object for forgejo.CreatePullRequestOption and not plain text (%v / %v)", e, e2)
+				}
+			}
 			res, _, err := cli.Repo.RepoCreatePullRequest(context.Background(), repocreatepullrequest_owner, repocreatepullrequest_repo, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -6929,7 +7149,15 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreatePullReviewOptions
-			if repocreatepullreview_body != "" { json.Unmarshal([]byte(repocreatepullreview_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repocreatepullreview_body), &bodyVal); e != nil {
+				w, werr := json.Marshal(map[string]string{"body": repocreatepullreview_body})
+				if werr != nil {
+					return werr
+				}
+				if e2 := json.Unmarshal(w, &bodyVal); e2 != nil {
+					return fmt.Errorf("flag --body: not a JSON object for forgejo.CreatePullReviewOptions and not plain text (%v / %v)", e, e2)
+				}
+			}
 			res, _, err := cli.Repo.RepoCreatePullReview(context.Background(), repocreatepullreview_owner, repocreatepullreview_repo, repocreatepullreview_index, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -6957,7 +7185,15 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreatePullReviewCommentOptions
-			if repocreatepullreviewcomment_body != "" { json.Unmarshal([]byte(repocreatepullreviewcomment_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repocreatepullreviewcomment_body), &bodyVal); e != nil {
+				w, werr := json.Marshal(map[string]string{"body": repocreatepullreviewcomment_body})
+				if werr != nil {
+					return werr
+				}
+				if e2 := json.Unmarshal(w, &bodyVal); e2 != nil {
+					return fmt.Errorf("flag --body: not a JSON object for forgejo.CreatePullReviewCommentOptions and not plain text (%v / %v)", e, e2)
+				}
+			}
 			res, _, err := cli.Repo.RepoCreatePullReviewComment(context.Background(), repocreatepullreviewcomment_owner, repocreatepullreviewcomment_repo, repocreatepullreviewcomment_index, repocreatepullreviewcomment_id, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -6986,7 +7222,15 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreatePullReviewCommentReplyOptions
-			if repocreatepullreviewcommentreply_body != "" { json.Unmarshal([]byte(repocreatepullreviewcommentreply_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repocreatepullreviewcommentreply_body), &bodyVal); e != nil {
+				w, werr := json.Marshal(map[string]string{"body": repocreatepullreviewcommentreply_body})
+				if werr != nil {
+					return werr
+				}
+				if e2 := json.Unmarshal(w, &bodyVal); e2 != nil {
+					return fmt.Errorf("flag --body: not a JSON object for forgejo.CreatePullReviewCommentReplyOptions and not plain text (%v / %v)", e, e2)
+				}
+			}
 			res, _, err := cli.Repo.RepoCreatePullReviewCommentReply(context.Background(), repocreatepullreviewcommentreply_owner, repocreatepullreviewcommentreply_repo, repocreatepullreviewcommentreply_index, repocreatepullreviewcommentreply_id, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -7036,7 +7280,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.PullReviewRequestOptions
-			if repocreatepullreviewrequests_body != "" { json.Unmarshal([]byte(repocreatepullreviewrequests_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repocreatepullreviewrequests_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.PullReviewRequestOptions: %w", e)
+			}
 			res, _, err := cli.Repo.RepoCreatePullReviewRequests(context.Background(), repocreatepullreviewrequests_owner, repocreatepullreviewrequests_repo, repocreatepullreviewrequests_index, &bodyVal)
 			if err != nil { return err }
 			if res != nil {
@@ -7062,7 +7308,15 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateReleaseOption
-			if repocreaterelease_body != "" { json.Unmarshal([]byte(repocreaterelease_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repocreaterelease_body), &bodyVal); e != nil {
+				w, werr := json.Marshal(map[string]string{"body": repocreaterelease_body})
+				if werr != nil {
+					return werr
+				}
+				if e2 := json.Unmarshal(w, &bodyVal); e2 != nil {
+					return fmt.Errorf("flag --body: not a JSON object for forgejo.CreateReleaseOption and not plain text (%v / %v)", e, e2)
+				}
+			}
 			res, _, err := cli.Repo.RepoCreateRelease(context.Background(), repocreaterelease_owner, repocreaterelease_repo, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -7111,7 +7365,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateStatusOption
-			if repocreatestatus_body != "" { json.Unmarshal([]byte(repocreatestatus_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repocreatestatus_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.CreateStatusOption: %w", e)
+			}
 			res, _, err := cli.Repo.RepoCreateStatus(context.Background(), repocreatestatus_owner, repocreatestatus_repo, repocreatestatus_sha, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -7135,7 +7391,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateTagOption
-			if repocreatetag_body != "" { json.Unmarshal([]byte(repocreatetag_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repocreatetag_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.CreateTagOption: %w", e)
+			}
 			res, _, err := cli.Repo.RepoCreateTag(context.Background(), repocreatetag_owner, repocreatetag_repo, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -7158,7 +7416,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateTagProtectionOption
-			if repocreatetagprotection_body != "" { json.Unmarshal([]byte(repocreatetagprotection_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repocreatetagprotection_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.CreateTagProtectionOption: %w", e)
+			}
 			res, _, err := cli.Repo.RepoCreateTagProtection(context.Background(), repocreatetagprotection_owner, repocreatetagprotection_repo, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -7181,7 +7441,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateWikiPageOptions
-			if repocreatewikipage_body != "" { json.Unmarshal([]byte(repocreatewikipage_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repocreatewikipage_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.CreateWikiPageOptions: %w", e)
+			}
 			res, _, err := cli.Repo.RepoCreateWikiPage(context.Background(), repocreatewikipage_owner, repocreatewikipage_repo, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -7317,7 +7579,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.DeleteFileOptions
-			if repodeletefile_body != "" { json.Unmarshal([]byte(repodeletefile_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repodeletefile_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.DeleteFileOptions: %w", e)
+			}
 			res, _, err := cli.Repo.RepoDeleteFile(context.Background(), repodeletefile_owner, repodeletefile_repo, repodeletefile_filepath, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -7495,7 +7759,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.PullReviewRequestOptions
-			if repodeletepullreviewrequests_body != "" { json.Unmarshal([]byte(repodeletepullreviewrequests_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repodeletepullreviewrequests_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.PullReviewRequestOptions: %w", e)
+			}
 			_, err := cli.Repo.RepoDeletePullReviewRequests(context.Background(), repodeletepullreviewrequests_owner, repodeletepullreviewrequests_repo, repodeletepullreviewrequests_index, &bodyVal)
 			if err != nil { return err }
 			return nil
@@ -7704,7 +7970,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.DismissPullReviewOptions
-			if repodismisspullreview_body != "" { json.Unmarshal([]byte(repodismisspullreview_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repodismisspullreview_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.DismissPullReviewOptions: %w", e)
+			}
 			res, _, err := cli.Repo.RepoDismissPullReview(context.Background(), repodismisspullreview_owner, repodismisspullreview_repo, repodismisspullreview_index, repodismisspullreview_id, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -7781,7 +8049,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.EditRepoOption
-			if repoedit_body != "" { json.Unmarshal([]byte(repoedit_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repoedit_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.EditRepoOption: %w", e)
+			}
 			res, _, err := cli.Repo.RepoEdit(context.Background(), repoedit_owner, repoedit_repo, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -7806,7 +8076,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.EditBranchProtectionOption
-			if repoeditbranchprotection_body != "" { json.Unmarshal([]byte(repoeditbranchprotection_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repoeditbranchprotection_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.EditBranchProtectionOption: %w", e)
+			}
 			res, _, err := cli.Repo.RepoEditBranchProtection(context.Background(), repoeditbranchprotection_owner, repoeditbranchprotection_repo, repoeditbranchprotection_name, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -7832,7 +8104,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.EditGitHookOption
-			if repoeditgithook_body != "" { json.Unmarshal([]byte(repoeditgithook_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repoeditgithook_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.EditGitHookOption: %w", e)
+			}
 			res, _, err := cli.Repo.RepoEditGitHook(context.Background(), repoeditgithook_owner, repoeditgithook_repo, repoeditgithook_id, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -7858,7 +8132,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.EditHookOption
-			if repoedithook_body != "" { json.Unmarshal([]byte(repoedithook_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repoedithook_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.EditHookOption: %w", e)
+			}
 			res, _, err := cli.Repo.RepoEditHook(context.Background(), repoedithook_owner, repoedithook_repo, repoedithook_id, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -7884,7 +8160,15 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.EditPullRequestOption
-			if repoeditpullrequest_body != "" { json.Unmarshal([]byte(repoeditpullrequest_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repoeditpullrequest_body), &bodyVal); e != nil {
+				w, werr := json.Marshal(map[string]string{"body": repoeditpullrequest_body})
+				if werr != nil {
+					return werr
+				}
+				if e2 := json.Unmarshal(w, &bodyVal); e2 != nil {
+					return fmt.Errorf("flag --body: not a JSON object for forgejo.EditPullRequestOption and not plain text (%v / %v)", e, e2)
+				}
+			}
 			res, _, err := cli.Repo.RepoEditPullRequest(context.Background(), repoeditpullrequest_owner, repoeditpullrequest_repo, repoeditpullrequest_index, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -7910,7 +8194,15 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.EditReleaseOption
-			if repoeditrelease_body != "" { json.Unmarshal([]byte(repoeditrelease_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repoeditrelease_body), &bodyVal); e != nil {
+				w, werr := json.Marshal(map[string]string{"body": repoeditrelease_body})
+				if werr != nil {
+					return werr
+				}
+				if e2 := json.Unmarshal(w, &bodyVal); e2 != nil {
+					return fmt.Errorf("flag --body: not a JSON object for forgejo.EditReleaseOption and not plain text (%v / %v)", e, e2)
+				}
+			}
 			res, _, err := cli.Repo.RepoEditRelease(context.Background(), repoeditrelease_owner, repoeditrelease_repo, repoeditrelease_id, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -7938,7 +8230,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.EditAttachmentOptions
-			if repoeditreleaseattachment_body != "" { json.Unmarshal([]byte(repoeditreleaseattachment_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repoeditreleaseattachment_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.EditAttachmentOptions: %w", e)
+			}
 			res, _, err := cli.Repo.RepoEditReleaseAttachment(context.Background(), repoeditreleaseattachment_owner, repoeditreleaseattachment_repo, repoeditreleaseattachment_id, repoeditreleaseattachment_attachmentId, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -7965,7 +8259,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.EditTagProtectionOption
-			if repoedittagprotection_body != "" { json.Unmarshal([]byte(repoedittagprotection_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repoedittagprotection_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.EditTagProtectionOption: %w", e)
+			}
 			res, _, err := cli.Repo.RepoEditTagProtection(context.Background(), repoedittagprotection_owner, repoedittagprotection_repo, repoedittagprotection_id, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -7991,7 +8287,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateWikiPageOptions
-			if repoeditwikipage_body != "" { json.Unmarshal([]byte(repoeditwikipage_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repoeditwikipage_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.CreateWikiPageOptions: %w", e)
+			}
 			res, _, err := cli.Repo.RepoEditWikiPage(context.Background(), repoeditwikipage_owner, repoeditwikipage_repo, repoeditwikipage_pageName, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -9713,7 +10011,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.MergePullRequestOption
-			if repomergepullrequest_body != "" { json.Unmarshal([]byte(repomergepullrequest_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repomergepullrequest_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.MergePullRequestOption: %w", e)
+			}
 			_, err := cli.Repo.RepoMergePullRequest(context.Background(), repomergepullrequest_owner, repomergepullrequest_repo, repomergepullrequest_index, &bodyVal)
 			if err != nil { return err }
 			return nil
@@ -9731,7 +10031,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.MigrateRepoOptions
-			if repomigrate_body != "" { json.Unmarshal([]byte(repomigrate_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repomigrate_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.MigrateRepoOptions: %w", e)
+			}
 			res, _, err := cli.Repo.RepoMigrate(context.Background(), &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -9845,7 +10147,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.ReplaceFlagsOption
-			if reporeplaceallflags_body != "" { json.Unmarshal([]byte(reporeplaceallflags_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(reporeplaceallflags_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.ReplaceFlagsOption: %w", e)
+			}
 			_, err := cli.Repo.RepoReplaceAllFlags(context.Background(), reporeplaceallflags_owner, reporeplaceallflags_repo, &bodyVal)
 			if err != nil { return err }
 			return nil
@@ -9938,7 +10242,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.NoteOptions
-			if reposetnote_body != "" { json.Unmarshal([]byte(reposetnote_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(reposetnote_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.NoteOptions: %w", e)
+			}
 			res, _, err := cli.Repo.RepoSetNote(context.Background(), reposetnote_owner, reposetnote_repo, reposetnote_sha, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -9985,7 +10291,15 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.SubmitPullReviewOptions
-			if reposubmitpullreview_body != "" { json.Unmarshal([]byte(reposubmitpullreview_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(reposubmitpullreview_body), &bodyVal); e != nil {
+				w, werr := json.Marshal(map[string]string{"body": reposubmitpullreview_body})
+				if werr != nil {
+					return werr
+				}
+				if e2 := json.Unmarshal(w, &bodyVal); e2 != nil {
+					return fmt.Errorf("flag --body: not a JSON object for forgejo.SubmitPullReviewOptions and not plain text (%v / %v)", e, e2)
+				}
+			}
 			res, _, err := cli.Repo.RepoSubmitPullReview(context.Background(), reposubmitpullreview_owner, reposubmitpullreview_repo, reposubmitpullreview_index, reposubmitpullreview_id, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -10141,7 +10455,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.TransferRepoOption
-			if repotransfer_body != "" { json.Unmarshal([]byte(repotransfer_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repotransfer_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.TransferRepoOption: %w", e)
+			}
 			_, err := cli.Repo.RepoTransfer(context.Background(), repotransfer_owner, repotransfer_repo, &bodyVal)
 			if err != nil { return err }
 			return nil
@@ -10187,7 +10503,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.UpdateRepoAvatarOption
-			if repoupdateavatar_body != "" { json.Unmarshal([]byte(repoupdateavatar_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repoupdateavatar_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.UpdateRepoAvatarOption: %w", e)
+			}
 			_, err := cli.Repo.RepoUpdateAvatar(context.Background(), repoupdateavatar_owner, repoupdateavatar_repo, &bodyVal)
 			if err != nil { return err }
 			return nil
@@ -10210,7 +10528,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.UpdateBranchRepoOption
-			if repoupdatebranch_body != "" { json.Unmarshal([]byte(repoupdatebranch_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repoupdatebranch_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.UpdateBranchRepoOption: %w", e)
+			}
 			_, err := cli.Repo.RepoUpdateBranch(context.Background(), repoupdatebranch_owner, repoupdatebranch_repo, repoupdatebranch_branch, &bodyVal)
 			if err != nil { return err }
 			return nil
@@ -10234,7 +10554,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.UpdateFileOptions
-			if repoupdatefile_body != "" { json.Unmarshal([]byte(repoupdatefile_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repoupdatefile_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.UpdateFileOptions: %w", e)
+			}
 			res, _, err := cli.Repo.RepoUpdateFile(context.Background(), repoupdatefile_owner, repoupdatefile_repo, repoupdatefile_filepath, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
@@ -10280,7 +10602,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.RepoTopicOptions
-			if repoupdatetopics_body != "" { json.Unmarshal([]byte(repoupdatetopics_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(repoupdatetopics_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.RepoTopicOptions: %w", e)
+			}
 			_, err := cli.Repo.RepoUpdateTopics(context.Background(), repoupdatetopics_owner, repoupdatetopics_repo, &bodyVal)
 			if err != nil { return err }
 			return nil
@@ -10342,7 +10666,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateOrUpdateSecretOption
-			if updatereposecret_body != "" { json.Unmarshal([]byte(updatereposecret_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(updatereposecret_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.CreateOrUpdateSecretOption: %w", e)
+			}
 			_, err := cli.Repo.UpdateRepoSecret(context.Background(), updatereposecret_owner, updatereposecret_repo, updatereposecret_secretname, &bodyVal)
 			if err != nil { return err }
 			return nil
@@ -10366,7 +10692,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.UpdateVariableOption
-			if updaterepovariable_body != "" { json.Unmarshal([]byte(updaterepovariable_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(updaterepovariable_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.UpdateVariableOption: %w", e)
+			}
 			_, err := cli.Repo.UpdateRepoVariable(context.Background(), updaterepovariable_owner, updaterepovariable_repo, updaterepovariable_variablename, &bodyVal)
 			if err != nil { return err }
 			return nil
@@ -10527,7 +10855,9 @@ actions, etc.) instead.`,
 			cli, e := resolveHostClient(cmd, "")
 			if e != nil { return e }
 			var bodyVal forgejo.CreateAccessTokenOption
-			if usercreatetoken_body != "" { json.Unmarshal([]byte(usercreatetoken_body), &bodyVal) }
+			if e := json.Unmarshal([]byte(usercreatetoken_body), &bodyVal); e != nil {
+				return fmt.Errorf("flag --body: expected a JSON object for forgejo.CreateAccessTokenOption: %w", e)
+			}
 			res, _, err := cli.User.UserCreateToken(context.Background(), usercreatetoken_username, &bodyVal)
 			if err != nil { return err }
 			j, _ := json.MarshalIndent(res, "", "  ")
