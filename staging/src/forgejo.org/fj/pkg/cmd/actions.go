@@ -28,17 +28,38 @@ func newActionsCmd() *cobra.Command {
 	return cmd
 }
 
+// resolveRunRef maps a user-supplied run reference to the run's database id.
+// By default the reference is the run's index_in_repo — the number the web
+// UI shows and `fj actions runs` prints — resolved through the run-by-index
+// endpoint. rawID passes the reference through as a database id instead (#108).
+func resolveRunRef(c *forgejo.Client, owner, repo, ref string, rawID bool) (int64, error) {
+	n, err := strconv.ParseInt(ref, 10, 64)
+	if err != nil {
+		return 0, fmt.Errorf("invalid run reference %q: %w", ref, err)
+	}
+	if rawID {
+		return n, nil
+	}
+	run, _, err := c.Repo.ActionRunByIndex(context.Background(), owner, repo, n)
+	if err != nil {
+		return 0, fmt.Errorf("run index %d: %w", n, err)
+	}
+	return run.Id, nil
+}
+
 func newActionsJobsCmd() *cobra.Command {
-	return &cobra.Command{
+	var rawID bool
+	cmd := &cobra.Command{
 		Use:   "jobs <RUN>",
 		Short: "List the jobs in an action run",
+		Long:  "RUN is the run's index — the number the web UI shows and 'fj actions runs'\nprints (index_in_repo). Pass --run-id to use the run's raw database id.",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			runID, err := strconv.ParseInt(args[0], 10, 64)
-			if err != nil {
-				return fmt.Errorf("invalid run id %q: %w", args[0], err)
-			}
 			c, owner, repo, err := resolveClient(cmd)
+			if err != nil {
+				return err
+			}
+			runID, err := resolveRunRef(c, owner, repo, args[0], rawID)
 			if err != nil {
 				return err
 			}
@@ -57,6 +78,8 @@ func newActionsJobsCmd() *cobra.Command {
 			return nil
 		},
 	}
+	cmd.Flags().BoolVar(&rawID, "run-id", false, "treat RUN as the run's raw database id instead of its index")
+	return cmd
 }
 
 func newActionsJobCmd() *cobra.Command {
@@ -88,7 +111,8 @@ func newActionsJobCmd() *cobra.Command {
 
 func newActionsLogsCmd() *cobra.Command {
 	var jobID int64
-	var runID int64
+	var runRef string
+	var rawID bool
 	var attempt int64
 	var step int
 	var outFile string
@@ -108,7 +132,11 @@ func newActionsLogsCmd() *cobra.Command {
 				fmt.Print(logs)
 				return nil
 			}
-			if runID != 0 {
+			if runRef != "" {
+				runID, err := resolveRunRef(c, owner, repo, runRef, rawID)
+				if err != nil {
+					return err
+				}
 				logs, _, err := c.Repo.RepoGetActionRunLogs(context.Background(), owner, repo, runID)
 				if err != nil {
 					return err
@@ -123,11 +151,12 @@ func newActionsLogsCmd() *cobra.Command {
 				fmt.Printf("wrote %d bytes to %s\n", len(logs), path)
 				return nil
 			}
-			return fmt.Errorf("must specify --job <ID> or --run <ID>")
+			return fmt.Errorf("must specify --job <ID> or --run <RUN>")
 		},
 	}
 	cmd.Flags().Int64Var(&jobID, "job", 0, "print a single job's logs (plain text)")
-	cmd.Flags().Int64Var(&runID, "run", 0, "download all jobs' logs for a run (zip)")
+	cmd.Flags().StringVar(&runRef, "run", "", "download all jobs' logs for a run (zip); RUN is the run's index unless --run-id is set")
+	cmd.Flags().BoolVar(&rawID, "run-id", false, "treat --run's value as the run's raw database id instead of its index")
 	cmd.Flags().Int64Var(&attempt, "attempt", 0, "with --job: fetch a specific historical attempt (default: latest)")
 	cmd.Flags().IntVar(&step, "step", 0, "with --job: narrow to one step (number from `fj actions job`; omit for all steps)")
 	cmd.Flags().StringVar(&outFile, "out", "", "output file for --run (default: run-<id>-logs.zip)")

@@ -30,6 +30,24 @@ func (s *RepoService) ActionRun(ctx context.Context, owner string, repo string, 
 	return &result, &Response{Response: resp}, nil
 }
 
+// ActionRunByIndex — Get an action run by its index in the repository
+// GET /repos/{owner}/{repo}/actions/runs/index/{index}
+func (s *RepoService) ActionRunByIndex(ctx context.Context, owner string, repo string, index int64) (*ActionRun, *Response, error) {
+	u := s.client.base.JoinPath(fmt.Sprintf("/repos/%s/%s/actions/runs/index/%d", owner, repo, index))
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
+	if err != nil { return nil, nil, fmt.Errorf("request: %w", err) }
+
+	resp, err := s.client.client.Do(req)
+	if err != nil { return nil, nil, fmt.Errorf("do: %w", err) }
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 400 { return nil, nil, handleError(resp) }
+
+	var result ActionRun
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil { return nil,  nil, fmt.Errorf("decode: %w", err) }
+	return &result, &Response{Response: resp}, nil
+}
+
 // CancelActionRun — Cancel a pending or running workflow run.
 // POST /repos/{owner}/{repo}/actions/runs/{run_id}/cancel
 func (s *RepoService) CancelActionRun(ctx context.Context, owner string, repo string, runId int64) (*Response, error) {

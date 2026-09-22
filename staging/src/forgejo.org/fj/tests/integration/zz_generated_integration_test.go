@@ -3726,7 +3726,7 @@ func TestGenerated_Org(t *testing.T) {
 	})
 }
 
-// TestGenerated_Repo tests all 269 auto-generated repo commands.
+// TestGenerated_Repo tests all 270 auto-generated repo commands.
 func TestGenerated_Repo(t *testing.T) {
 	skipIfNoInstance(t)
 	binary := buildFjBinary(t)
@@ -3735,6 +3735,28 @@ func TestGenerated_Repo(t *testing.T) {
 			"--owner", testUser(),
 			"--repo", testRepo,
 			"--run-id", "1",
+		}
+		out, err := runFj(t, binary, args...)
+		if err != nil {
+			// GET: 404/403 means resource doesn't exist — still proves the command works
+			if isAcceptableError(out) { t.Skip("resource not found (command works)") }
+			t.Errorf("%v\n%s", err, out)
+			return
+		}
+		// Verify valid JSON output
+		trimmed := bytes.TrimSpace([]byte(out))
+		if len(trimmed) > 0 {
+			var v interface{}
+			if e := json.Unmarshal(trimmed, &v); e != nil {
+				t.Errorf("invalid JSON: %v\n%s", e, string(trimmed[:min(len(trimmed),200)]))
+			}
+		}
+	})
+	t.Run("ActionRunByIndex", func(t *testing.T) {
+		args := []string{"api", "repo", "action-run-by-index",
+			"--owner", testUser(),
+			"--repo", testRepo,
+			"--index", "1",
 		}
 		out, err := runFj(t, binary, args...)
 		if err != nil {

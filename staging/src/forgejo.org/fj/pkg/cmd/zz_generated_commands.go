@@ -4164,6 +4164,28 @@ actions, etc.) instead.`,
 		_ = mc.MarkFlagRequired("run-id")
 		svcCmd.AddCommand(mc)
 		}
+		{ // GET /repos/{owner}/{repo}/actions/runs/index/{index} -> Repo.ActionRunByIndex
+		mc := &cobra.Command{Use: "action-run-by-index", Short: "Get an action run by its index in the repository"}
+		var actionrunbyindex_owner string
+		mc.Flags().StringVar(&actionrunbyindex_owner, "owner", "", "owner")
+		var actionrunbyindex_repo string
+		mc.Flags().StringVar(&actionrunbyindex_repo, "repo", "", "repo")
+		var actionrunbyindex_index int64
+		mc.Flags().Int64Var(&actionrunbyindex_index, "index", 0, "index")
+		mc.RunE = func(cmd *cobra.Command, args []string) error {
+			cli, e := resolveHostClient(cmd, "")
+			if e != nil { return e }
+			res, _, err := cli.Repo.ActionRunByIndex(context.Background(), actionrunbyindex_owner, actionrunbyindex_repo, actionrunbyindex_index)
+			if err != nil { return err }
+			j, _ := json.MarshalIndent(res, "", "  ")
+			fmt.Println(string(j))
+			return nil
+		}
+		_ = mc.MarkFlagRequired("owner")
+		_ = mc.MarkFlagRequired("repo")
+		_ = mc.MarkFlagRequired("index")
+		svcCmd.AddCommand(mc)
+		}
 		{ // POST /repos/{owner}/{repo}/actions/runs/{run_id}/cancel -> Repo.CancelActionRun
 		mc := &cobra.Command{Use: "cancel-action-run", Short: "Cancel a pending or running workflow run."}
 		var cancelactionrun_owner string
