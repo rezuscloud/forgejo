@@ -498,6 +498,32 @@ func TestCLICommands(t *testing.T) {
 			t.Fatalf("command failed at flag parsing, not at the endpoint: %s", errOut)
 		}
 
+		// #108: jobs/logs address runs by INDEX (the number 'actions runs'
+		// prints); resolution happens server-side — a nonexistent index must
+		// fail at the by-index endpoint (404 on stderr), never at flag
+		// parsing. --run-id must bind and take the raw DB-id path.
+		_, errOut, err = runFjFull(t, binary, "actions", "jobs", "1", "-r", ownerRepo)
+		if err == nil {
+			t.Fatalf("expected not-found error for nonexistent run index, got success")
+		}
+		if strings.Contains(errOut, "unknown flag") || strings.Contains(errOut, "invalid argument") {
+			t.Fatalf("jobs <index> failed at flag parsing, not at the endpoint: %s", errOut)
+		}
+		_, errOut, err = runFjFull(t, binary, "actions", "jobs", "1", "--run-id", "-r", ownerRepo)
+		if err == nil {
+			t.Fatalf("expected not-found error for nonexistent raw run id, got success")
+		}
+		if strings.Contains(errOut, "unknown flag") {
+			t.Fatalf("--run-id flag did not bind: %s", errOut)
+		}
+		_, errOut, err = runFjFull(t, binary, "actions", "logs", "--run", "1", "-r", ownerRepo)
+		if err == nil {
+			t.Fatalf("expected not-found error for logs of nonexistent run index, got success")
+		}
+		if strings.Contains(errOut, "unknown flag") {
+			t.Fatalf("logs --run <index> failed at flag parsing, not at the endpoint: %s", errOut)
+		}
+
 		// variables CRUD
 		if _, err := runFj(t, binary, "actions", "variables", "create",
 			"VAR_TEST", "v1", "-r", ownerRepo); err != nil {

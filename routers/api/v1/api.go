@@ -894,6 +894,7 @@ func Routes() *web.Route {
 					})
 					m.Group("/runs", func() {
 						m.Get("", repo.ListActionRuns)
+						m.Get("/index/{index}", repo.GetActionRunByIndex)
 						m.Get("/{run_id}", repo.GetActionRun)
 						m.Delete("/{run_id}", reqToken(), reqAdmin(unit.TypeActions), repo.DeleteActionRun)
 						m.Post("/{run_id}/cancel", reqToken(), reqRepoWriter(unit.TypeActions), repo.CancelActionRun)

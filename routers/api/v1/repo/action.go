@@ -1069,7 +1069,7 @@ func GetActionRun(ctx *context.APIContext) {
 	//   "404":
 	//     "$ref": "#/responses/notFound"
 
-	run, err := actions_model.GetRunByID(ctx, ctx.ParamsInt64(":run_id"))
+	run, err := actions_model.GetRunByID(ctx, ctx.ParamsInt64(":index"))
 	if err != nil {
 		if errors.Is(err, util.ErrNotExist) {
 			ctx.Error(http.StatusNotFound, "GetRunById", err)
@@ -1083,6 +1083,58 @@ func GetActionRun(ctx *context.APIContext) {
 	// run with the requested ID is owned by the repository
 	if ctx.Repo().Repository.ID != run.RepoID {
 		ctx.Error(http.StatusNotFound, "GetRunById", util.ErrNotExist)
+		return
+	}
+
+	if err := run.LoadAttributes(ctx); err != nil {
+		ctx.Error(http.StatusInternalServerError, "LoadAttributes", err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, convert.ToActionRun(ctx, run, ctx.Doer()))
+}
+
+// GetActionRunByIndex returns a run looked up by its per-repo index — the
+// number the web UI shows and `fj actions runs` prints (index_in_repo), as
+// opposed to the global DB id the {run_id} routes take. Repository-scoped
+// by construction (GetRunByIndex binds repoID), so a leaked index can never
+// resolve a foreign run.
+func GetActionRunByIndex(ctx *context.APIContext) {
+	// swagger:operation GET /repos/{owner}/{repo}/actions/runs/index/{index} repository ActionRun
+	// ---
+	// summary: Get an action run by its index in the repository
+	// produces:
+	// - application/json
+	// parameters:
+	// - name: owner
+	//   in: path
+	//   description: owner of the repo
+	//   type: string
+	//   required: true
+	// - name: repo
+	//   in: path
+	//   description: name of the repo
+	//   type: string
+	//   required: true
+	// - name: index
+	//   in: path
+	//   description: index of the action run in the repository (index_in_repo, as shown in the web UI)
+	//   type: integer
+	//   format: int64
+	//   required: true
+	// responses:
+	//   "200":
+	//     "$ref": "#/responses/ActionRun"
+	//   "404":
+	//     "$ref": "#/responses/notFound"
+
+	run, err := actions_model.GetRunByIndex(ctx, ctx.Repo().Repository.ID, ctx.ParamsInt64(":index"))
+	if err != nil {
+		if errors.Is(err, util.ErrNotExist) {
+			ctx.Error(http.StatusNotFound, "GetRunByIndex", err)
+		} else {
+			ctx.Error(http.StatusInternalServerError, "GetRunByIndex", err)
+		}
 		return
 	}
 
@@ -1131,7 +1183,7 @@ func DeleteActionRun(ctx *context.APIContext) {
 	//   "404":
 	//     "$ref": "#/responses/notFound"
 
-	run, err := actions_model.GetRunByID(ctx, ctx.ParamsInt64(":run_id"))
+	run, err := actions_model.GetRunByID(ctx, ctx.ParamsInt64(":index"))
 	if err != nil {
 		if errors.Is(err, util.ErrNotExist) {
 			ctx.Error(http.StatusNotFound, "GetRunById", err)
@@ -1192,7 +1244,7 @@ func CancelActionRun(ctx *context.APIContext) {
 	//   "404":
 	//     "$ref": "#/responses/notFound"
 
-	run, err := actions_model.GetRunByID(ctx, ctx.ParamsInt64(":run_id"))
+	run, err := actions_model.GetRunByID(ctx, ctx.ParamsInt64(":index"))
 	if err != nil {
 		if errors.Is(err, util.ErrNotExist) {
 			ctx.Error(http.StatusNotFound, "GetRunById", err)
@@ -1251,7 +1303,7 @@ func ListActionRunJobs(ctx *context.APIContext) {
 	//   "404":
 	//     "$ref": "#/responses/notFound"
 
-	run, err := actions_model.GetRunByID(ctx, ctx.ParamsInt64(":run_id"))
+	run, err := actions_model.GetRunByID(ctx, ctx.ParamsInt64(":index"))
 	if err != nil {
 		if errors.Is(err, util.ErrNotExist) {
 			ctx.Error(http.StatusNotFound, "GetRunById", err)
