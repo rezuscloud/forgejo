@@ -1,5 +1,5 @@
 {
-  "$comment": "Polished command descriptors. The generator (gen/main.go, -polish-out) emits zz_generated_polished.go from this file: each group maps commands to SDK operations by operationId. Contract: `params` binds query params (key = swagger param name); `args` binds path params as positionals (key = swagger param name); `body`/`bodyConst` bind option-struct fields (key = swagger json field name; kinds derive from the spec); `row`/`lines` render with printf formats whose columns are constrained expressions — response fields (Go names), bound arg/flag vars, or shared render helpers by name (statusSymbol, stateStr, timeStr). `unlessEmpty` guards a line on a response json field (string: != \"\", date-time: != nil). Validation is fail-loudly at generation time: unknown op/field/func, unbound params, verb/format mismatch. Add groups here + regenerate; never hand-write a polished command file.",
+  "$comment": "Polished command descriptors. The generator (gen/main.go, -polish-out) emits zz_generated_polished.go from this file: each group maps commands to SDK operations by operationId. Contract: `params` binds query params (key = swagger param name); `args` binds path params as positionals (key = swagger param name); `body`/`bodyConst` bind option-struct fields (key = swagger json field name; kinds derive from the spec); `row`/`lines` render with printf formats whose columns are constrained expressions \u2014 response fields (Go names), bound arg/flag vars, or shared render helpers by name (statusSymbol, stateStr, timeStr). `unlessEmpty` guards a line on a response json field (string: != \"\", date-time: != nil). Validation is fail-loudly at generation time: unknown op/field/func, unbound params, verb/format mismatch. Add groups here + regenerate; never hand-write a polished command file.",
   "groups": [
     {
       "name": "milestone",
@@ -660,6 +660,9 @@
             }
           ]
         }
+      ],
+      "extra": [
+        "newIssueLabelCmd"
       ]
     }
   ]

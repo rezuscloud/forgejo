@@ -20,6 +20,8 @@ func newPrCmd() *cobra.Command {
 	cmd.AddCommand(newPrCreateCmd())
 	cmd.AddCommand(newPrMergeCmd())
 	cmd.AddCommand(newPrStatusCmd())
+	// A PR is an issue to the labels API — same command, mounted here too (#104).
+	cmd.AddCommand(newIssueLabelCmd())
 	return cmd
 }
 

@@ -235,6 +235,62 @@ func TestCLICommands(t *testing.T) {
 			t.Fatal(err)
 		}
 		contains(t, out, "State: open")
+
+		// labels (#104): names resolve server-side — add / list / remove / set
+		// through the polished issue group's extra command.
+		for _, lbl := range []string{
+			`{"name":"area/cli","color":"#00aabb"}`,
+			`{"name":"area/api","color":"#aa00bb"}`,
+		} {
+			if _, err = runFj(t, binary, "api", "repo", "issue-create-label",
+				"-r", ownerRepo, "--body", lbl); err != nil {
+				t.Fatal(err)
+			}
+		}
+		idxs := strconv.FormatInt(idx, 10)
+		if out, err = runFj(t, binary, "issue", "label", idxs,
+			"-r", ownerRepo, "--add", "area/cli, area/api"); err != nil {
+			t.Fatal(err)
+		}
+		contains(t, out, "area/cli")
+		contains(t, out, "area/api")
+		// bare invocation lists
+		if out, err = runFj(t, binary, "issue", "label", idxs, "-r", ownerRepo); err != nil {
+			t.Fatal(err)
+		}
+		contains(t, out, "area/cli")
+		// remove one, the other survives
+		if out, err = runFj(t, binary, "issue", "label", idxs,
+			"-r", ownerRepo, "--remove", "area/cli"); err != nil {
+			t.Fatal(err)
+		}
+		contains(t, out, "area/api")
+		if strings.Contains(out, "area/cli") {
+			t.Fatalf("removed label still present: %s", out)
+		}
+		// set replaces the whole set
+		if out, err = runFj(t, binary, "issue", "label", idxs,
+			"-r", ownerRepo, "--set", "area/cli"); err != nil {
+			t.Fatal(err)
+		}
+		contains(t, out, "area/cli")
+		if strings.Contains(out, "area/api") {
+			t.Fatalf("--set must replace, not append: %s", out)
+		}
+		// --set refuses to combine (add/remove with set is a footgun)
+		if _, err = runFj(t, binary, "issue", "label", idxs,
+			"-r", ownerRepo, "--set", "area/cli", "--add", "area/api"); err == nil {
+			t.Fatal("expected --set + --add to be rejected")
+		}
+		// unknown names are silently dropped by the forge (documented upstream
+		// behavior — names resolve server-side, missing ones add nothing)
+		if out, err = runFj(t, binary, "issue", "label", idxs,
+			"-r", ownerRepo, "--add", "no-such-label"); err != nil {
+			t.Fatal(err)
+		}
+		if strings.Contains(out, "no-such-label") {
+			t.Fatalf("unknown label leaked into the issue's labels: %s", out)
+		}
 	})
 
 	// ---- milestone: full lifecycle (create → list → view → edit → close →
@@ -306,6 +362,14 @@ func TestCLICommands(t *testing.T) {
 			"-r", ownerRepo); err != nil {
 			t.Fatal(err)
 		}
+
+		// a PR is an issue to the labels API — the same command under `pr`
+		// must work unchanged (#104)
+		if out, err = runFj(t, binary, "pr", "label", strconv.FormatInt(idx, 10),
+			"-r", ownerRepo, "--add", "area/cli"); err != nil {
+			t.Fatal(err)
+		}
+		contains(t, out, "area/cli")
 
 		if _, err = runFj(t, binary, "pr", "merge", strconv.FormatInt(idx, 10),
 			"-s", "merge", "-r", ownerRepo); err != nil {
