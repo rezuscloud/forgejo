@@ -643,6 +643,10 @@ func genCLISubcommand(svc string, m MD, spec *SwaggerSpec) string {
 		goType   string
 		required bool
 		isBody   bool
+		// bodyDef: when the body param refs a definition, its name — lets the
+		// emitter detect option structs with a required string `body` property
+		// and accept plain text for them (r130).
+		bodyDef string
 	}
 	var pathParams, queryParams, bodyParams []cliParam
 	for _, p := range m.Params {
@@ -653,6 +657,9 @@ func genCLISubcommand(svc string, m MD, spec *SwaggerSpec) string {
 				goType:   pt(&p, spec),
 				required: p.In == "path",
 				isBody:   p.In == "body",
+			}
+			if p.In == "body" && p.Schema != nil && p.Schema.Ref != "" {
+				cp.bodyDef = strings.TrimPrefix(p.Schema.Ref, "#/definitions/")
 			}
 			if cp.isBody { bodyParams = append(bodyParams, cp) } else if p.In == "query" { queryParams = append(queryParams, cp) } else { pathParams = append(pathParams, cp) }
 		}
@@ -719,7 +726,32 @@ func genCLISubcommand(svc string, m MD, spec *SwaggerSpec) string {
 			bt = "forgejo." + bt
 		}
 		b.WriteString(fmt.Sprintf("\t\t\tvar bodyVal %s\n", bt))
-		b.WriteString(fmt.Sprintf("\t\t\tif %s_%s != \"\" { json.Unmarshal([]byte(%s_%s), &bodyVal) }\n", varname, cp.goName, varname, cp.goName))
+		// r130: the decode error MUST surface — a swallowed Unmarshal left the
+		// struct zero and the server answered a cryptic 422 ("Body: Required").
+		// For option structs whose schema carries a string `body` property
+		// (comments, issues, releases), plain text is accepted and wrapped into
+		// that field — the overwhelmingly common payload is markdown prose, not
+		// a JSON object; full JSON objects keep working unchanged.
+		def, hasDef := spec.Defs[cp.bodyDef]
+		bodyStringProp := hasDef && func() bool {
+			p, ok := def.Props["body"]
+			return ok && p.Type == "string"
+		}()
+		if bodyStringProp {
+			b.WriteString(fmt.Sprintf("\t\t\tif e := json.Unmarshal([]byte(%s_%s), &bodyVal); e != nil {\n", varname, cp.goName))
+			b.WriteString(fmt.Sprintf("\t\t\t\tw, werr := json.Marshal(map[string]string{\"body\": %s_%s})\n", varname, cp.goName))
+			b.WriteString("\t\t\t\tif werr != nil {\n")
+			b.WriteString("\t\t\t\t\treturn werr\n")
+			b.WriteString("\t\t\t\t}\n")
+			b.WriteString("\t\t\t\tif e2 := json.Unmarshal(w, &bodyVal); e2 != nil {\n")
+			b.WriteString(fmt.Sprintf("\t\t\t\t\treturn fmt.Errorf(\"flag --%s: not a JSON object for %s and not plain text (%%v / %%v)\", e, e2)\n", cp.flagName, bt))
+			b.WriteString("\t\t\t\t}\n")
+			b.WriteString("\t\t\t}\n")
+		} else {
+			b.WriteString(fmt.Sprintf("\t\t\tif e := json.Unmarshal([]byte(%s_%s), &bodyVal); e != nil {\n", varname, cp.goName))
+			b.WriteString(fmt.Sprintf("\t\t\t\treturn fmt.Errorf(\"flag --%s: expected a JSON object for %s: %%w\", e)\n", cp.flagName, bt))
+			b.WriteString("\t\t\t}\n")
+		}
 		// Primitive body types (string) are passed by value, not pointer
 		if isPrimitive(bt) && !strings.HasPrefix(bt, "[]") {
 			callArgs = append(callArgs, "bodyVal")
