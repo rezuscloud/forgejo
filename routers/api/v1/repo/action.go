@@ -1069,7 +1069,7 @@ func GetActionRun(ctx *context.APIContext) {
 	//   "404":
 	//     "$ref": "#/responses/notFound"
 
-	run, err := actions_model.GetRunByID(ctx, ctx.ParamsInt64(":index"))
+	run, err := actions_model.GetRunByID(ctx, ctx.ParamsInt64(":run_id"))
 	if err != nil {
 		if errors.Is(err, util.ErrNotExist) {
 			ctx.Error(http.StatusNotFound, "GetRunById", err)
@@ -1183,7 +1183,7 @@ func DeleteActionRun(ctx *context.APIContext) {
 	//   "404":
 	//     "$ref": "#/responses/notFound"
 
-	run, err := actions_model.GetRunByID(ctx, ctx.ParamsInt64(":index"))
+	run, err := actions_model.GetRunByID(ctx, ctx.ParamsInt64(":run_id"))
 	if err != nil {
 		if errors.Is(err, util.ErrNotExist) {
 			ctx.Error(http.StatusNotFound, "GetRunById", err)
@@ -1244,7 +1244,7 @@ func CancelActionRun(ctx *context.APIContext) {
 	//   "404":
 	//     "$ref": "#/responses/notFound"
 
-	run, err := actions_model.GetRunByID(ctx, ctx.ParamsInt64(":index"))
+	run, err := actions_model.GetRunByID(ctx, ctx.ParamsInt64(":run_id"))
 	if err != nil {
 		if errors.Is(err, util.ErrNotExist) {
 			ctx.Error(http.StatusNotFound, "GetRunById", err)
@@ -1303,7 +1303,7 @@ func ListActionRunJobs(ctx *context.APIContext) {
 	//   "404":
 	//     "$ref": "#/responses/notFound"
 
-	run, err := actions_model.GetRunByID(ctx, ctx.ParamsInt64(":index"))
+	run, err := actions_model.GetRunByID(ctx, ctx.ParamsInt64(":run_id"))
 	if err != nil {
 		if errors.Is(err, util.ErrNotExist) {
 			ctx.Error(http.StatusNotFound, "GetRunById", err)

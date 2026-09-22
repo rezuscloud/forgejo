@@ -106,6 +106,17 @@ jobs:
 			assert.Equal(t, run.Title, got.Title)
 		})
 
+		t.Run("by-id logs route unaffected (regression: the greedy flip broke it too)", func(t *testing.T) {
+			req := NewRequestf(t, "GET",
+				"/api/v1/repos/%s/actions/runs/%d/logs",
+				repoA.FullName(), run.ID,
+			)
+			req.AddTokenAuth(token)
+			// The mock runner produced log rows; the route must answer 200
+			// (zip), never the "run with id 0" 404 of the param regression.
+			MakeRequest(t, req, http.StatusOK)
+		})
+
 		t.Run("cross-repo: 404 — index belongs to another repo's sequence", func(t *testing.T) {
 			req := NewRequestf(t, "GET",
 				"/api/v1/repos/%s/actions/runs/index/%d",
