@@ -1029,6 +1029,7 @@ type PolishCommand struct {
 	BodyConst map[string]string          `json:"bodyConst,omitempty"`
 	Empty     string                     `json:"empty,omitempty"`
 	Row       *PolishRender              `json:"row,omitempty"`
+	Entries   *PolishEntries             `json:"entries,omitempty"`
 	Lines     []PolishLine               `json:"lines,omitempty"`
 }
 
@@ -1062,15 +1063,26 @@ type PolishLine struct {
 	UnlessEmpty string   `json:"unlessEmpty,omitempty"` // response json field name
 }
 
+// PolishEntries renders repeated rows over an array-of-object response
+// field (e.g. CombinedStatus.statuses): Field names the response json field;
+// Columns resolve against the ELEMENT definition with receiver `it`, under
+// the same grammar and fail-loud validation as row/lines.
+type PolishEntries struct {
+	Field   string   `json:"field"`
+	Format  string   `json:"format"`
+	Columns []string `json:"columns"`
+}
+
 // polishRenderers is the render vocabulary column expressions may call.
 // name -> printf verb of the return value. A name not listed here fails
 // generation. Kept in one place on purpose: this is the contract between
 // the descriptor DSL and the hand-written render layer (render.go/helpers.go).
 var polishRenderers = map[string]string{
-	"statusSymbol": "s",
-	"stateStr":     "s",
-	"timeStr":      "s",
-	"valI64":       "d",
+	"statusSymbol":   "s",
+	"stateStr":       "s",
+	"timeStr":        "s",
+	"valI64":         "d",
+	"commitStateStr": "s",
 }
 
 func polishFatal(format string, a ...any) {
@@ -1221,14 +1233,25 @@ func polishVerbs(format string) []string {
 		if i+1 >= len(format) {
 			polishFatal("dangling %% in format %q", format)
 		}
-		switch format[i+1] {
-		case '%':
+		if format[i+1] == '%' {
 			i++
+			continue
+		}
+		// skip printf flags, width, and precision — only the final verb
+		// character is constrained (the %% case is excluded above)
+		j := i + 1
+		for j < len(format) && strings.ContainsRune("-+ 0#.0123456789", rune(format[j])) {
+			j++
+		}
+		if j >= len(format) {
+			polishFatal("unsupported verb in format %q", format)
+		}
+		switch format[j] {
 		case 'd', 's', 't', 'f':
-			verbs = append(verbs, string(format[i+1]))
-			i++
+			verbs = append(verbs, string(format[j]))
+			i = j
 		default:
-			polishFatal("unsupported verb %%%c in format %q", format[i+1], format)
+			polishFatal("unsupported verb %%%c in format %q", format[j], format)
 		}
 	}
 	return verbs
@@ -1529,6 +1552,8 @@ func genPolishCommand(g PolishGroup, c PolishCommand, ops map[string]polishOpRef
 	}
 	var rows *outLine
 	var lines []outLine
+	var entries *outLine
+	entriesField := ""
 	touched := false
 
 	if c.Row != nil {
@@ -1542,6 +1567,33 @@ func genPolishCommand(g PolishGroup, c PolishCommand, ops map[string]polishOpRef
 			r.verbs = append(r.verbs, v)
 		}
 		rows = r
+	}
+	if c.Row != nil && c.Entries != nil {
+		polishFatal("%s: row and entries are mutually exclusive", where)
+	}
+	if c.Entries != nil {
+		if fields == nil || strings.HasPrefix(m.RetTy, "[]") {
+			polishFatal("%s: entries requires a single-object return (%s returns %q)", where, c.Op, m.RetTy)
+		}
+		ps, ok := spec.Defs[m.RetTy].Props[c.Entries.Field]
+		if !ok {
+			polishFatal("%s: entries field %q not in %s", where, c.Entries.Field, m.RetTy)
+		}
+		// the field must be an array of named refs so element columns resolve
+		// against a concrete definition — the same rule row returns follow
+		if ps.Items == nil || ps.Items.Ref == "" {
+			polishFatal("%s: entries field %q is not an array of objects", where, c.Entries.Field)
+		}
+		elem := last(ps.Items.Ref)
+		elemFields := responseFields(elem, spec)
+		entriesField = goFieldName(c.Entries.Field)
+		e := &outLine{format: c.Entries.Format}
+		for _, col := range c.Entries.Columns {
+			ex, v := polishRenderExpr(col, "it", elemFields, vars, where, &touched)
+			e.exprs = append(e.exprs, ex)
+			e.verbs = append(e.verbs, v)
+		}
+		entries = e
 	}
 	for _, ln := range c.Lines {
 		ol := outLine{format: ln.Format}
@@ -1573,6 +1625,9 @@ func genPolishCommand(g PolishGroup, c PolishCommand, ops map[string]polishOpRef
 	for _, ol := range append(lines, func() []outLine {
 		if rows != nil {
 			return []outLine{*rows}
+		}
+		if entries != nil {
+			return []outLine{*entries}
 		}
 		return nil
 	}()...) {
@@ -1810,7 +1865,7 @@ func genPolishCommand(g PolishGroup, c PolishCommand, ops map[string]polishOpRef
 	callStr += ")"
 
 	switch {
-	case rows != nil || touched:
+	case rows != nil || entries != nil || touched:
 		b.WriteString(fmt.Sprintf("\t\t\tres, _, err := %s\n", callStr))
 	case m.HasRet:
 		// err is already declared (arg parse / resolveClient) — assignment, not declaration
@@ -1837,6 +1892,17 @@ func genPolishCommand(g PolishGroup, c PolishCommand, ops map[string]polishOpRef
 		} else {
 			b.WriteString(fmt.Sprintf("\t\t\t%s\n", call))
 		}
+	}
+	if entries != nil {
+		// same empty semantics as row rendering, scoped to the entries slice
+		empty := c.Empty
+		if empty == "" {
+			empty = "no results"
+		}
+		b.WriteString(fmt.Sprintf("\t\t\tif len(res.%s) == 0 {\n\t\t\t\tfmt.Println(%q)\n\t\t\t}\n", entriesField, empty))
+		b.WriteString(fmt.Sprintf("\t\t\tfor _, it := range res.%s {\n", entriesField))
+		b.WriteString(fmt.Sprintf("\t\t\t\tfmt.Printf(%q, %s)\n", entries.format, strings.Join(entries.exprs, ", ")))
+		b.WriteString("\t\t\t}\n")
 	}
 
 	b.WriteString("\t\t\treturn nil\n")
