@@ -1644,7 +1644,7 @@ func registerRoutes(m *web.Route) {
 					m.Post("/rerun", reqRepoActionsWriter, actions.Rerun)
 					m.Post("/prioritize", reqRepoActionsWriter, actions.PrioritizeRun)
 					m.Post("/deprioritize", reqRepoActionsWriter, actions.DeprioritizeRun)
-				})
+				}, actions.RunIDFallback)
 			})
 
 			m.Group("/workflows/{workflow_name}", func() {

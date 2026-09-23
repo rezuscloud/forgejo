@@ -37,6 +37,9 @@ SIGNATURES=(
   "services/convert/pull_review.go|LoadResolveDoers"
   "templates/swagger/v1_json.tmpl|\"in_reply_to\""
   "tests/integration/api_pull_review_test.go|TestAPIPullReviewCommentReplyResolve"
+  # actions run-ID fallback route (#136): /actions/runs/{id} → canonical index URL
+  "routers/web/web.go|}, actions.RunIDFallback)"
+  "routers/web/repo/actions/run_id_fallback.go|func RunIDFallback"
 )
 
 echo "== [1/4] SDK regen (only if swagger changed) =="
