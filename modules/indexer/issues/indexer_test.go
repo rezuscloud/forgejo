@@ -4,6 +4,7 @@
 package issues
 
 import (
+	"context"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -420,6 +421,63 @@ func searchIssueWithPaginator(t *testing.T) {
 	}
 }
 
+// emptyResultIndexer emulates an index that is empty, rebuilding or lagging
+// behind the database (lost bleve files, queue backpressure, restart): it
+// reports "no matches" for every search without any error.
+type emptyResultIndexer struct {
+	internal.Indexer
+}
+
+func (*emptyResultIndexer) Index(context.Context, ...*internal.IndexerData) error { return nil }
+func (*emptyResultIndexer) Delete(context.Context, ...int64) error                { return nil }
+func (*emptyResultIndexer) Search(context.Context, *internal.SearchOptions) (*internal.SearchResult, error) {
+	return &internal.SearchResult{}, nil
+}
+
+func TestSearchIssuesFallbackToDBOnEmptyIndex(t *testing.T) {
+	require.NoError(t, unittest.PrepareTestDatabase())
+
+	prev := globalIndexer.Load()
+	t.Cleanup(func() { globalIndexer.Store(prev) })
+	var emptyIndex internal.Indexer = &emptyResultIndexer{}
+	globalIndexer.Store(&emptyIndex)
+
+	t.Run("empty index with DB matches serves the DB result", func(t *testing.T) {
+		opts := &SearchOptions{RepoIDs: []int64{1}}
+		require.NoError(t, opts.WithKeyword(t.Context(), "issue2"))
+		ids, total, err := SearchIssues(t.Context(), opts)
+		require.NoError(t, err)
+		assert.Equal(t, []int64{2}, ids)
+		assert.Equal(t, int64(1), total)
+	})
+
+	t.Run("count queries are verified as well", func(t *testing.T) {
+		opts := &SearchOptions{RepoIDs: []int64{1}}
+		require.NoError(t, opts.WithKeyword(t.Context(), "issue2"))
+		total, err := CountIssues(t.Context(), opts)
+		require.NoError(t, err)
+		assert.Equal(t, int64(1), total)
+	})
+
+	t.Run("empty index and empty DB stays empty", func(t *testing.T) {
+		opts := &SearchOptions{RepoIDs: []int64{1}}
+		require.NoError(t, opts.WithKeyword(t.Context(), "zzz-nonexistent"))
+		ids, total, err := SearchIssues(t.Context(), opts)
+		require.NoError(t, err)
+		assert.Empty(t, ids)
+		assert.Equal(t, int64(0), total)
+	})
+
+	t.Run("multi-repo queries are not verified", func(t *testing.T) {
+		opts := &SearchOptions{}
+		require.NoError(t, opts.WithKeyword(t.Context(), "issue2"))
+		ids, total, err := SearchIssues(t.Context(), opts)
+		require.NoError(t, err)
+		assert.Empty(t, ids)
+		assert.Equal(t, int64(0), total)
+	})
+}
+
 func TestBleveDeleteIssue(t *testing.T) {
 	require.NoError(t, unittest.PrepareTestDatabase())
 
@@ -450,8 +508,16 @@ func TestBleveDeleteIssue(t *testing.T) {
 
 	DeleteIssueIndexer(ctx, issue.ID)
 	assert.Eventually(t, func() bool {
-		ids, _, err := SearchIssues(ctx, opts)
+		// Assert directly against the engine: the SearchIssues wrapper now
+		// deliberately serves database results when the index reports empty,
+		// while this test deletes from the index only (the database row is
+		// kept), which the wrapper would resurrect.
+		result, err := (*globalIndexer.Load()).Search(ctx, opts)
 		assert.NoError(t, err)
+		ids := make([]int64, 0, len(result.Hits))
+		for _, hit := range result.Hits {
+			ids = append(ids, hit.ID)
+		}
 		return !slices.Contains(ids, issue.ID)
 	}, time.Second*5, time.Millisecond*100, "failed to delete issue")
 }

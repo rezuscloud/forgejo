@@ -333,6 +333,7 @@ func ParseSortBy(sortBy string, defaultSortBy internal.SortBy) internal.SortBy {
 func SearchIssues(ctx context.Context, opts *SearchOptions) ([]int64, int64, error) {
 	indexer := *globalIndexer.Load()
 
+	fromGlobalIndexer := true
 	if len(opts.Tokens) == 0 {
 		// This is a conservative shortcut.
 		// If the keyword is empty, db has better (at least not worse) performance to filter issues.
@@ -341,11 +342,31 @@ func SearchIssues(ctx context.Context, opts *SearchOptions) ([]int64, int64, err
 		// Even worse, the external indexer like elastic search may not be available for a while,
 		// and the user may not be able to list issues completely until it is available again.
 		indexer = db_index.NewIndexer()
+		fromGlobalIndexer = false
 	}
 
 	result, err := indexer.Search(ctx, opts)
 	if err != nil {
 		return nil, 0, err
+	}
+
+	// An index may be empty, rebuilding or lagging behind the database (for
+	// example: lost index files after a restart, or an indexer queue under
+	// heavy load). It then reports "no matching issues" without any error,
+	// which surfaces to clients as a silent empty list although the issues
+	// exist. For single-repo queries, an empty index result is verified
+	// against the database, and the database's answer is served on
+	// disagreement — an empty result contradicted by the database must
+	// never reach the user as a fact.
+	if fromGlobalIndexer && result.Total == 0 && len(result.Hits) == 0 && len(opts.RepoIDs) == 1 {
+		dbResult, dbErr := db_index.NewIndexer().Search(ctx, opts)
+		switch {
+		case dbErr != nil:
+			log.Error("issue search: the issue index (%T) returned an empty result for repo %d, and the database verification failed: %v", indexer, opts.RepoIDs[0], dbErr)
+		case dbResult.Total > 0:
+			log.Error("issue search: the issue index (%T) returned an empty result for repo %d, but the database has %d matching issues - serving the database result", indexer, opts.RepoIDs[0], dbResult.Total)
+			result = dbResult
+		}
 	}
 
 	ret := make([]int64, 0, len(result.Hits))
