@@ -38,31 +38,45 @@ func TestGetCommitStatuses(t *testing.T) {
 
 	assert.Equal(t, "ci/awesomeness", statuses[0].Context)
 	assert.Equal(t, structs.CommitStatusPending, statuses[0].State)
-	assert.Equal(t, "https://try.gitea.io/api/v1/repos/user2/repo1/statuses/1234123412341234123412341234123412341234", statuses[0].APIURL(db.DefaultContext))
+	url, err := statuses[0].APIURL(db.DefaultContext)
+	require.NoError(t, err)
+	assert.Equal(t, "https://try.gitea.io/api/v1/repos/user2/repo1/statuses/1234123412341234123412341234123412341234", url)
 
 	assert.Equal(t, "cov/awesomeness", statuses[1].Context)
 	assert.Equal(t, structs.CommitStatusWarning, statuses[1].State)
-	assert.Equal(t, "https://try.gitea.io/api/v1/repos/user2/repo1/statuses/1234123412341234123412341234123412341234", statuses[1].APIURL(db.DefaultContext))
+	url, err = statuses[1].APIURL(db.DefaultContext)
+	require.NoError(t, err)
+	assert.Equal(t, "https://try.gitea.io/api/v1/repos/user2/repo1/statuses/1234123412341234123412341234123412341234", url)
 
 	assert.Equal(t, "cov/awesomeness", statuses[2].Context)
 	assert.Equal(t, structs.CommitStatusSuccess, statuses[2].State)
-	assert.Equal(t, "https://try.gitea.io/api/v1/repos/user2/repo1/statuses/1234123412341234123412341234123412341234", statuses[2].APIURL(db.DefaultContext))
+	url, err = statuses[2].APIURL(db.DefaultContext)
+	require.NoError(t, err)
+	assert.Equal(t, "https://try.gitea.io/api/v1/repos/user2/repo1/statuses/1234123412341234123412341234123412341234", url)
 
 	assert.Equal(t, "ci/awesomeness", statuses[3].Context)
 	assert.Equal(t, structs.CommitStatusFailure, statuses[3].State)
-	assert.Equal(t, "https://try.gitea.io/api/v1/repos/user2/repo1/statuses/1234123412341234123412341234123412341234", statuses[3].APIURL(db.DefaultContext))
+	url, err = statuses[3].APIURL(db.DefaultContext)
+	require.NoError(t, err)
+	assert.Equal(t, "https://try.gitea.io/api/v1/repos/user2/repo1/statuses/1234123412341234123412341234123412341234", url)
 
 	assert.Equal(t, "deploy/awesomeness", statuses[4].Context)
 	assert.Equal(t, structs.CommitStatusError, statuses[4].State)
-	assert.Equal(t, "https://try.gitea.io/api/v1/repos/user2/repo1/statuses/1234123412341234123412341234123412341234", statuses[4].APIURL(db.DefaultContext))
+	url, err = statuses[4].APIURL(db.DefaultContext)
+	require.NoError(t, err)
+	assert.Equal(t, "https://try.gitea.io/api/v1/repos/user2/repo1/statuses/1234123412341234123412341234123412341234", url)
 
 	assert.Equal(t, "deploy/awesomeness", statuses[5].Context)
 	assert.Equal(t, structs.CommitStatusPending, statuses[5].State)
-	assert.Equal(t, "https://try.gitea.io/api/v1/repos/user2/repo1/statuses/1234123412341234123412341234123412341234", statuses[5].APIURL(db.DefaultContext))
+	url, err = statuses[5].APIURL(db.DefaultContext)
+	require.NoError(t, err)
+	assert.Equal(t, "https://try.gitea.io/api/v1/repos/user2/repo1/statuses/1234123412341234123412341234123412341234", url)
 
 	assert.Equal(t, "publish/awesomeness", statuses[6].Context)
 	assert.Equal(t, structs.CommitStatusSkipped, statuses[6].State)
-	assert.Equal(t, "https://try.gitea.io/api/v1/repos/user2/repo1/statuses/1234123412341234123412341234123412341234", statuses[6].APIURL(db.DefaultContext))
+	url, err = statuses[6].APIURL(db.DefaultContext)
+	require.NoError(t, err)
+	assert.Equal(t, "https://try.gitea.io/api/v1/repos/user2/repo1/statuses/1234123412341234123412341234123412341234", url)
 
 	statuses, maxResults, err = db.FindAndCount[git_model.CommitStatus](db.DefaultContext, &git_model.CommitStatusOptions{
 		ListOptions: db.ListOptions{Page: 2, PageSize: 50},
@@ -313,4 +327,66 @@ func TestCleanupCommitStatus(t *testing.T) {
 	unittest.AssertNotExistsBean(t, &git_model.CommitStatus{ID: 22})
 	unittest.AssertExistsAndLoadBean(t, &git_model.CommitStatus{ID: 23})
 	unittest.AssertNotExistsBean(t, &git_model.CommitStatus{ID: 24})
+}
+
+func TestNewCommitStatusKeepsRepoLoaded(t *testing.T) {
+	// rezuscloud/forgejo#146: the inserted status must carry its repository.
+	// API serialization (ToCommitStatus → APIURL) otherwise re-fetches the
+	// repository on every create — a pointless extra query that panicked live
+	// when the fetch failed under DB load.
+	require.NoError(t, unittest.PrepareTestDatabase())
+
+	repo2 := unittest.AssertExistsAndLoadBean(t, &repo_model.Repository{ID: 2})
+	user2 := unittest.AssertExistsAndLoadBean(t, &user_model.User{ID: 2})
+	gitRepo, err := gitrepo.OpenRepository(git.DefaultContext, repo2)
+	require.NoError(t, err)
+	defer gitRepo.Close()
+
+	commit, err := gitRepo.GetBranchCommit(repo2.DefaultBranch)
+	require.NoError(t, err)
+
+	defer func() {
+		_, err := db.DeleteByBean(db.DefaultContext, &git_model.CommitStatus{
+			RepoID:    repo2.ID,
+			CreatorID: user2.ID,
+			SHA:       commit.ID.String(),
+			Context:   "keeprepo/test",
+		})
+		require.NoError(t, err)
+	}()
+
+	status := &git_model.CommitStatus{
+		State:   structs.CommitStatusSuccess,
+		Context: "keeprepo/test",
+	}
+	require.NoError(t, git_model.NewCommitStatus(db.DefaultContext, git_model.NewCommitStatusOptions{
+		Repo:         repo2,
+		Creator:      user2,
+		SHA:          commit.ID,
+		CommitStatus: status,
+	}))
+	require.NotNil(t, status.Repo, "NewCommitStatus must keep the repository on the inserted object — API serialization must not need a re-fetch")
+	assert.Equal(t, repo2.ID, status.Repo.ID)
+
+	// The URL must be derivable from the kept repository without any
+	// additional lookup, and must address the status's own SHA.
+	url, err := status.APIURL(db.DefaultContext)
+	require.NoError(t, err)
+	assert.Contains(t, url, "/statuses/"+commit.ID.String())
+}
+
+func TestCommitStatusAPIURLErrorNoPanic(t *testing.T) {
+	// rezuscloud/forgejo#146: a repository that cannot load (dangling RepoID
+	// here; a transient DB failure live) must surface as an error — the
+	// pre-fix code discarded the loadAttributes error and dereferenced a nil
+	// Repository, panicking the /statuses response path.
+	require.NoError(t, unittest.PrepareTestDatabase())
+
+	status := &git_model.CommitStatus{
+		RepoID: unittest.NonexistentID,
+		SHA:    "1234123412341234123412341234123412341234",
+	}
+	_, err := status.APIURL(db.DefaultContext)
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "CommitStatus[0].APIURL")
 }

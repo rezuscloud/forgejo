@@ -77,7 +77,15 @@ func NewCommitStatus(ctx *context.APIContext) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, convert.ToCommitStatus(ctx, status))
+	apiStatus, err := convert.ToCommitStatus(ctx, status)
+	if err != nil {
+		// The status row is already written; only its serialization failed.
+		// Report the error honestly: a panic here used to return 500 with a
+		// stack trace and clients retried into duplicate writes (#146).
+		ctx.Error(http.StatusInternalServerError, "CreateCommitStatus", err)
+		return
+	}
+	ctx.JSON(http.StatusCreated, apiStatus)
 }
 
 // GetCommitStatuses returns all statuses for any given commit hash
@@ -217,7 +225,12 @@ func getCommitStatuses(ctx *context.APIContext, sha string) {
 
 	apiStatuses := make([]*api.CommitStatus, 0, len(statuses))
 	for _, status := range statuses {
-		apiStatuses = append(apiStatuses, convert.ToCommitStatus(ctx, status))
+		apiStatus, err := convert.ToCommitStatus(ctx, status)
+		if err != nil {
+			ctx.Error(http.StatusInternalServerError, "GetCommitStatuses", err)
+			return
+		}
+		apiStatuses = append(apiStatuses, apiStatus)
 	}
 
 	ctx.SetLinkHeader(int(maxResults), listOptions.PageSize)
@@ -283,7 +296,11 @@ func GetCombinedCommitStatusByRef(ctx *context.APIContext) {
 		return
 	}
 
-	combiStatus := convert.ToCombinedStatus(ctx, statuses, convert.ToRepo(ctx, repo, ctx.Repo().Permission))
+	combiStatus, err := convert.ToCombinedStatus(ctx, statuses, convert.ToRepo(ctx, repo, ctx.Repo().Permission))
+	if err != nil {
+		ctx.Error(http.StatusInternalServerError, "GetCombinedCommitStatus", err)
+		return
+	}
 
 	ctx.SetTotalCountHeader(count)
 	ctx.JSON(http.StatusOK, combiStatus)

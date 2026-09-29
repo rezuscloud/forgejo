@@ -169,9 +169,15 @@ func (status *CommitStatus) loadAttributes(ctx context.Context) (err error) {
 }
 
 // APIURL returns the absolute APIURL to this commit-status.
-func (status *CommitStatus) APIURL(ctx context.Context) string {
-	_ = status.loadAttributes(ctx)
-	return status.Repo.APIURL() + "/statuses/" + url.PathEscape(status.SHA)
+func (status *CommitStatus) APIURL(ctx context.Context) (string, error) {
+	if err := status.loadAttributes(ctx); err != nil {
+		// A transient repository-load failure must surface as an error, never
+		// as a nil dereference: live, this path panicked on POST /statuses
+		// after the row was already written, so the client retried and
+		// duplicated the write (rezuscloud/forgejo#146).
+		return "", fmt.Errorf("CommitStatus[%d].APIURL: %w", status.ID, err)
+	}
+	return status.Repo.APIURL() + "/statuses/" + url.PathEscape(status.SHA), nil
 }
 
 // LocaleString returns the locale string name of the Status
@@ -423,6 +429,12 @@ func NewCommitStatus(ctx context.Context, opts NewCommitStatusOptions) error {
 	if _, err = db.GetEngine(ctx).Insert(opts.CommitStatus); err != nil {
 		return fmt.Errorf("insert CommitStatus[%s, %s]: %w", repoPath, opts.SHA, err)
 	}
+
+	// Keep the in-memory object complete: without this, API serialization
+	// (ToCommitStatus → APIURL) re-fetches the repository on every create —
+	// a pointless extra query that also panicked live when the fetch failed
+	// under DB load (rezuscloud/forgejo#146).
+	opts.CommitStatus.Repo = opts.Repo
 
 	return committer.Commit()
 }
