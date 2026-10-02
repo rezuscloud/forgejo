@@ -214,6 +214,9 @@ func GetWorkflowFromCommit(gitRepo *git.Repository, ref, workflowID string) (*Wo
 
 	commit, err := gitRepo.GetCommit(ref)
 	if err != nil {
+		if errors.Is(err, util.ErrNotExist) {
+			return nil, util.NewInvalidArgumentErrorf("reference '%s' does not exist", ref)
+		}
 		return nil, err
 	}
 
@@ -230,7 +233,11 @@ func GetWorkflowFromCommit(gitRepo *git.Repository, ref, workflowID string) (*Wo
 		}
 	}
 	if workflowEntry == nil {
+<<<<<<< HEAD
 		return nil, util.NewNotExistErrorf("workflow %q not found", workflowID)
+=======
+		return nil, util.NewNotExistErrorf("workflow not found")
+>>>>>>> upstream/v16.0/forgejo
 	}
 
 	return &Workflow{
